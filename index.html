@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>crypto Wallet</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+</head>
+<body>
+    <div class="container">
+    <div class="logo">
+        💎
+    </div>
+        <h1>crypto Wallet</h1>
+        <p class="subtitle">
+        Connect your wallet securely
+    </p>
+        <button id="btnConnect">Connect Wallet</button>
+        <p id="alamat">Belum terhubung</p>
+    </div>
+    <div class="send-box">
+  <h3>Kirim ETH</h3>
+  <input type="text" id="toAddress" placeholder="Alamat tujuan 0x..." />
+  <input type="number" id="amount" placeholder="Jumlah ETH" step="0.001" />
+  <button id="sendBtn" class="wallet-button">Kirim</button>
+  <p id="txStatus"></p>
+  <hr style="margin:15px 0; border-color:#334155;">
+<button id="btnCekSaldo">Cek Saldo</button>
+<input id="inputHash">
+<button id="btnCekHash">Lihat Hash Transaksi</button>
+</div>
+    <script src="app.js"></script>
+</body>
+</html>

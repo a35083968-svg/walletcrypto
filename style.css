@@ -1,0 +1,148 @@
+/* ===========================
+   GLOBAL
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#0f172a,#111827,#020617);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+/* ===========================
+   CARD
+=========================== */
+
+.container{
+    width:340px;
+    background:#1e293b;
+    padding:35px;
+    border-radius:25px;
+    text-align:center;
+    box-shadow:
+    0 0 25px rgba(0,255,170,.25);
+}
+
+/* ===========================
+   JUDUL
+=========================== */
+
+h1{
+    color:#ffffff;
+    font-size:32px;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    color:#94a3b8;
+    margin-bottom:30px;
+    font-size:15px;
+}
+
+/* ===========================
+   TOMBOL
+=========================== */
+
+button{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:15px;
+    background:linear-gradient(90deg,#22c55e,#16a34a);
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+}
+
+button:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 20px #22c55e;
+}
+
+/* ===========================
+   STATUS WALLET
+=========================== */
+
+#walletAddress{
+    margin-top:25px;
+    color:#cbd5e1;
+    font-size:16px;
+    background:#334155;
+    padding:12px;
+    border-radius:10px;
+    word-break:break-word;
+}
+
+/* ===========================
+   LOGO
+=========================== */
+
+.logo{
+    width:90px;
+    height:90px;
+    margin:auto;
+    margin-bottom:20px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#22c55e,#15803d);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    font-size:40px;
+    box-shadow:0 0 20px rgba(34,197,94,.5);
+}
+
+.send-box {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #00ff88;
+  border-radius: 10px;
+}
+.send-box input {
+  width: 90%;
+  padding: 10px;
+  margin: 8px 0;
+  background: #111;
+  color: white;
+  border: 1px solid #00ff88;
+  border-radius: 5px;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media(max-width:400px){
+
+.container{
+    width:90%;
+    padding:30px;
+}
+
+h1{
+    font-size:28px;
+}
+
+button{
+    font-size:17px;
+}
+
+body{
+    padding:20px;
+}
+
+#alamat{
+    margin-bottom:15px;
+}
+
+}
