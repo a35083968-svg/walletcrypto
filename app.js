@@ -42,30 +42,34 @@ btnConnect.addEventListener("click", async () => {
     }
 });
 
-// FUNGSI UPDATE SALDO ETH + TOKEN JADI 1
 async function updateUI() {
     if (!akun ||!web3) return;
     
-    const balance = await web3.eth.getBalance(akun);
-    const saldoETH = web3.utils.fromWei(balance, 'ether');
-    
-    let html = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br>Saldo: ${parseFloat(saldoETH).toFixed(4)} ETH`;
-    
-    // baca token
-    if (cAWEUSD_ADDRESS!== "0xALAMAT_CONTRACT_cAWEUSD_DISINI") {
-        const abi = [{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"}];
-        const tokenContract = new web3.eth.Contract(abi, cAWEUSD_ADDRESS);
-        try {
-            const balanceToken = await tokenContract.methods.balanceOf(akun).call();
-            const saldoToken = balanceToken / (10 ** cAWEUSD_DECIMALS);
-            html += `<br>cAWEUSD: ${parseFloat(saldoToken).toLocaleString()} cAWEUSD`;
-        } catch (error) {
-            console.log("Gagal baca token:", error);
+    try {
+        const balance = await web3.eth.getBalance(akun);
+        const saldoETH = web3.utils.fromWei(balance, 'ether');
+        
+        let html = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br>Saldo: ${parseFloat(saldoETH).toFixed(4)} ETH`;
+        
+        // baca token - HANYA JALAN KALAU ALAMAT SUDAH DIGANTI
+        if (cAWEUSD_ADDRESS && cAWEUSD_ADDRESS !== "0xALAMAT_CONTRACT_cAWEUSD_DISINI") {
+            const abi = [{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"}];
+            const tokenContract = new web3.eth.Contract(abi, cAWEUSD_ADDRESS);
+            try {
+                const balanceToken = await tokenContract.methods.balanceOf(akun).call();
+                const saldoToken = balanceToken / (10 ** cAWEUSD_DECIMALS);
+                html += `<br>cAWEUSD: ${parseFloat(saldoToken).toLocaleString()} cAWEUSD`;
+            } catch (error) {
+                console.log("Gagal baca token:", error);
+            }
         }
+        
+        alamat.innerHTML = html;
+    } catch(err) {
+        console.log("Error updateUI:", err);
+        alamat.innerHTML = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br><span style="color:red;">Gagal ambil saldo</span>`;
     }
-    
-    alamat.innerHTML = html;
-}
+                }
 
 // KIRIM ETH
 document.getElementById('sendBtn').addEventListener('click', async () => {
