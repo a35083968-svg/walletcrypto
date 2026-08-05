@@ -10,7 +10,7 @@ const inputHash = document.getElementById("inputHash");
 const statusEl = document.getElementById("txStatus");
 
 // DATA TOKEN cAWEUSD - WAJIB GANTI DENGAN ALAMAT ASLI
-const cAWEUSD_ADDRESS = "0xALAMAT_CONTRACT_cAWEUSD_DISINI"; // <-- GANTI INI DULU
+const cAWEUSD_ADDRESS = ""; // JANGAN ISI DULU KALO BELUM PUNYA
 const cAWEUSD_DECIMALS = 18;
 
 // CONNECT WALLET
@@ -19,15 +19,8 @@ btnConnect.addEventListener("click", async () => {
         web3 = new Web3(window.ethereum);
         try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            akun = accounts[0]; // 1. AKUN DULU
+            akun = accounts[0]; // 1. AKUN DULU    
             
-            // 2. CEK JARINGAN SEPOLIA
-            const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-            if (chainId!== '0xaa36a7') { // 0xaa36a7 = Sepolia
-                alert("Ganti jaringan ke Sepolia Testnet dulu di Bitget Wallet!");
-                return;
-            }
-
             alamat.textContent = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}`;
             btnConnect.textContent = "Terhubung ✅";
             btnConnect.disabled = true;
@@ -118,7 +111,7 @@ if (parseFloat(amount) > parseFloat(web3.utils.fromWei(balance, 'ether'))) {
 });
 
 // FITUR 1: CEK SALDO
-btnCekSaldo.addEventListener('click', async () => {
+btnCekSaldo.addEventListener('click', async () => { // BENAR
   if (!akun) { statusEl.innerText = "Connect wallet dulu"; return; }
   statusEl.innerText = "Mengecek saldo...";
   await updateUI(); // CUKUP 1 INI
