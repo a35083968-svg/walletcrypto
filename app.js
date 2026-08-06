@@ -36,25 +36,23 @@ btnConnect.addEventListener("click", async () => {
 });
 
 async function updateUI() {
-    if (!akun ||!web3) return;
-    
+    if (!akun ||!web3) {
+        console.log("updateUI gagal: akun/web3 belum ada");
+        return;
+    }
     try {
+        statusEl.innerText = "Mengambil saldo..."; // biar tau jalan apa gak
         const balance = await web3.eth.getBalance(akun);
         const saldoETH = web3.utils.fromWei(balance, 'ether');
         
-        let html = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br>Saldo: ${parseFloat(saldoETH).toFixed(4)} ETH`;
+        let html = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br><b>Saldo: ${parseFloat(saldoETH).toFixed(4)} ETH</b>`;
+        alamat.innerHTML = html;
+        statusEl.innerText = ""; // kosongin status
         
-        // baca token - HANYA JALAN KALAU ALAMAT SUDAH DIGANTI
-        if (cAWEUSD_ADDRESS && cAWEUSD_ADDRESS !== "0xALAMAT_CONTRACT_cAWEUSD_DISINI") {
-            const abi = [{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"}];
-            const tokenContract = new web3.eth.Contract(abi, cAWEUSD_ADDRESS);
-            try {
-                const balanceToken = await tokenContract.methods.balanceOf(akun).call();
-                const saldoToken = balanceToken / (10 ** cAWEUSD_DECIMALS);
-                html += `<br>cAWEUSD: ${parseFloat(saldoToken).toLocaleString()} cAWEUSD`;
-            } catch (error) {
-                console.log("Gagal baca token:", error);
-            }
+    } catch(err) {
+        console.log("Error updateUI:", err);
+        alamat.innerHTML = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br><span style="color:red;">Gagal ambil saldo: ${err.message}</span>`;
+    }
         }
         
         alamat.innerHTML = html;
