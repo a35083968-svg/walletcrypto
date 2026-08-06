@@ -132,7 +132,7 @@ btnCekHash.addEventListener('click', async () => {
         Dari: ${tx.from.slice(0,6)}...${tx.from.slice(-4)} <br>
         Ke: ${tx.to.slice(0,6)}...${tx.to.slice(-4)} <br>
         Jumlah: ${web3.utils.fromWei(tx.value, 'ether')} ETH <br>
-        <a href="https://etherscan.io/tx/${tx}" target="_blank" style="color:#22c55e;">Lihat di Etherscan</a>
+        <a href="https://etherscan.io/tx/${hash}" target="_blank" style="color:#22c55e;">Lihat di Etherscan</a>
       `;
     } else {
       statusEl.innerText = "Transaksi tidak ditemukan. Mungkin masih pending";
