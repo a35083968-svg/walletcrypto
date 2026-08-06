@@ -35,25 +35,7 @@ btnConnect.addEventListener("click", async () => {
     }
 });
 
-async function updateUI() {
-    if (!akun ||!web3) {
-        console.log("updateUI gagal: akun/web3 belum ada");
-        return;
-    }
-    try {
-        statusEl.innerText = "Mengambil saldo...";
-        const balance = await web3.eth.getBalance(akun);
-        const saldoETH = web3.utils.fromWei(balance, 'ether');
-        
-        let html = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br><b>Saldo: ${parseFloat(saldoETH).toFixed(4)} ETH</b>`;
-        alamat.innerHTML = html;
-        statusEl.innerText = "";
-        
-    } catch(err) {
-        console.log("Error updateUI:", err);
-        alamat.innerHTML = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br><span style="color:red;">Gagal ambil saldo: ${err.message}</span>`;
-    }
-                }
+
         
        alamat.innerHTML = html;
     } catch(err) {
