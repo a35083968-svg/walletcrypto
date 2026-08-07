@@ -15,8 +15,7 @@ if (!btnConnect) {
     console.error("btnConnect tidak ditemukan");
 }
 
-// DATA TOKEN cAWEUSD - WAJIB GANTI DENGAN ALAMAT ASLI
-const cAWEUSD_ADDRESS = ""; // JANGAN ISI DULU KALO BELUM PUNYA
+const cAWEUSD_ADDRESS = "";
 const cAWEUSD_DECIMALS = 18;
 
 btnConnect.addEventListener("click", async () => {
