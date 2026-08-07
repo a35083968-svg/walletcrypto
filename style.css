@@ -73,14 +73,14 @@ button:hover{
    STATUS WALLET
 =========================== */
 
-#walletAddress{
-    margin-top:25px;
+#alamat{
+    margin-top:20px;
     color:#cbd5e1;
-    font-size:16px;
     background:#334155;
     padding:12px;
     border-radius:10px;
     word-break:break-word;
+    line-height:1.6;
 }
 
 /* ===========================
