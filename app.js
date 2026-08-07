@@ -9,58 +9,81 @@ const btnCekHash = document.getElementById("btnCekHash");
 const inputHash = document.getElementById("inputHash");
 const statusEl = document.getElementById("txStatus");
 
+console.log(btnConnect);
+
+if (!btnConnect) {
+    console.error("btnConnect tidak ditemukan");
+}
+
 // DATA TOKEN cAWEUSD - WAJIB GANTI DENGAN ALAMAT ASLI
 const cAWEUSD_ADDRESS = ""; // JANGAN ISI DULU KALO BELUM PUNYA
 const cAWEUSD_DECIMALS = 18;
 
-// CONNECT WALLET
 btnConnect.addEventListener("click", async () => {
-    if (typeof window.ethereum!== 'undefined') {
+
+    console.log("Connect ditekan");
+
+    if (typeof window.ethereum !== "undefined") {
+        console.log("Ethereum ditemukan");
+    } else {
+        console.log("Ethereum TIDAK ditemukan");
+    }
+
+    if (typeof window.ethereum !== 'undefined') {
         web3 = new Web3(window.ethereum);
+
         try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            akun = accounts[0]; // 1. AKUN DULU    
-            
+            const accounts = await window.ethereum.request({
+                method: 'eth_requestAccounts'
+            });
+
+            akun = accounts[0];
+
             alamat.textContent = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}`;
             btnConnect.textContent = "Terhubung ✅";
             btnConnect.disabled = true;
-            
-            await updateUI(); // 3. UPDATE SALDO + TOKEN
+
+            await updateUI();
 
         } catch (error) {
             alert("Gagal connect: " + error.message);
         }
+
     } else {
         alert("Install Bitget Wallet / MetaMask dan buka di Browser DApp");
     }
+
 });
 
 async function updateUI() {
-    if (!akun ||!web3) {
-        console.log("updateUI gagal: akun/web3 belum ada");
+    if (!akun || !web3) {
+        console.log("updateUI gagal");
         return;
     }
+
     try {
         statusEl.innerText = "Mengambil saldo...";
         const balance = await web3.eth.getBalance(akun);
-        const saldoETH = web3.utils.fromWei(balance, 'ether');
-        
-        let html = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br><b>Saldo: ${parseFloat(saldoETH).toFixed(4)} ETH</b>`;
-        alamat.innerHTML = html;
+        const saldoETH = web3.utils.fromWei(balance, "ether");
+
+        alamat.innerHTML = `
+            Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}
+            <br>
+            <b>Saldo: ${parseFloat(saldoETH).toFixed(4)} ETH</b>
+        `;
+
         statusEl.innerText = "";
-        
-    } catch(err) {
-        console.log("Error updateUI:", err);
-        alamat.innerHTML = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br><span style="color:red;">Gagal ambil saldo: ${err.message}</span>`;
+
+    } catch (err) {
+        console.log(err);
+
+        alamat.innerHTML = `
+            Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}
+            <br>
+            <span style="color:red;">Gagal mengambil saldo</span>
+        `;
     }
-  }
-        
-       alamat.innerHTML = html;
-    } catch(err) {
-        console.log("Error updateUI:", err);
-        alamat.innerHTML = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br><span style="color:red;">Gagal ambil saldo</span>`;
     }
-  }
 
 // KIRIM ETH
 document.getElementById('sendBtn').addEventListener('click', async () => {
