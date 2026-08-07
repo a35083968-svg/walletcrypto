@@ -53,14 +53,14 @@ async function updateUI() {
         console.log("Error updateUI:", err);
         alamat.innerHTML = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br><span style="color:red;">Gagal ambil saldo: ${err.message}</span>`;
     }
-                    }
+  }
         
        alamat.innerHTML = html;
     } catch(err) {
         console.log("Error updateUI:", err);
         alamat.innerHTML = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br><span style="color:red;">Gagal ambil saldo</span>`;
     }
-                }
+  }
 
 // KIRIM ETH
 document.getElementById('sendBtn').addEventListener('click', async () => {
@@ -81,10 +81,10 @@ document.getElementById('sendBtn').addEventListener('click', async () => {
   }
 const balance = await web3.eth.getBalance(akun);
 if (parseFloat(amount) > parseFloat(web3.utils.fromWei(balance, 'ether'))) {
-    statusEl.innerText = "Saldo ETH tidak cukup"; 
-    return; 
-}
-  try {
+    statusEl.innerText = "Saldo ETH tidak cukup";
+    return;
+}  // <-- INI KURUNG TUTUPNYA KEBURU
+try {
     statusEl.innerText = "Menunggu konfirmasi di Wallet...";
     const tx = await window.ethereum.request({
       method: 'eth_sendTransaction',
