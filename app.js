@@ -63,27 +63,27 @@ async function updateUI() {
 
     try {
         statusEl.innerText = "Mengambil saldo...";
+        const chainId = await web3.eth.getChainId();console.log("Chain ID:", chainId);
         const balance = await web3.eth.getBalance(akun);
         const saldoETH = web3.utils.fromWei(balance, "ether");
 
-        alamat.innerHTML = `
-            Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}
-            <br>
-            <b>Saldo: ${parseFloat(saldoETH).toFixed(4)} ETH</b>
-        `;
+    alamat.innerHTML = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br>
+        Saldo: ${saldoETH} ETH
+    `;    
 
         statusEl.innerText = "";
 
-    } catch (err) {
-        console.log(err);
+  catch (err) {
+    console.error("Error getBalance:", err);
 
-        alamat.innerHTML = `
-            Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}
-            <br>
-            <span style="color:red;">Gagal mengambil saldo</span>
-        `;
-    }
-    }
+    statusEl.innerText = err.message;
+
+    alamat.innerHTML = `
+        Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}
+        <br>
+        <span style="color:red;">Gagal mengambil saldo</span>
+    `;
+}
 
 // KIRIM ETH
 document.getElementById('sendBtn').addEventListener('click', async () => {
