@@ -68,11 +68,16 @@ async function updateUI() {
         // Debug jaringan
         const chainId = await web3.eth.getChainId();
         console.log("Chain ID:", chainId);
+        console.log("Alamat:", akun);
+        console.log("Chain:", chainId);
 
+        alert("Chain ID : " + chainId);
+        
         // Ambil saldo
         const balance = await web3.eth.getBalance(akun);
         console.log("Balance (Wei):", balance);
-
+        console.log("Wei:", balance);
+        
         const saldoETH = web3.utils.fromWei(balance, "ether");
         console.log("Saldo ETH:", saldoETH);
 
@@ -131,8 +136,10 @@ try {
     statusEl.innerText = "Menunggu konfirmasi di Wallet...";
     const tx = await window.ethereum.request({
       method: 'eth_sendTransaction',
-      params: [{ from: akun, to: to, value: '0x' + (parseFloat(amount) * 10**18).toString(16) }]
-    });
+      params: [{from: akun,to: to,value: web3.utils.toHex(
+        web3.utils.toWei(amount.toString(), "ether")
+    )
+}]
     
     statusEl.innerHTML = `
       <div style="background:#1e293b; padding:10px; border-radius:8px; margin-top:10px;">
