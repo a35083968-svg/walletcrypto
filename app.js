@@ -55,33 +55,54 @@ btnConnect.addEventListener("click", async () => {
 });
 
 async function updateUI() {
+
     if (!akun || !web3) {
         console.log("updateUI gagal");
         return;
     }
 
     try {
-        statusEl.innerText = "Mengambil saldo...";
-        const chainId = await web3.eth.getChainId();console.log("Chain ID:", chainId);
-        const balance = await web3.eth.getBalance(akun);
-        const saldoETH = web3.utils.fromWei(balance, "ether");
 
-    alamat.innerHTML = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}<br>
-        Saldo: ${saldoETH} ETH
-    `;    
+        statusEl.innerText = "Mengambil saldo...";
+
+        // Debug jaringan
+        const chainId = await web3.eth.getChainId();
+        console.log("Chain ID:", chainId);
+
+        // Ambil saldo
+        const balance = await web3.eth.getBalance(akun);
+        console.log("Balance (Wei):", balance);
+
+        const saldoETH = web3.utils.fromWei(balance, "ether");
+        console.log("Saldo ETH:", saldoETH);
+
+        // Update tampilan
+        alamat.innerHTML = `
+            <b>Alamat:</b><br>
+            ${akun.slice(0,6)}...${akun.slice(-4)}
+            <br><br>
+            <b>Saldo:</b> ${parseFloat(saldoETH).toFixed(4)} ETH
+        `;
 
         statusEl.innerText = "";
 
-  catch (err) {
-    console.error("Error getBalance:", err);
+    } catch (err) {
 
-    statusEl.innerText = err.message;
+        console.error("Error getBalance:", err);
 
-    alamat.innerHTML = `
-        Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}
-        <br>
-        <span style="color:red;">Gagal mengambil saldo</span>
-    `;
+        statusEl.innerText = err.message;
+
+        alamat.innerHTML = `
+            <b>Alamat:</b><br>
+            ${akun.slice(0,6)}...${akun.slice(-4)}
+            <br><br>
+            <span style="color:red">
+                Gagal mengambil saldo
+            </span>
+        `;
+
+    }
+
 }
 
 // KIRIM ETH
@@ -154,7 +175,7 @@ btnCekHash.addEventListener('click', async () => {
         Dari: ${tx.from.slice(0,6)}...${tx.from.slice(-4)} <br>
         Ke: ${tx.to.slice(0,6)}...${tx.to.slice(-4)} <br>
         Jumlah: ${web3.utils.fromWei(tx.value, 'ether')} ETH <br>
-        <a href="https://etherscan.io/tx/${hash}" target="_blank" style="color:#22c55e;">Lihat di Etherscan</a>
+        <a href="https://sepolia.etherscan.io/tx/${hash}" target="_blank" style="color:#22c55e;">Lihat di Etherscan</a>
       `;
     } else {
       statusEl.innerText = "Transaksi tidak ditemukan. Mungkin masih pending";
