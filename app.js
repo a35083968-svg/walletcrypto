@@ -272,11 +272,11 @@ sendBtn.addEventListener("click", async () => {
 
         console.log("Chain ID:", chainId);
 
-        // ======================================
-// CEK NETWORK - DIHAPUS BIAR BISA SEMUA JARINGAN
-// ======================================
-console.log("Chain ID:", chainId);
-// Kode cek 11155111 kita buang
+        const chainIdNum = Number(chainId);
+if (chainIdNum !== 1 && chainIdNum !== 11155111) {
+    statusEl.innerText = "Wallet harus di Ethereum Mainnet atau Sepolia Testnet.";
+    return;
+}
 
         // ======================================
         // CEK SALDO
