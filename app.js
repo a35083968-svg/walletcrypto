@@ -272,14 +272,11 @@ sendBtn.addEventListener("click", async () => {
 
         console.log("Chain ID:", chainId);
 
-        // Sepolia = 11155111
-        if (Number(chainId) !== 11155111) {
-
-            statusEl.innerText =
-                "Wallet harus berada di jaringan Sepolia.";
-
-            return;
-        }
+        // ======================================
+// CEK NETWORK - DIHAPUS BIAR BISA SEMUA JARINGAN
+// ======================================
+console.log("Chain ID:", chainId);
+// Kode cek 11155111 kita buang
 
         // ======================================
         // CEK SALDO
