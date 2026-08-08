@@ -272,9 +272,9 @@ sendBtn.addEventListener("click", async () => {
 
         console.log("Chain ID:", chainId);
 
-        const chainIdNum = Number(chainId);
-if (chainIdNum !== 1 && chainIdNum !== 11155111) {
-    statusEl.innerText = "Wallet harus di Ethereum Mainnet atau Sepolia Testnet.";
+        // Mainnet = 1
+if (Number(chainId) !== 1) {
+    statusEl.innerText = "Wallet harus berada di jaringan Ethereum Mainnet.";
     return;
 }
 
