@@ -73,7 +73,7 @@ button:hover{
    STATUS WALLET
 =========================== */
 
-#alamat{
+.alamat{
     margin-top:20px;
     color:#cbd5e1;
     background:#334155;
@@ -122,7 +122,7 @@ button:hover{
    RESPONSIVE
 =========================== */
 
-@media(max-width:400px){
+.media(max-width:400px){
 
 .container{
     width:90%;
