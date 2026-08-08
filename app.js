@@ -122,29 +122,41 @@ btnConnect.addEventListener("click", async () => {
 
 async function updateUI() {
 
-    if (!akun || !web3) {
+    console.log("========== UPDATE UI ==========");
+    console.log("akun:", akun);
+    console.log("web3:", web3);
+    console.log("alamat element:", alamat);
 
-        console.log("❌ updateUI gagal: wallet belum terhubung");
+    if (!akun) {
+        console.log("❌ akun kosong");
+        return;
+    }
 
+    if (!web3) {
+        console.log("❌ web3 kosong");
         return;
     }
 
     try {
 
-        statusEl.innerText = "Mengambil saldo...";
+        // Tampilkan alamat dahulu
+        alamat.innerHTML = `
+            <b>Alamat:</b><br>
+            ${akun.slice(0, 6)}...${akun.slice(-4)}
 
-        // Ambil Chain ID
-        const chainId = await web3.eth.getChainId();
+            <br><br>
 
-        console.log("Chain ID:", chainId);
-        console.log("Alamat:", akun);
+            <b>Saldo ETH:</b><br>
+            Mengambil saldo...
+        `;
 
-        // Ambil saldo dalam Wei
+        console.log("✅ Alamat berhasil ditampilkan");
+
+        // Ambil saldo
         const balance = await web3.eth.getBalance(akun);
 
         console.log("Balance Wei:", balance);
 
-        // Ubah Wei -> ETH
         const saldoETH = web3.utils.fromWei(
             balance,
             "ether"
@@ -152,7 +164,7 @@ async function updateUI() {
 
         console.log("Saldo ETH:", saldoETH);
 
-        // Tampilkan alamat + saldo
+        // Tampilkan saldo
         alamat.innerHTML = `
             <b>Alamat:</b><br>
             ${akun.slice(0, 6)}...${akun.slice(-4)}
@@ -163,11 +175,11 @@ async function updateUI() {
             ${parseFloat(saldoETH).toFixed(4)} ETH
         `;
 
-        statusEl.innerText = "";
+        console.log("✅ ALAMAT + SALDO BERHASIL DITAMPILKAN");
 
     } catch (error) {
 
-        console.error("❌ Error mengambil saldo:", error);
+        console.error("❌ ERROR UPDATE UI:", error);
 
         alamat.innerHTML = `
             <b>Alamat:</b><br>
@@ -181,7 +193,7 @@ async function updateUI() {
         `;
 
         statusEl.innerText =
-            "Gagal mengambil saldo: " + error.message;
+            "Error: " + error.message;
     }
 }
 
