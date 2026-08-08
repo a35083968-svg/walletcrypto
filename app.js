@@ -1,7 +1,10 @@
-let web3;
-let akun;
+let web3 = null;
+let akun = null;
 
-// Ambil element dari HTML
+// ==========================================
+// AMBIL ELEMENT HTML
+// ==========================================
+
 const btnConnect = document.getElementById("btnConnect");
 const alamat = document.getElementById("alamat");
 const btnCekSaldo = document.getElementById("btnCekSaldo");
@@ -9,55 +12,120 @@ const btnCekHash = document.getElementById("btnCekHash");
 const inputHash = document.getElementById("inputHash");
 const statusEl = document.getElementById("txStatus");
 
-console.log(btnConnect);
+const sendBtn = document.getElementById("sendBtn");
+const toAddress = document.getElementById("toAddress");
+const amountInput = document.getElementById("amount");
+
+// ==========================================
+// CEK ELEMENT
+// ==========================================
+
+console.log("btnConnect:", btnConnect);
+console.log("alamat:", alamat);
+console.log("sendBtn:", sendBtn);
+console.log("btnCekSaldo:", btnCekSaldo);
+console.log("btnCekHash:", btnCekHash);
 
 if (!btnConnect) {
-    console.error("btnConnect tidak ditemukan");
+    console.error("❌ btnConnect tidak ditemukan");
 }
+
+if (!alamat) {
+    console.error("❌ alamat tidak ditemukan");
+}
+
+if (!sendBtn) {
+    console.error("❌ sendBtn tidak ditemukan");
+}
+
+// ==========================================
+// DATA TOKEN
+// ==========================================
 
 const cAWEUSD_ADDRESS = "";
 const cAWEUSD_DECIMALS = 18;
 
+// ==========================================
+// CEK WALLET
+// ==========================================
+
+function walletTersedia() {
+    return typeof window.ethereum !== "undefined";
+}
+
+// ==========================================
+// CONNECT WALLET
+// ==========================================
+
 btnConnect.addEventListener("click", async () => {
 
-    console.log("Connect ditekan");
+    console.log("🔵 Connect Wallet ditekan");
 
-    if (typeof window.ethereum !== "undefined") {
-        console.log("Ethereum ditemukan");
-    } else {
-        console.log("Ethereum TIDAK ditemukan");
+    if (!walletTersedia()) {
+
+        console.error("❌ window.ethereum tidak ditemukan");
+
+        alert(
+            "Wallet tidak ditemukan.\n\n" +
+            "Buka website ini melalui browser/DApp browser " +
+            "MetaMask atau Bitget Wallet."
+        );
+
+        return;
     }
 
-    if (typeof window.ethereum !== 'undefined') {
+    try {
+
+        statusEl.innerText = "Menghubungkan wallet...";
+
+        // Buat Web3
         web3 = new Web3(window.ethereum);
 
-        try {
-            const accounts = await window.ethereum.request({
-                method: 'eth_requestAccounts'
-            });
+        console.log("✅ Web3 berhasil dibuat");
 
-            akun = accounts[0];
+        // Minta akses akun
+        const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts"
+        });
 
-            alamat.textContent = `Alamat: ${akun.slice(0,6)}...${akun.slice(-4)}`;
-            btnConnect.textContent = "Terhubung ✅";
-            btnConnect.disabled = true;
-
-            await updateUI();
-
-        } catch (error) {
-            alert("Gagal connect: " + error.message);
+        if (!accounts || accounts.length === 0) {
+            throw new Error("Tidak ada akun wallet yang ditemukan.");
         }
 
-    } else {
-        alert("Install Bitget Wallet / MetaMask dan buka di Browser DApp");
+        akun = accounts[0];
+
+        console.log("✅ Akun:", akun);
+
+        // Ubah tombol
+        btnConnect.textContent = "Terhubung ✅";
+        btnConnect.disabled = true;
+
+        // Ambil saldo
+        await updateUI();
+
+        statusEl.innerText = "Wallet berhasil terhubung";
+
+    } catch (error) {
+
+        console.error("❌ Gagal connect:", error);
+
+        statusEl.innerText =
+            "Gagal connect: " + error.message;
+
     }
 
 });
 
+// ==========================================
+// UPDATE ALAMAT + SALDO
+// ==========================================
+
 async function updateUI() {
 
     if (!akun || !web3) {
-        console.log("updateUI gagal");
+
+        console.log("❌ updateUI gagal: wallet belum terhubung");
+
         return;
     }
 
@@ -65,129 +133,436 @@ async function updateUI() {
 
         statusEl.innerText = "Mengambil saldo...";
 
-        // Debug jaringan
+        // Ambil Chain ID
         const chainId = await web3.eth.getChainId();
+
         console.log("Chain ID:", chainId);
         console.log("Alamat:", akun);
-        console.log("Chain:", chainId);
 
-        alert("Chain ID : " + chainId);
-        
-        // Ambil saldo
+        // Ambil saldo dalam Wei
         const balance = await web3.eth.getBalance(akun);
-        console.log("Balance (Wei):", balance);
-        console.log("Wei:", balance);
-        
-        const saldoETH = web3.utils.fromWei(balance, "ether");
+
+        console.log("Balance Wei:", balance);
+
+        // Ubah Wei -> ETH
+        const saldoETH = web3.utils.fromWei(
+            balance,
+            "ether"
+        );
+
         console.log("Saldo ETH:", saldoETH);
 
-        // Update tampilan
+        // Tampilkan alamat + saldo
         alamat.innerHTML = `
             <b>Alamat:</b><br>
-            ${akun.slice(0,6)}...${akun.slice(-4)}
+            ${akun.slice(0, 6)}...${akun.slice(-4)}
+
             <br><br>
-            <b>Saldo:</b> ${parseFloat(saldoETH).toFixed(4)} ETH
+
+            <b>Saldo ETH:</b><br>
+            ${parseFloat(saldoETH).toFixed(4)} ETH
         `;
 
         statusEl.innerText = "";
 
-    } catch (err) {
+    } catch (error) {
 
-        console.error("Error getBalance:", err);
-
-        statusEl.innerText = err.message;
+        console.error("❌ Error mengambil saldo:", error);
 
         alamat.innerHTML = `
             <b>Alamat:</b><br>
-            ${akun.slice(0,6)}...${akun.slice(-4)}
+            ${akun.slice(0, 6)}...${akun.slice(-4)}
+
             <br><br>
-            <span style="color:red">
+
+            <span style="color:red;">
                 Gagal mengambil saldo
             </span>
         `;
 
+        statusEl.innerText =
+            "Gagal mengambil saldo: " + error.message;
     }
-
 }
 
+// ==========================================
 // KIRIM ETH
-document.getElementById('sendBtn').addEventListener('click', async () => {
-  const to = document.getElementById('toAddress').value;
-  const amount = document.getElementById('amount').value;
+// ==========================================
 
-  if (!akun) { statusEl.innerText = "Connect wallet dulu"; return; }
-  if (!to ||!amount) { statusEl.innerText = "Alamat dan jumlah wajib diisi"; return; }
-  
-  // VALIDASI BARU
-  if (!web3.utils.isAddress(to)) { 
-      statusEl.innerText = "Alamat tujuan tidak valid! Harus 0x... 42 karakter"; 
-      return; 
-  }
-  if (parseFloat(amount) <= 0) { 
-      statusEl.innerText = "Jumlah ETH harus lebih dari 0"; 
-      return; 
-  }
-const balance = await web3.eth.getBalance(akun);
-if (parseFloat(amount) > parseFloat(web3.utils.fromWei(balance, 'ether'))) {
-    statusEl.innerText = "Saldo ETH tidak cukup";
-    return;
-}  // <-- INI KURUNG TUTUPNYA KEBURU
-try {
-    statusEl.innerText = "Menunggu konfirmasi di Wallet...";
-    const tx = await window.ethereum.request({
-      method: 'eth_sendTransaction',
-      params: [{from: akun,to: to,value: web3.utils.toHex(
-        web3.utils.toWei(amount.toString(), "ether")
-    )
-}]
-    
-    statusEl.innerHTML = `
-      <div style="background:#1e293b; padding:10px; border-radius:8px; margin-top:10px;">
-        ✅ Transaksi terkirim! <br>
-        <small>Hash: ${tx.slice(0,10)}...${tx.slice(-8)}</small> <br>
-        <a href="https://sepolia.etherscan.io/tx/${tx}" target="_blank" style="color:#22c55e;">Lihat di Etherscan</a>
-      </div>
-    `;
-    
-    // Kosongkan form
-    document.getElementById('toAddress').value = "";
-    document.getElementById('amount').value = "";
-    setTimeout(async () => { await updateUI(); }, 3000); // CUKUP 1 INI
-  } catch (error) {
-    statusEl.innerText = "Gagal: " + error.message;
-  }
-});
+sendBtn.addEventListener("click", async () => {
 
-// FITUR 1: CEK SALDO
-btnCekSaldo.addEventListener('click', async () => { // BENAR
-  if (!akun) { statusEl.innerText = "Connect wallet dulu"; return; }
-  statusEl.innerText = "Mengecek saldo...";
-  await updateUI(); // CUKUP 1 INI
-  statusEl.innerText = "Saldo sudah diupdate di atas";
-});
+    console.log("🟢 Tombol Kirim ditekan");
 
-// FITUR 2: LIHAT HASH TRANSAKSI
-btnCekHash.addEventListener('click', async () => {
-  const hash = inputHash.value;
-  if (!hash) { statusEl.innerText = "Masukkan Hash Transaksi dulu"; return; }
-  
-  if (!web3) web3 = new Web3(window.ethereum);
+    const to = toAddress.value.trim();
+    const amount = amountInput.value.trim();
 
-  try {
-    statusEl.innerText = "Mencari transaksi...";
-    const tx = await web3.eth.getTransaction(hash);
-    if (tx) {
-      statusEl.innerHTML = `
-        Ditemukan! <br>
-        Dari: ${tx.from.slice(0,6)}...${tx.from.slice(-4)} <br>
-        Ke: ${tx.to.slice(0,6)}...${tx.to.slice(-4)} <br>
-        Jumlah: ${web3.utils.fromWei(tx.value, 'ether')} ETH <br>
-        <a href="https://sepolia.etherscan.io/tx/${hash}" target="_blank" style="color:#22c55e;">Lihat di Etherscan</a>
-      `;
-    } else {
-      statusEl.innerText = "Transaksi tidak ditemukan. Mungkin masih pending";
+    // Wallet belum connect
+    if (!akun || !web3) {
+
+        statusEl.innerText =
+            "Connect wallet dulu";
+
+        return;
     }
-  } catch (error) {
-    statusEl.innerText = "Gagal: " + error.message;
-  }
+
+    // Input kosong
+    if (!to || !amount) {
+
+        statusEl.innerText =
+            "Alamat dan jumlah wajib diisi";
+
+        return;
+    }
+
+    // Validasi alamat
+    if (!web3.utils.isAddress(to)) {
+
+        statusEl.innerText =
+            "Alamat tujuan tidak valid.";
+
+        return;
+    }
+
+    // Validasi jumlah
+    const jumlah = Number(amount);
+
+    if (!Number.isFinite(jumlah) || jumlah <= 0) {
+
+        statusEl.innerText =
+            "Jumlah ETH harus lebih dari 0.";
+
+        return;
+    }
+
+    try {
+
+        // ======================================
+        // CEK SALDO
+        // ======================================
+
+        const balanceWei =
+            await web3.eth.getBalance(akun);
+
+        const saldoETH =
+            Number(
+                web3.utils.fromWei(
+                    balanceWei,
+                    "ether"
+                )
+            );
+
+        console.log("Saldo:", saldoETH);
+        console.log("Jumlah kirim:", jumlah);
+
+        if (jumlah >= saldoETH) {
+
+            statusEl.innerText =
+                "Saldo ETH tidak cukup. Sisakan sedikit ETH untuk biaya gas.";
+
+            return;
+        }
+
+        // ======================================
+        // UBAH ETH -> WEI
+        // ======================================
+
+        const valueWei =
+            web3.utils.toWei(
+                amount.toString(),
+                "ether"
+            );
+
+        console.log("Value Wei:", valueWei);
+
+        // ======================================
+        // KIRIM TRANSAKSI
+        // ======================================
+
+        statusEl.innerText =
+            "Menunggu konfirmasi di Wallet...";
+
+        const tx = await window.ethereum.request({
+
+            method: "eth_sendTransaction",
+
+            params: [
+                {
+                    from: akun,
+                    to: to,
+                    value: web3.utils.toHex(valueWei)
+                }
+            ]
+
+        });
+
+        console.log("Transaction Hash:", tx);
+
+        // ======================================
+        // BERHASIL
+        // ======================================
+
+        statusEl.innerHTML = `
+            <div style="
+                background:#1e293b;
+                padding:10px;
+                border-radius:8px;
+                margin-top:10px;
+            ">
+
+                ✅ Transaksi berhasil dikirim!
+
+                <br><br>
+
+                <small>
+                    Hash:
+                    ${tx.slice(0, 10)}...
+                    ${tx.slice(-8)}
+                </small>
+
+                <br><br>
+
+                <a
+                    href="https://sepolia.etherscan.io/tx/${tx}"
+                    target="_blank"
+                    style="color:#22c55e;"
+                >
+                    Lihat di Etherscan
+                </a>
+
+            </div>
+        `;
+
+        // Kosongkan input
+        toAddress.value = "";
+        amountInput.value = "";
+
+        // Update saldo setelah beberapa detik
+        setTimeout(async () => {
+
+            await updateUI();
+
+        }, 3000);
+
+    } catch (error) {
+
+        console.error("❌ Transaksi gagal:", error);
+
+        // User menolak transaksi
+        if (
+            error.code === 4001 ||
+            error.message.toLowerCase().includes("reject")
+        ) {
+
+            statusEl.innerText =
+                "Transaksi dibatalkan oleh pengguna.";
+
+        } else {
+
+            statusEl.innerText =
+                "Transaksi gagal: " +
+                error.message;
+        }
+    }
+
 });
+
+// ==========================================
+// CEK SALDO
+// ==========================================
+
+btnCekSaldo.addEventListener("click", async () => {
+
+    console.log("🔵 Cek Saldo ditekan");
+
+    if (!akun || !web3) {
+
+        statusEl.innerText =
+            "Connect wallet dulu";
+
+        return;
+    }
+
+    statusEl.innerText =
+        "Mengecek saldo...";
+
+    await updateUI();
+
+    statusEl.innerText =
+        "Saldo berhasil diperbarui.";
+
+});
+
+// ==========================================
+// LIHAT HASH TRANSAKSI
+// ==========================================
+
+btnCekHash.addEventListener("click", async () => {
+
+    const hash = inputHash.value.trim();
+
+    if (!hash) {
+
+        statusEl.innerText =
+            "Masukkan Hash Transaksi dulu.";
+
+        return;
+    }
+
+    if (!web3) {
+
+        if (!walletTersedia()) {
+
+            statusEl.innerText =
+                "Wallet belum tersedia.";
+
+            return;
+        }
+
+        web3 = new Web3(window.ethereum);
+    }
+
+    try {
+
+        statusEl.innerText =
+            "Mencari transaksi...";
+
+        const tx =
+            await web3.eth.getTransaction(hash);
+
+        if (!tx) {
+
+            statusEl.innerText =
+                "Transaksi tidak ditemukan. Mungkin masih pending.";
+
+            return;
+        }
+
+        const jumlahETH =
+            web3.utils.fromWei(
+                tx.value,
+                "ether"
+            );
+
+        statusEl.innerHTML = `
+
+            <div style="
+                background:#1e293b;
+                padding:10px;
+                border-radius:8px;
+            ">
+
+                <b>Transaksi ditemukan ✅</b>
+
+                <br><br>
+
+                Dari:
+                ${tx.from.slice(0, 6)}...
+                ${tx.from.slice(-4)}
+
+                <br>
+
+                Ke:
+                ${
+                    tx.to
+                    ? tx.to.slice(0, 6) +
+                      "..." +
+                      tx.to.slice(-4)
+                    : "Contract"
+                }
+
+                <br>
+
+                Jumlah:
+                ${jumlahETH} ETH
+
+                <br><br>
+
+                <a
+                    href="https://sepolia.etherscan.io/tx/${hash}"
+                    target="_blank"
+                    style="color:#22c55e;"
+                >
+                    Lihat di Etherscan
+                </a>
+
+            </div>
+        `;
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error mencari transaksi:",
+            error
+        );
+
+        statusEl.innerText =
+            "Gagal: " + error.message;
+    }
+
+});
+
+// ==========================================
+// JIKA AKUN WALLET BERGANTI
+// ==========================================
+
+if (walletTersedia()) {
+
+    window.ethereum.on(
+        "accountsChanged",
+        async (accounts) => {
+
+            console.log(
+                "Account berubah:",
+                accounts
+            );
+
+            if (accounts.length === 0) {
+
+                akun = null;
+                web3 = null;
+
+                btnConnect.textContent =
+                    "Connect Wallet";
+
+                btnConnect.disabled = false;
+
+                alamat.innerText =
+                    "Belum terhubung";
+
+                statusEl.innerText =
+                    "Wallet terputus";
+
+                return;
+            }
+
+            akun = accounts[0];
+
+            console.log(
+                "Akun baru:",
+                akun
+            );
+
+            await updateUI();
+        }
+    );
+
+    // ======================================
+    // JIKA NETWORK BERGANTI
+    // ======================================
+
+    window.ethereum.on(
+        "chainChanged",
+        async (chainId) => {
+
+            console.log(
+                "Network berubah:",
+                chainId
+            );
+
+            if (web3 && akun) {
+
+                await updateUI();
+            }
+        }
+    );
+}
