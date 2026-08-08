@@ -205,48 +205,81 @@ sendBtn.addEventListener("click", async () => {
 
     console.log("🟢 Tombol Kirim ditekan");
 
+    if (!akun || !web3) {
+        statusEl.innerText = "Connect wallet dulu.";
+        return;
+    }
+
     const to = toAddress.value.trim();
     const amount = amountInput.value.trim();
 
-    // Wallet belum connect
-    if (!akun || !web3) {
+    // ======================================
+    // VALIDASI INPUT
+    // ======================================
 
-        statusEl.innerText =
-            "Connect wallet dulu";
-
+    if (!to) {
+        statusEl.innerText = "Masukkan alamat tujuan.";
         return;
     }
 
-    // Input kosong
-    if (!to || !amount) {
-
-        statusEl.innerText =
-            "Alamat dan jumlah wajib diisi";
-
+    if (!amount) {
+        statusEl.innerText = "Masukkan jumlah ETH.";
         return;
     }
 
-    // Validasi alamat
+    // Validasi alamat Ethereum
     if (!web3.utils.isAddress(to)) {
-
         statusEl.innerText =
-            "Alamat tujuan tidak valid.";
-
+            "Alamat tujuan tidak valid. Harus alamat 0x...";
         return;
     }
 
     // Validasi jumlah
-    const jumlah = Number(amount);
+    let valueWei;
 
-    if (!Number.isFinite(jumlah) || jumlah <= 0) {
+    try {
+
+        valueWei = web3.utils.toWei(
+            amount,
+            "ether"
+        );
+
+    } catch (error) {
 
         statusEl.innerText =
-            "Jumlah ETH harus lebih dari 0.";
+            "Jumlah ETH tidak valid.";
 
         return;
     }
 
+    if (valueWei === "0") {
+        statusEl.innerText =
+            "Jumlah ETH harus lebih dari 0.";
+        return;
+    }
+
+    console.log("Alamat tujuan:", to);
+    console.log("Jumlah ETH:", amount);
+    console.log("Jumlah Wei:", valueWei);
+
     try {
+
+        // ======================================
+        // CEK NETWORK
+        // ======================================
+
+        const chainId = await web3.eth.getChainId();
+
+        console.log("Chain ID:", chainId);
+
+        // Sepolia = 11155111
+        if (Number(chainId) !== 11155111) {
+
+            statusEl.innerText =
+                "Wallet harus berada di jaringan Sepolia.";
+
+            return;
+        }
 
         // ======================================
         // CEK SALDO
@@ -255,59 +288,49 @@ sendBtn.addEventListener("click", async () => {
         const balanceWei =
             await web3.eth.getBalance(akun);
 
-        const saldoETH =
-            Number(
-                web3.utils.fromWei(
-                    balanceWei,
-                    "ether"
-                )
-            );
+        console.log("Saldo Wei:", balanceWei);
 
-        console.log("Saldo:", saldoETH);
-        console.log("Jumlah kirim:", jumlah);
-
-        if (jumlah >= saldoETH) {
+        if (
+            web3.utils.toBN(valueWei)
+                .gte(web3.utils.toBN(balanceWei))
+        ) {
 
             statusEl.innerText =
-                "Saldo ETH tidak cukup. Sisakan sedikit ETH untuk biaya gas.";
+                "Saldo tidak cukup. Sisakan ETH untuk biaya gas.";
 
             return;
         }
 
         // ======================================
-        // UBAH ETH -> WEI
+        // TAMPILKAN INFORMASI
         // ======================================
 
-        const valueWei =
-            web3.utils.toWei(
-                amount.toString(),
-                "ether"
-            );
-
-        console.log("Value Wei:", valueWei);
+        statusEl.innerText =
+            "Menunggu konfirmasi di wallet...";
 
         // ======================================
         // KIRIM TRANSAKSI
         // ======================================
 
-        statusEl.innerText =
-            "Menunggu konfirmasi di Wallet...";
+        const txHash =
+            await window.ethereum.request({
 
-        const tx = await window.ethereum.request({
+                method: "eth_sendTransaction",
 
-            method: "eth_sendTransaction",
+                params: [
+                    {
+                        from: akun,
+                        to: to,
+                        value: web3.utils.toHex(valueWei)
+                    }
+                ]
 
-            params: [
-                {
-                    from: akun,
-                    to: to,
-                    value: web3.utils.toHex(valueWei)
-                }
-            ]
+            });
 
-        });
-
-        console.log("Transaction Hash:", tx);
+        console.log(
+            "✅ Transaction Hash:",
+            txHash
+        );
 
         // ======================================
         // BERHASIL
@@ -316,25 +339,28 @@ sendBtn.addEventListener("click", async () => {
         statusEl.innerHTML = `
             <div style="
                 background:#1e293b;
-                padding:10px;
-                border-radius:8px;
+                padding:12px;
+                border-radius:10px;
                 margin-top:10px;
             ">
 
-                ✅ Transaksi berhasil dikirim!
+                <b>✅ Transaksi berhasil dikirim!</b>
 
                 <br><br>
 
-                <small>
-                    Hash:
-                    ${tx.slice(0, 10)}...
-                    ${tx.slice(-8)}
-                </small>
+                Jumlah:
+                ${amount} ETH
+
+                <br><br>
+
+                Hash:
+                ${txHash.slice(0,10)}...
+                ${txHash.slice(-8)}
 
                 <br><br>
 
                 <a
-                    href="https://sepolia.etherscan.io/tx/${tx}"
+                    href="https://sepolia.etherscan.io/tx/${txHash}"
                     target="_blank"
                     style="color:#22c55e;"
                 >
@@ -348,36 +374,35 @@ sendBtn.addEventListener("click", async () => {
         toAddress.value = "";
         amountInput.value = "";
 
-        // Update saldo setelah beberapa detik
-        setTimeout(async () => {
-
-            await updateUI();
-
+        // Update saldo
+        setTimeout(() => {
+            updateUI();
         }, 3000);
 
     } catch (error) {
 
-        console.error("❌ Transaksi gagal:", error);
+        console.error(
+            "❌ ERROR TRANSAKSI:",
+            error
+        );
 
         // User menolak transaksi
-        if (
-            error.code === 4001 ||
-            error.message.toLowerCase().includes("reject")
-        ) {
+        if (error.code === 4001) {
 
             statusEl.innerText =
-                "Transaksi dibatalkan oleh pengguna.";
+                "Transaksi dibatalkan di wallet.";
 
-        } else {
-
-            statusEl.innerText =
-                "Transaksi gagal: " +
-                error.message;
+            return;
         }
+
+        statusEl.innerText =
+            "Transaksi gagal: " +
+            (error.message || "Error tidak diketahui.");
+
     }
 
 });
-
+                    
 // ==========================================
 // CEK SALDO
 // ==========================================
