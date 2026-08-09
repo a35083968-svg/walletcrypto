@@ -496,27 +496,23 @@ sendBtn.addEventListener("click", async () => {
             "⏳ Mengirim permintaan transaksi..."
         );
 
-        const tx =
-            await window.ethereum.request({
+        console.log("📨 Meminta wallet membuka konfirmasi...");
+statusEl.innerText = "Membuka konfirmasi wallet...";
 
-                method:
-                    "eth_sendTransaction",
+const tx = await window.ethereum.request({
+    method: "eth_sendTransaction",
+    params: [
+        {
+            from: akun,
+            to: to,
+            value: web3.utils.toHex(valueWei)
+        }
+    ]
+});
 
-                params: [
-                    {
-                        from: akun,
+console.log("✅ Wallet mengembalikan TX Hash:", tx);
 
-                        to: to,
-
-                        value:
-                            web3.utils.toHex(
-                                valueWei
-                            )
-                    }
-                ]
-
-            });
-
+statusEl.innerText = "Transaksi berhasil dikirim!";
 
         // ==================================================
         // TRANSAKSI BERHASIL
