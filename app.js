@@ -417,106 +417,145 @@ sendBtn.addEventListener("click", async () => {
         valueWei
     );
 
-    // ==================================================
-// CEK SALDO
-// ==================================================
+// ======================================================
+// CEK NETWORK WALLET
+// ======================================================
 
 try {
 
-    const reader = buatReadProvider();
-
-    debug("📡 Mengecek saldo melalui RPC Sepolia...");
-
-    const balanceWei =
-        await reader.eth.getBalance(akun);
+    const walletChainId =
+        await web3.eth.getChainId();
 
     debug(
-        "💰 Saldo Wei: " +
-        balanceWei
+        "🌐 Wallet Chain ID: " +
+        walletChainId
     );
 
-    debug(
-        "💎 Saldo ETH: " +
-        reader.utils.fromWei(
-            balanceWei,
-            "ether"
-        )
-    );
-
-    if (
-        BigInt(valueWei) >=
-        BigInt(balanceWei)
-    ) {
+    if (Number(walletChainId) !== 11155111) {
 
         debug(
-            "❌ Saldo tidak cukup"
+            "❌ Wallet bukan Sepolia"
         );
 
         statusEl.innerText =
-            "Saldo ETH tidak cukup. Sisakan ETH untuk gas.";
+            "Ganti network wallet ke Sepolia.";
 
         return;
     }
 
-    debug("✅ Saldo cukup");
+    debug("✅ Wallet = Sepolia");
 
 } catch (error) {
 
     debug(
-        "❌ Gagal mengecek saldo: " +
+        "❌ Gagal membaca network wallet: " +
         error.message
     );
 
     statusEl.innerText =
-        "Gagal mengecek saldo: " +
-        error.message;
+        "Gagal membaca network wallet.";
 
     return;
 }
 
-    // ==================================================
-    // CEK NETWORK
-    // ==================================================
 
-    try {
+// ======================================================
+// CEK SALDO + GAS
+// ======================================================
 
-        const reader = buatReadProvider();
+try {
 
-const chainId =
-    await reader.eth.getChainId();
+    debug(
+        "⛽ Menghitung estimasi gas..."
+    );
+
+    const gasEstimate =
+        await web3.eth.estimateGas({
+            from: akun,
+            to: to,
+            value: valueWei
+        });
+
+    debug(
+        "⛽ Gas Estimate: " +
+        gasEstimate
+    );
+
+    const gasPrice =
+        await web3.eth.getGasPrice();
+
+    debug(
+        "⛽ Gas Price: " +
+        gasPrice
+    );
+
+    const estimatedGasCost =
+        BigInt(gasEstimate) *
+        BigInt(gasPrice);
+
+    debug(
+        "⛽ Perkiraan biaya gas Wei: " +
+        estimatedGasCost.toString()
+    );
+
+    const balanceWei =
+        await web3.eth.getBalance(akun);
+
+    debug(
+        "💰 Saldo wallet Wei: " +
+        balanceWei
+    );
+
+    const totalNeeded =
+        BigInt(valueWei) +
+        estimatedGasCost;
+
+    debug(
+        "💰 Total diperlukan Wei: " +
+        totalNeeded.toString()
+    );
+
+    if (
+        BigInt(balanceWei) <
+        totalNeeded
+    ) {
 
         debug(
-            "🌐 Network Chain ID: " +
-            chainId
+            "❌ Saldo tidak cukup untuk ETH + GAS"
         );
 
-        if (chainId == 11155111) {
-
-            debug(
-                "✅ Network = Sepolia"
+        const gasETH =
+            web3.utils.fromWei(
+                estimatedGasCost.toString(),
+                "ether"
             );
 
-        } else if (chainId == 1) {
+        statusEl.innerText =
+            "Saldo tidak cukup untuk membayar ETH + gas. " +
+            "Perkiraan gas: " +
+            gasETH +
+            " ETH";
 
-            debug(
-                "⚠️ Network = Ethereum Mainnet"
-            );
-
-        } else {
-
-            debug(
-                "⚠️ Network bukan Sepolia"
-            );
-        }
-
-    } catch (error) {
-
-        debug(
-            "❌ Gagal membaca network: " +
-            error.message
-        );
+        return;
     }
 
+    debug(
+        "✅ Saldo cukup untuk ETH + GAS"
+    );
+
+} catch (error) {
+
+    debug(
+        "❌ Gagal menghitung gas: " +
+        error.message
+    );
+
+    statusEl.innerText =
+        "Gagal menghitung biaya gas: " +
+        error.message;
+
+    return;
+}
 
     // ==================================================
     // KIRIM TRANSAKSI
