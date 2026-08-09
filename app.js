@@ -1,6 +1,19 @@
 let web3 = null;
+let readWeb3 = null;
 let akun = null;
 
+function buatReadProvider() {
+    if (!readWeb3) {
+        readWeb3 = new Web3(SEPOLIA_RPC);
+        debug("📡 Read RPC Sepolia berhasil dibuat");
+    }
+
+    return readWeb3;
+}
+
+// RPC khusus untuk membaca blockchain Sepolia
+const SEPOLIA_RPC =
+    "https://ethereum-sepolia-rpc.publicnode.com";
 // ======================================================
 // AMBIL ELEMENT HTML
 // ======================================================
@@ -180,26 +193,12 @@ btnConnect.addEventListener("click", async () => {
 
 });
 
-
-// ======================================================
-// UPDATE ALAMAT + SALDO
-// ======================================================
-
 async function updateUI() {
 
     debug("========== UPDATE UI ==========");
 
     if (!akun) {
-
         debug("❌ akun kosong");
-
-        return;
-    }
-
-    if (!web3) {
-
-        debug("❌ web3 kosong");
-
         return;
     }
 
@@ -208,8 +207,7 @@ async function updateUI() {
         // Tampilkan alamat terlebih dahulu
         alamat.innerHTML = `
             <b>Alamat:</b><br>
-            ${akun.slice(0, 6)}...
-            ${akun.slice(-4)}
+            ${akun.slice(0, 6)}...${akun.slice(-4)}
 
             <br><br>
 
@@ -217,24 +215,51 @@ async function updateUI() {
             Mengambil saldo...
         `;
 
-        // Chain ID
+        // Gunakan RPC khusus membaca blockchain
+        const reader = buatReadProvider();
+
+        debug("📡 Mengambil Chain ID dari RPC...");
+
         const chainId =
-            await web3.eth.getChainId();
+            await reader.eth.getChainId();
 
-        debug("🌐 Chain ID: " + chainId);
+        debug("🌐 RPC Chain ID: " + chainId);
 
-        // Saldo Wei
+        if (Number(chainId) !== 11155111) {
+
+            debug(
+                "⚠️ RPC bukan Sepolia!"
+            );
+
+            alamat.innerHTML = `
+                <b>Alamat:</b><br>
+                ${akun.slice(0, 6)}...${akun.slice(-4)}
+
+                <br><br>
+
+                <span style="color:red;">
+                    RPC bukan Sepolia
+                </span>
+            `;
+
+            return;
+        }
+
+        debug("✅ RPC = Sepolia");
+
+        // Ambil saldo
+        debug("📡 Meminta saldo dari RPC...");
+
         const balanceWei =
-            await web3.eth.getBalance(akun);
+            await reader.eth.getBalance(akun);
 
         debug(
             "💰 Balance Wei: " +
             balanceWei
         );
 
-        // Saldo ETH
         const saldoETH =
-            web3.utils.fromWei(
+            reader.utils.fromWei(
                 balanceWei,
                 "ether"
             );
@@ -244,11 +269,10 @@ async function updateUI() {
             saldoETH
         );
 
-        // Tampilkan
+        // Tampilkan saldo
         alamat.innerHTML = `
             <b>Alamat:</b><br>
-            ${akun.slice(0, 6)}...
-            ${akun.slice(-4)}
+            ${akun.slice(0, 6)}...${akun.slice(-4)}
 
             <br><br>
 
@@ -257,7 +281,7 @@ async function updateUI() {
         `;
 
         debug(
-            "✅ ALAMAT + SALDO DITAMPILKAN"
+            "✅ ALAMAT + SALDO BERHASIL DITAMPILKAN"
         );
 
     } catch (error) {
@@ -269,8 +293,7 @@ async function updateUI() {
 
         alamat.innerHTML = `
             <b>Alamat:</b><br>
-            ${akun.slice(0, 6)}...
-            ${akun.slice(-4)}
+            ${akun.slice(0, 6)}...${akun.slice(-4)}
 
             <br><br>
 
@@ -283,9 +306,7 @@ async function updateUI() {
             "Gagal mengambil saldo: " +
             error.message;
     }
-
-}
-
+    }
 
 // ======================================================
 // KIRIM ETH
@@ -396,50 +417,62 @@ sendBtn.addEventListener("click", async () => {
         valueWei
     );
 
-
     // ==================================================
-    // CEK SALDO
-    // ==================================================
+// CEK SALDO
+// ==================================================
 
-    try {
+try {
 
-        const balanceWei =
-            await web3.eth.getBalance(akun);
+    const reader = buatReadProvider();
+
+    debug("📡 Mengecek saldo melalui RPC Sepolia...");
+
+    const balanceWei =
+        await reader.eth.getBalance(akun);
+
+    debug(
+        "💰 Saldo Wei: " +
+        balanceWei
+    );
+
+    debug(
+        "💎 Saldo ETH: " +
+        reader.utils.fromWei(
+            balanceWei,
+            "ether"
+        )
+    );
+
+    if (
+        BigInt(valueWei) >=
+        BigInt(balanceWei)
+    ) {
 
         debug(
-            "💰 Saldo Wei: " +
-            balanceWei
-        );
-
-        if (
-            BigInt(valueWei) >=
-            BigInt(balanceWei)
-        ) {
-
-            debug(
-                "❌ Saldo tidak cukup"
-            );
-
-            statusEl.innerText =
-                "Saldo ETH tidak cukup. " +
-                "Sisakan ETH untuk gas.";
-
-            return;
-        }
-
-    } catch (error) {
-
-        debug(
-            "❌ Gagal mengecek saldo: " +
-            error.message
+            "❌ Saldo tidak cukup"
         );
 
         statusEl.innerText =
-            "Gagal mengecek saldo";
+            "Saldo ETH tidak cukup. Sisakan ETH untuk gas.";
 
         return;
     }
 
+    debug("✅ Saldo cukup");
+
+} catch (error) {
+
+    debug(
+        "❌ Gagal mengecek saldo: " +
+        error.message
+    );
+
+    statusEl.innerText =
+        "Gagal mengecek saldo: " +
+        error.message;
+
+    return;
+}
 
     // ==================================================
     // CEK NETWORK
@@ -447,8 +480,10 @@ sendBtn.addEventListener("click", async () => {
 
     try {
 
-        const chainId =
-            await web3.eth.getChainId();
+        const reader = buatReadProvider();
+
+const chainId =
+    await reader.eth.getChainId();
 
         debug(
             "🌐 Network Chain ID: " +
@@ -700,10 +735,10 @@ btnCekHash.addEventListener(
             statusEl.innerText =
                 "Mencari transaksi...";
 
-            const tx =
-                await web3.eth.getTransaction(
-                    hash
-                );
+            const reader = buatReadProvider();
+
+const tx =
+    await reader.eth.getTransaction(hash);
 
             if (!tx) {
 
@@ -722,10 +757,10 @@ btnCekHash.addEventListener(
             );
 
             const jumlahETH =
-                web3.utils.fromWei(
-                    tx.value,
-                    "ether"
-                );
+               reader.utils.fromWei(
+                   tx.value,
+                   "ether"
+            );
 
             statusEl.innerHTML = `
 
