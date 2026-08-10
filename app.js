@@ -30,59 +30,12 @@ const toAddress = document.getElementById("toAddress");
 const amountInput = document.getElementById("amount");
 
 // ======================================================
-// DEBUG PANEL
-// Dibuat otomatis, jadi tidak perlu menambah HTML
-// ======================================================
-
-const debugPanel = document.createElement("div");
-
-debugPanel.id = "debugPanel";
-
-debugPanel.style.cssText = `
-    position:fixed;
-    left:10px;
-    right:10px;
-    bottom:10px;
-    max-height:220px;
-    overflow-y:auto;
-    background:#020617;
-    color:#00ff88;
-    border:1px solid #00ff88;
-    border-radius:10px;
-    padding:10px;
-    font-family:monospace;
-    font-size:12px;
-    z-index:99999;
-    box-shadow:0 0 15px rgba(0,255,136,.3);
-`;
-
-debugPanel.innerHTML = `
-    <b>🛠 DEBUG PANEL</b>
-    <hr style="border-color:#334155">
-`;
-
-document.body.appendChild(debugPanel);
-
-
-// ======================================================
 // FUNGSI DEBUG
 // ======================================================
 
 function debug(message) {
-
     console.log(message);
-
-    const line = document.createElement("div");
-
-    const waktu = new Date().toLocaleTimeString();
-
-    line.textContent = `[${waktu}] ${message}`;
-
-    debugPanel.appendChild(line);
-
-    debugPanel.scrollTop = debugPanel.scrollHeight;
 }
-
 
 // ======================================================
 // CEK ELEMENT
@@ -373,22 +326,43 @@ sendBtn.addEventListener("click", async () => {
 
     debug("✅ Alamat tujuan valid");
 
+// ======================================================
+// VALIDASI JUMLAH ETH
+// ======================================================
 
-    // ==================================================
-    // VALIDASI JUMLAH
-    // ==================================================
+if (!/^\d+(\.\d+)?$/.test(amount)) {
 
-    let valueWei;
+    statusEl.innerText =
+        "Jumlah ETH tidak valid.";
 
-    try {
+    return;
+}
 
-        valueWei =
-            web3.utils.toWei(
-                amount,
-                "ether"
-            );
+let valueWei;
 
-    } catch (error) {
+try {
+
+    valueWei =
+        web3.utils.toWei(
+            amount,
+            "ether"
+        );
+
+} catch (error) {
+
+    statusEl.innerText =
+        "Jumlah ETH tidak valid.";
+
+    return;
+}
+
+if (BigInt(valueWei) <= 0n) {
+
+    statusEl.innerText =
+        "Jumlah ETH harus lebih dari 0.";
+
+    return;
+            }
 
         debug(
             "❌ Jumlah ETH tidak valid"
@@ -458,131 +432,152 @@ try {
     return;
 }
 
-
 // ======================================================
-// CEK SALDO + GAS
+// CEK SALDO
 // ======================================================
 
 try {
 
-    debug(
-        "⛽ Menghitung estimasi gas..."
-    );
-
-    const gasEstimate =
-        await web3.eth.estimateGas({
-            from: akun,
-            to: to,
-            value: valueWei
-        });
-
-    debug(
-        "⛽ Gas Estimate: " +
-        gasEstimate
-    );
-
-    const gasPrice =
-        await web3.eth.getGasPrice();
-
-    debug(
-        "⛽ Gas Price: " +
-        gasPrice
-    );
-
-    const estimatedGasCost =
-        BigInt(gasEstimate) *
-        BigInt(gasPrice);
-
-    debug(
-        "⛽ Perkiraan biaya gas Wei: " +
-        estimatedGasCost.toString()
-    );
+    debug("💰 Mengecek saldo wallet...");
 
     const balanceWei =
         await web3.eth.getBalance(akun);
 
     debug(
-        "💰 Saldo wallet Wei: " +
+        "💰 Saldo Wei: " +
         balanceWei
     );
 
-    const totalNeeded =
-        BigInt(valueWei) +
-        estimatedGasCost;
-
-    debug(
-        "💰 Total diperlukan Wei: " +
-        totalNeeded.toString()
-    );
-
-    if (
-        BigInt(balanceWei) <
-        totalNeeded
-    ) {
-
-        debug(
-            "❌ Saldo tidak cukup untuk ETH + GAS"
+    const saldoETH =
+        web3.utils.fromWei(
+            balanceWei,
+            "ether"
         );
 
-        const gasETH =
-            web3.utils.fromWei(
-                estimatedGasCost.toString(),
-                "ether"
-            );
+    debug(
+        "💰 Saldo ETH: " +
+        saldoETH
+    );
+
+    // Cadangan untuk gas
+    const GAS_BUFFER_WEI =
+        BigInt(web3.utils.toWei("0.0001", "ether"));
+
+    const totalMinimum =
+        BigInt(valueWei) +
+        GAS_BUFFER_WEI;
+
+    if (BigInt(balanceWei) < totalMinimum) {
 
         statusEl.innerText =
-            "Saldo tidak cukup untuk membayar ETH + gas. " +
-            "Perkiraan gas: " +
-            gasETH +
-            " ETH";
+            "Saldo tidak cukup. Sisakan ETH untuk gas.";
+
+        debug(
+            "❌ Saldo tidak cukup untuk ETH + gas"
+        );
 
         return;
     }
 
     debug(
-        "✅ Saldo cukup untuk ETH + GAS"
+        "✅ Saldo cukup untuk transaksi + cadangan gas"
     );
 
 } catch (error) {
 
     debug(
-        "❌ Gagal menghitung gas: " +
+        "❌ Gagal mengecek saldo: " +
         error.message
     );
 
     statusEl.innerText =
-        "Gagal menghitung biaya gas: " +
-        error.message;
+        "Gagal mengecek saldo.";
 
     return;
-}
+        }    
 
-    // ==================================================
-    // KIRIM TRANSAKSI
-    // ==================================================
+// ======================================================
+// KIRIM TRANSAKSI
+// ======================================================
 
-    try {
+try {
+
+    statusEl.innerText =
+        "Membuka konfirmasi wallet...";
+
+    debug(
+        "📨 Meminta wallet mengonfirmasi transaksi..."
+    );
+
+    const tx = await window.ethereum.request({
+        method: "eth_sendTransaction",
+        params: [
+            {
+                from: akun,
+                to: to,
+                value: web3.utils.toHex(valueWei)
+            }
+        ]
+    });
+
+    debug(
+        "✅ TX HASH: " + tx
+    );
+
+    statusEl.innerHTML = `
+        <div>
+            <b>✅ Transaksi berhasil dikirim!</b>
+            <br><br>
+
+            Hash:
+            ${tx.slice(0, 10)}...
+            ${tx.slice(-8)}
+
+            <br><br>
+
+            <a
+                href="https://sepolia.etherscan.io/tx/${tx}"
+                target="_blank"
+                style="color:#22c55e;"
+            >
+                Lihat di Etherscan
+            </a>
+        </div>
+    `;
+
+    toAddress.value = "";
+    amountInput.value = "";
+
+    setTimeout(async () => {
+        await updateUI();
+    }, 5000);
+
+} catch (error) {
+
+    console.error(error);
+
+    debug(
+        "❌ TRANSAKSI ERROR: " +
+        error.message
+    );
+
+    // User menolak transaksi
+    if (
+        error.code === 4001 ||
+        error.code === -32603 &&
+        error.message?.toLowerCase().includes("reject")
+    ) {
 
         statusEl.innerText =
-            "Menunggu konfirmasi di Wallet...";
+            "Transaksi dibatalkan.";
 
-        debug(
-            "⏳ Mengirim permintaan transaksi..."
-        );
+        return;
+    }
 
-        console.log("📨 Meminta wallet membuka konfirmasi...");
-statusEl.innerText = "Membuka konfirmasi wallet...";
-
-const tx = await window.ethereum.request({
-    method: "eth_sendTransaction",
-    params: [
-        {
-            from: akun,
-            to: to,
-            value: web3.utils.toHex(valueWei)
-        }
-    ]
-});
+    statusEl.innerText =
+        "Transaksi gagal: " +
+        (error.message || "Kesalahan tidak diketahui.");
+        }    
 
 console.log("✅ Wallet mengembalikan TX Hash:", tx);
 
@@ -671,6 +666,7 @@ statusEl.innerText = "Transaksi berhasil dikirim!";
         );
 
 
+
         // User menolak
         if (
             error.code === 4001
@@ -693,7 +689,6 @@ statusEl.innerText = "Transaksi berhasil dikirim!";
     }
 
 });
-
 
 // ======================================================
 // CEK SALDO
