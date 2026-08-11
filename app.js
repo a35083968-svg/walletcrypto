@@ -4,6 +4,7 @@
 // ======================================================
 
 let web3 = null;
+let readWeb3 = null;
 let akun = null;
 
 const SEPOLIA_CHAIN_ID = 11155111;
@@ -27,6 +28,15 @@ const statusEl =
 const btnCekSaldo =
     document.getElementById("btnCekSaldo");
 
+const sendBtn =
+    document.getElementById("sendBtn");
+
+const toAddress =
+    document.getElementById("toAddress");
+
+const amountInput =
+    document.getElementById("amount");
+
 
 // ======================================================
 // CEK AWAL
@@ -39,6 +49,9 @@ console.log("alamat:", !!alamat);
 console.log("status:", !!statusEl);
 console.log("Web3:", typeof Web3);
 console.log("ethereum:", typeof window.ethereum);
+console.log("sendBtn:", !!sendBtn);
+console.log("toAddress:", !!toAddress);
+console.log("amountInput:", !!amountInput);
 console.log("================================");
 
 
@@ -55,6 +68,18 @@ function setStatus(message) {
     }
 }
 
+function buatReadProvider() {
+
+    if (!readWeb3) {
+        readWeb3 = new Web3(SEPOLIA_RPC);
+
+        console.log(
+            "READ PROVIDER BERHASIL DIBUAT"
+        );
+    }
+
+    return readWeb3;
+}
 
 // ======================================================
 // CEK WALLET
@@ -279,26 +304,32 @@ if (btnConnect) {
                     "Mengambil saldo..."
                 );
 
+                const reader = buatReadProvider();
+
+                console.log("Meminta saldo ke RPC Sepolia...");
+                console.log("Alamat:", akun);
 
                 const balanceWei =
-                    await web3.eth.getBalance(
-                        akun
-                    );
-
-
-                const balanceETH =
-                    web3.utils.fromWei(
-                        balanceWei,
-                        "ether"
-                    );
-
-
-                console.log(
-                    "SALDO:",
-                    balanceETH
+                await reader.eth.getBalance(
+                    akun
                 );
 
+                console.log(
+                    "Balance Wei:",
+                    balanceWei
+                );
 
+                const balanceETH =
+                    reader.utils.fromWei(
+                    balanceWei,
+                    "ether"
+                );
+
+                console.log(
+                    "Balance ETH:",
+                    balanceETH
+                );
+                
                 if (alamat) {
 
                     alamat.innerHTML = `
@@ -346,22 +377,20 @@ if (btnConnect) {
                     "================================"
                 );
 
-            } catch (error) {
+                catch (error) {
 
                 console.error(
-                    "CONNECT ERROR:",
+                    "SALDO ERROR:",
                     error
                 );
 
-
                 setStatus(
-                    "Gagal connect: " +
+                    "Gagal mengambil saldo: " +
                     (
-                        error.message ||
-                        "Kesalahan tidak diketahui."
+                    error.message ||
+                    "Kesalahan tidak diketahui."
                     )
                 );
-
             }
 
         }
@@ -455,6 +484,22 @@ if (btnCekSaldo) {
 
 }
 
+// ======================================================
+// KIRIM ETH
+// ======================================================
+
+if (sendBtn) {
+
+    sendBtn.addEventListener(
+        "click",
+        async function () {
+
+            console.log("TOMBOL KIRIM DITEKAN");
+
+        }
+    );
+
+}
 
 // ======================================================
 // ACCOUNT BERUBAH
