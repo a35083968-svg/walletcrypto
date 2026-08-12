@@ -361,31 +361,30 @@ if (btnConnect) {
                     "Wallet berhasil terhubung."
                 );
 
-
                 console.log(
-                    "================================"
-                );
+    "================================"
+);
 
-                console.log(
-                    "CONNECT BERHASIL"
-                );
+console.log(
+    "CONNECT BERHASIL"
+);
 
-                console.log(
-                    "Akun:",
-                    akun
-                );
+console.log(
+    "Akun:",
+    akun
+);
 
-                console.log(
-                    "Saldo:",
-                    balanceETH
-                );
+console.log(
+    "Saldo:",
+    balanceETH
+);
 
-                console.log(
-                    "================================"
-                );
+console.log(
+    "================================"
+);
 
-                catch (error) {
-
+} catch (error) {
+                
                 console.error(
                     "SALDO ERROR:",
                     error
