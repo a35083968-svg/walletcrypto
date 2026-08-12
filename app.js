@@ -19,6 +19,11 @@ const SEPOLIA_RPC =
 const btnConnect =
     document.getElementById("btnConnect");
 
+    console.log(
+    "HASIL BTN CONNECT:",
+    btnConnect
+);
+
 const alamat =
     document.getElementById("alamat");
 
@@ -99,6 +104,8 @@ function walletTersedia() {
 // ======================================================
 
 if (btnConnect) {
+
+    console.log("EVENT CONNECT BERHASIL DIPASANG");
 
     btnConnect.addEventListener(
         "click",
