@@ -500,9 +500,14 @@ if (sendBtn) {
         "click",
         async function () {
 
-            setStatus("TOMBOL KIRIM DITEKAN");
+        const tujuan = toAddress.value.trim();
+        const jumlah = amountInput.value.trim();
 
-        }
+           setStatus(
+              "Tujuan: " + tujuan +
+              " | Jumlah: " + jumlah
+          );
+       }
     );
 
 }
