@@ -500,7 +500,7 @@ if (sendBtn) {
         "click",
         async function () {
 
-            console.log("TOMBOL KIRIM DITEKAN");
+            setStatus("TOMBOL KIRIM DITEKAN");
 
         }
     );
