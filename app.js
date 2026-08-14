@@ -107,6 +107,9 @@ if (btnConnect) {
 
     console.log("EVENT CONNECT BERHASIL DIPASANG");
 
+    alert("EVENT CONNECT TERPASANG");
+}
+
     btnConnect.addEventListener(
         "click",
         async function () {
@@ -661,6 +664,14 @@ try {
         gasEstimate
     );
 
+    const gasPrice =
+    await reader.eth.getGasPrice();
+
+console.log(
+    "Gas Price:",
+    gasPrice
+);
+
     setStatus(
         "Estimasi gas berhasil: " +
         gasEstimate
@@ -895,5 +906,3 @@ async function updateSaldo() {
 console.log(
     "Crypto Wallet JS selesai dimuat."
 );
-
-alert("APP.JS BERHASIL DIMUAT");
