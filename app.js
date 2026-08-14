@@ -500,34 +500,155 @@ if (sendBtn) {
         "click",
         async function () {
 
-        const tujuan = toAddress.value.trim();
-        const jumlah = amountInput.value.trim();
-        const nilaiJumlah = Number(jumlah);
+            // 1. Pastikan wallet sudah terhubung
+            if (!akun || !web3) {
 
-if (!Number.isFinite(nilaiJumlah) || nilaiJumlah <= 0) {
+                setStatus(
+                    "Connect wallet dulu."
+                );
 
-    setStatus("Jumlah ETH tidak valid.");
-
-    return;
-}
-
-            if (!web3.utils.isAddress(tujuan)) {
-
-    setStatus("Alamat Ethereum tidak valid.");
-
-    return;
+                return;
             }
 
-        const valueWei = web3.utils.toWei(
-              jumlah,
-               "ether"
-          );
 
-              setStatus(
-              "ETH valid. Nilai Wei: " + valueWei
-                
-          );
-       }
+            // 2. Ambil input
+            const tujuan =
+                toAddress.value.trim();
+
+            const jumlah =
+                amountInput.value.trim();
+
+            const nilaiJumlah =
+                Number(jumlah);
+
+
+            // 3. Validasi jumlah
+            if (
+                !Number.isFinite(nilaiJumlah) ||
+                nilaiJumlah <= 0
+            ) {
+
+                setStatus(
+                    "Jumlah ETH tidak valid."
+                );
+
+                return;
+            }
+
+
+            // 4. Validasi alamat
+            if (
+                !web3.utils.isAddress(tujuan)
+            ) {
+
+                setStatus(
+                    "Alamat Ethereum tidak valid."
+                );
+
+                return;
+            }
+
+
+            // 5. Konversi ETH → Wei
+            const valueWei =
+                web3.utils.toWei(
+                    jumlah,
+                    "ether"
+                );
+
+
+            console.log(
+                "Tujuan:",
+                tujuan
+            );
+
+            console.log(
+                "Jumlah ETH:",
+                jumlah
+            );
+
+            console.log(
+                "Jumlah Wei:",
+                valueWei
+            );
+
+
+            // 6. Ambil saldo akun pengirim
+            try {
+
+                setStatus(
+                    "Mengecek saldo..."
+                );
+
+
+                const balanceWei =
+                    await web3.eth.getBalance(
+                        akun
+                    );
+
+
+                console.log(
+                    "Saldo Wei:",
+                    balanceWei
+                );
+
+
+                // 7. Bandingkan saldo dengan jumlah ETH
+                const saldo =
+                    BigInt(balanceWei);
+
+                const nilaiKirim =
+                    BigInt(valueWei);
+
+
+                if (
+                    saldo <= nilaiKirim
+                ) {
+
+                    setStatus(
+                        "Saldo tidak cukup untuk mengirim ETH."
+                    );
+
+                    return;
+                }
+
+
+                // 8. Saldo cukup
+                const balanceETH =
+                    web3.utils.fromWei(
+                        balanceWei,
+                        "ether"
+                    );
+
+
+                setStatus(
+                    "Saldo cukup. Siap ke tahap estimasi gas."
+                );
+
+
+                console.log(
+                    "Saldo ETH:",
+                    balanceETH
+                );
+
+                console.log(
+                    "Saldo cukup untuk jumlah ETH."
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "CEK SALDO KIRIM ERROR:",
+                    error
+                );
+
+                setStatus(
+                    "Gagal mengecek saldo."
+                );
+
+            }
+
+        }
     );
 
 }
