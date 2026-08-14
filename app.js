@@ -635,24 +635,7 @@ if (sendBtn) {
                     "Saldo cukup untuk jumlah ETH."
                 );
 
-            } catch (error) {
-
-                console.error(
-                    "CEK SALDO KIRIM ERROR:",
-                    error
-                );
-
-                setStatus(
-                    "Gagal mengecek saldo."
-                );
-
-            }
-
-        }
-    );
-
-}
-
+                
 // ==================================================
 // TAHAP BERIKUTNYA: ESTIMASI GAS
 // ==================================================
@@ -699,7 +682,27 @@ try {
     );
 
     return;
+  }
+                
+            } catch (error) {
+
+                console.error(
+                    "CEK SALDO KIRIM ERROR:",
+                    error
+                );
+
+                setStatus(
+                    "Gagal mengecek saldo."
+                );
+
+            }
+
+        }
+    );
+
 }
+
+
 
 // ======================================================
 // ACCOUNT BERUBAH
