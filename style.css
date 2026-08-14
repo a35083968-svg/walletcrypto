@@ -5,17 +5,18 @@
     font-family:Arial, Helvetica, sans-serif;
 }
 
+/* ===========================
+   JUDUL
+=========================== */
+
 body{
     background:linear-gradient(135deg,#0f172a,#111827,#020617);
     display:flex;
+    flex-direction:column;
     justify-content:center;
     align-items:center;
     min-height:100vh;
 }
-
-/* ===========================
-   JUDUL
-=========================== */
 
 h1{
     color:#ffffff;
