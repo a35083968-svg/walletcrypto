@@ -502,6 +502,21 @@ if (sendBtn) {
 
         const tujuan = toAddress.value.trim();
         const jumlah = amountInput.value.trim();
+        const nilaiJumlah = Number(jumlah);
+
+if (!Number.isFinite(nilaiJumlah) || nilaiJumlah <= 0) {
+
+    setStatus("Jumlah ETH tidak valid.");
+
+    return;
+}
+
+            if (!web3.utils.isAddress(tujuan)) {
+
+    setStatus("Alamat Ethereum tidak valid.");
+
+    return;
+            }
 
            setStatus(
               "Tujuan: " + tujuan +
