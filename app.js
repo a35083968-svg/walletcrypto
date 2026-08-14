@@ -653,6 +653,54 @@ if (sendBtn) {
 
 }
 
+// ==================================================
+// TAHAP BERIKUTNYA: ESTIMASI GAS
+// ==================================================
+
+try {
+
+    setStatus(
+        "Menghitung estimasi gas..."
+    );
+
+    const reader =
+        buatReadProvider();
+
+    const gasEstimate =
+        await reader.eth.estimateGas({
+            from: akun,
+            to: tujuan,
+            value: valueWei
+        });
+
+    console.log(
+        "Estimasi gas:",
+        gasEstimate
+    );
+
+    setStatus(
+        "Estimasi gas berhasil: " +
+        gasEstimate
+    );
+
+} catch (error) {
+
+    console.error(
+        "ESTIMASI GAS ERROR:",
+        error
+    );
+
+    setStatus(
+        "Gagal menghitung estimasi gas: " +
+        (
+            error.message ||
+            "Kesalahan tidak diketahui."
+        )
+    );
+
+    return;
+}
+
 // ======================================================
 // ACCOUNT BERUBAH
 // ======================================================
