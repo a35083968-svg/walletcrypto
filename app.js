@@ -518,9 +518,14 @@ if (!Number.isFinite(nilaiJumlah) || nilaiJumlah <= 0) {
     return;
             }
 
-           setStatus(
-              "Tujuan: " + tujuan +
-              " | Jumlah: " + jumlah
+        const valueWei = web3.utils.toWei(
+              jumlah,
+               "ether"
+          );
+
+              setStatus(
+              "ETH valid. Nilai Wei: " + valueWei
+                
           );
        }
     );
