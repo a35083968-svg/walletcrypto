@@ -930,3 +930,5 @@ async function updateSaldo() {
 console.log(
     "Crypto Wallet JS selesai dimuat."
 );
+
+alert("APP.JS BERHASIL DIMUAT");
