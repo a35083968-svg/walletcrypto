@@ -669,6 +669,38 @@ console.log(
     gasPrice
 );
 
+// ==========================================
+// HITUNG BIAYA GAS
+// ==========================================
+
+const gasFeeWei =
+    BigInt(gasEstimate) *
+    BigInt(gasPrice);
+
+console.log(
+    "Gas Fee Wei:",
+    gasFeeWei.toString()
+);
+
+
+const gasFeeETH =
+    reader.utils.fromWei(
+        gasFeeWei.toString(),
+        "ether"
+    );
+
+console.log(
+    "Gas Fee ETH:",
+    gasFeeETH
+);
+
+
+setStatus(
+    "Gas Fee: " +
+    gasFeeETH +
+    " ETH"
+);    
+
     setStatus(
         "Estimasi gas berhasil: " +
         gasEstimate
