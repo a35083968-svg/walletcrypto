@@ -699,6 +699,36 @@ setStatus(
     "Gas Fee: " +
     gasFeeETH +
     " ETH"
+);
+
+// ==========================================
+// HITUNG TOTAL KEBUTUHAN
+// ==========================================
+
+const totalNeededWei =
+    BigInt(valueWei) +
+    gasFeeWei;
+
+const totalNeededETH =
+    reader.utils.fromWei(
+        totalNeededWei.toString(),
+        "ether"
+    );
+
+console.log(
+    "Total kebutuhan Wei:",
+    totalNeededWei.toString()
+);
+
+console.log(
+    "Total kebutuhan ETH:",
+    totalNeededETH
+);
+
+setStatus(
+    "Total diperlukan: " +
+    totalNeededETH +
+    " ETH"
 );    
 
 } catch (error) {
