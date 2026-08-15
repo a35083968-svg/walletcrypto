@@ -107,9 +107,6 @@ if (btnConnect) {
 
     console.log("EVENT CONNECT BERHASIL DIPASANG");
 
-    alert("EVENT CONNECT TERPASANG");
-}
-
     btnConnect.addEventListener(
         "click",
         async function () {
