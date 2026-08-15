@@ -701,11 +701,6 @@ setStatus(
     " ETH"
 );    
 
-    setStatus(
-        "Estimasi gas berhasil: " +
-        gasEstimate
-    );
-
 } catch (error) {
 
     console.error(
