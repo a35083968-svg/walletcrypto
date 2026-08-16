@@ -731,6 +731,23 @@ setStatus(
     " ETH"
 );    
 
+// ==========================================
+// CEK SALDO TOTAL
+// ==========================================
+
+if (BigInt(balanceWei) < totalNeededWei) {
+
+    setStatus(
+        "Saldo tidak cukup untuk jumlah ETH + biaya gas."
+    );
+
+    return;
+}
+
+setStatus(
+    "Saldo cukup untuk ETH + biaya gas."
+);
+    
 } catch (error) {
 
     console.error(
