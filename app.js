@@ -665,8 +665,16 @@ try {
     await web3.eth.getGasPrice();
 
 console.log(
-    "Gas Price dari wallet:",
+    "Gas Price Wei:",
     gasPrice
+);
+
+console.log(
+    "Gas Price ETH:",
+    web3.utils.fromWei(
+        gasPrice,
+        "ether"
+    )
 );
 
 // ==========================================
