@@ -747,6 +747,25 @@ if (BigInt(balanceWei) < totalNeededWei) {
 setStatus(
     "Saldo cukup untuk ETH + biaya gas."
 );
+
+// ==========================================
+// TAHAP BERIKUTNYA: KIRIM TRANSAKSI
+// ==========================================
+
+setStatus("Membuka konfirmasi wallet...");
+
+const tx = await window.ethereum.request({
+    method: "eth_sendTransaction",
+    params: [{
+        from: akun,
+        to: tujuan,
+        value: web3.utils.toHex(valueWei)
+    }]
+});
+
+console.log("TX HASH:", tx);
+
+setStatus("Transaksi dikirim!");    
     
 } catch (error) {
 
