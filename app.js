@@ -662,10 +662,12 @@ try {
 );
 
     const gasPrice =
-    await web3.eth.getGasPrice();
+    await window.ethereum.request({
+    method: "eth_gasPrice"
+    });
 
 console.log(
-    "Gas Price Wei:",
+    "Gas Price dari Bitget:",
     gasPrice
 );
 
@@ -769,6 +771,7 @@ const tx = await window.ethereum.request({
         to: tujuan,
         value: web3.utils.toHex(valueWei),
         gas: web3.utils.toHex(gasEstimate)
+        gasPrice: gasPrice,
     }]
 });
 
