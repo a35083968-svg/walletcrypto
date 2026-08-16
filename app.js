@@ -657,15 +657,15 @@ try {
         });
 
     console.log(
-        "Estimasi gas:",
-        gasEstimate
-    );
+    "Estimasi gas dari wallet:",
+    gasEstimate
+);
 
     const gasPrice =
     await reader.eth.getGasPrice();
 
 console.log(
-    "Gas Price:",
+    "Gas Price dari wallet:",
     gasPrice
 );
 
