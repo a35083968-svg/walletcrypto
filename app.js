@@ -650,7 +650,7 @@ try {
         buatReadProvider();
 
     const gasEstimate =
-        await reader.eth.estimateGas({
+        await web3.eth.estimateGas({
             from: akun,
             to: tujuan,
             value: valueWei
