@@ -770,8 +770,8 @@ const tx = await window.ethereum.request({
         from: akun,
         to: tujuan,
         value: web3.utils.toHex(valueWei),
-        gas: web3.utils.toHex(gasEstimate)
-        gasPrice: gasPrice,
+        gas: web3.utils.toHex(gasEstimate),
+        gasPrice: gasPrice
     }]
 });
 
