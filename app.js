@@ -762,6 +762,31 @@ setStatus(
 // TAHAP BERIKUTNYA: KIRIM TRANSAKSI
 // ==========================================
 
+const walletBalanceWei =
+    await window.ethereum.request({
+        method: "eth_getBalance",
+        params: [akun, "latest"]
+    });
+
+console.log(
+    "SALDO LANGSUNG DARI WALLET:",
+    walletBalanceWei
+);
+
+console.log(
+    "SALDO WALLET ETH:",
+    web3.utils.fromWei(
+        walletBalanceWei,
+        "ether"
+    )
+);
+
+console.log(
+    "JUMLAH YANG AKAN DIKIRIM:",
+    jumlah,
+    "ETH"
+);
+    
 setStatus("Membuka konfirmasi wallet...");
 
 const tx = await window.ethereum.request({
