@@ -662,7 +662,7 @@ try {
 );
 
     const gasPrice =
-    await reader.eth.getGasPrice();
+    await web3.eth.getGasPrice();
 
 console.log(
     "Gas Price dari wallet:",
