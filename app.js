@@ -768,6 +768,18 @@ const walletBalanceWei =
         params: [akun, "latest"]
     });
 
+const walletBalanceETH =
+    web3.utils.fromWei(
+        walletBalanceWei,
+        "ether"
+    );
+
+setStatus(
+    "Saldo wallet sebenarnya: " +
+    walletBalanceETH +
+    " ETH"
+);    
+
 console.log(
     "SALDO LANGSUNG DARI WALLET:",
     walletBalanceWei
