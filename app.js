@@ -774,6 +774,27 @@ const walletBalanceETH =
         "ether"
     );
 
+const walletChainId =
+    await window.ethereum.request({
+        method: "eth_chainId"
+    });
+
+console.log(
+    "CHAIN ID WALLET:",
+    walletChainId
+);
+
+console.log(
+    "AKUN YANG DIGUNAKAN:",
+    akun
+);
+
+console.log(
+    "SALDO WALLET:",
+    walletBalanceETH,
+    "ETH"
+);    
+
 setStatus(
     "Saldo wallet sebenarnya: " +
     walletBalanceETH +
