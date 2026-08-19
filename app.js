@@ -935,20 +935,35 @@ setStatus("Transaksi dikirim!");
 } catch (error) {
 
     console.error(
-        "ESTIMASI GAS ERROR:",
+        "TRANSAKSI ERROR OBJECT:",
         error
     );
 
+    console.log(
+        "TRANSAKSI ERROR MESSAGE:",
+        error?.message
+    );
+
+    console.log(
+        "TRANSAKSI ERROR CODE:",
+        error?.code
+    );
+
+    console.log(
+        "TRANSAKSI ERROR DATA:",
+        error?.data
+    );
+
     setStatus(
-        "Gagal menghitung estimasi gas: " +
+        "Transaksi gagal: " +
         (
-            error.message ||
-            "Kesalahan tidak diketahui."
+            error?.message ||
+            "Error tidak diketahui."
         )
     );
 
     return;
-  }
+        }
                 
             } catch (error) {
 
