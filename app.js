@@ -918,13 +918,14 @@ console.log(
     
 setStatus("Membuka konfirmasi wallet...");
 
+console.log("MENGIRIM REQUEST TRANSAKSI");    
+
 const tx = await window.ethereum.request({
     method: "eth_sendTransaction",
     params: [{
         from: akun,
         to: tujuan,
-        value: web3.utils.toHex(valueWei),
-        gas: web3.utils.toHex(gasEstimate)
+        value: web3.utils.toHex(valueWei)
     }]
 });
 
