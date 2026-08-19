@@ -920,18 +920,42 @@ setStatus("Membuka konfirmasi wallet...");
 
 console.log("MENGIRIM REQUEST TRANSAKSI");    
 
-const tx = await window.ethereum.request({
+const provider =
+    window.bitkeep?.ethereum ||
+    window.ethereum;
+
+console.log(
+    "PROVIDER TRANSAKSI:",
+    provider
+);
+
+console.log(
+    "PROVIDER ACTIVE ADDRESS:",
+    provider?.selectedAddress
+);
+
+console.log(
+    "AKUN KITA:",
+    akun
+);
+
+const tx = await provider.request({
     method: "eth_sendTransaction",
     params: [{
-        from: akun,
+        from: provider.selectedAddress || akun,
         to: tujuan,
         value: web3.utils.toHex(valueWei)
     }]
 });
 
-console.log("TX HASH:", tx);
+console.log(
+    "TX HASH:",
+    tx
+);
 
-setStatus("Transaksi dikirim!");    
+setStatus(
+    "Transaksi dikirim!"
+);    
     
 } catch (error) {
 
