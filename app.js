@@ -920,17 +920,43 @@ setStatus("Membuka konfirmasi wallet...");
 
 console.log("MENGIRIM REQUEST TRANSAKSI");    
 
-const provider =
-    window.bitkeep?.ethereum ||
-    window.ethereum;
+console.log("========== DEBUG PROVIDER ==========");
 
 console.log(
-    "PROVIDER TRANSAKSI:",
+    "window.bitkeep:",
+    window.bitkeep
+);
+
+console.log(
+    "window.bitkeep.ethereum:",
+    window.bitkeep?.ethereum
+);
+
+console.log(
+    "window.ethereum:",
+    window.ethereum
+);
+
+console.log(
+    "BITKEEP SELECTED ADDRESS:",
+    window.bitkeep?.ethereum?.selectedAddress
+);
+
+console.log(
+    "ETHEREUM SELECTED ADDRESS:",
+    window.ethereum?.selectedAddress
+);
+
+const provider =
+    window.bitkeep?.ethereum;
+
+console.log(
+    "PROVIDER YANG AKAN DIPAKAI:",
     provider
 );
 
 console.log(
-    "PROVIDER ACTIVE ADDRESS:",
+    "PROVIDER SELECTED ADDRESS:",
     provider?.selectedAddress
 );
 
@@ -938,6 +964,16 @@ console.log(
     "AKUN KITA:",
     akun
 );
+
+console.log(
+    "===================================="
+);
+
+setStatus(
+    "DEBUG PROVIDER SELESAI. BELUM MENGIRIM TRANSAKSI."
+);
+
+return;
 
 const tx = await provider.request({
     method: "eth_sendTransaction",
