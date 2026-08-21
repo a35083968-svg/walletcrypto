@@ -1022,19 +1022,28 @@ console.log(
 );
 
 setStatus(
-    "DEBUG AKUN PROVIDER SELESAI. BELUM MENGIRIM TRANSAKSI."
+    "Membuka konfirmasi wallet..."
 );
 
-return;
+console.log(
+    "MENGIRIM TRANSAKSI DENGAN AKUN PROVIDER:"
+);
 
-const tx = await provider.request({
-    method: "eth_sendTransaction",
-    params: [{
-        from: provider.selectedAddress || akun,
-        to: tujuan,
-        value: web3.utils.toHex(valueWei)
-    }]
-});
+console.log(
+    providerAccount
+);
+
+const tx =
+    await provider.request({
+        method: "eth_sendTransaction",
+
+        params: [{
+            from: providerAccount,
+            to: tujuan,
+            value: web3.utils.toHex(valueWei),
+            gas: web3.utils.toHex(gasEstimate)
+        }]
+    });
 
 console.log(
     "TX HASH:",
@@ -1042,8 +1051,8 @@ console.log(
 );
 
 setStatus(
-    "Transaksi dikirim!"
-);    
+    "Transaksi berhasil dikirim."
+);
     
 } catch (error) {
 
@@ -1095,8 +1104,6 @@ setStatus(
     );
 
 }
-
-
 
 // ======================================================
 // ACCOUNT BERUBAH
