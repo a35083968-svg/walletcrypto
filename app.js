@@ -279,6 +279,20 @@ if (btnConnect) {
                     akun
                 );
 
+                // ==========================================
+// INISIALISASI PROVIDER BITGET
+// ==========================================
+
+if (window.bitkeep?.ethereum) {
+
+    await window.bitkeep.ethereum.enable();
+
+    console.log(
+        "BITGET SELECTED ADDRESS SETELAH ENABLE:",
+        window.bitkeep.ethereum.selectedAddress
+    );
+
+}
 
                 // --------------------------------------
                 // CEK NETWORK
