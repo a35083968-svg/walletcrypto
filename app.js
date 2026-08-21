@@ -457,7 +457,7 @@ if (btnConnect) {
                     "Wallet berhasil terhubung."
                 );
 
-                console.log(
+console.log(
     "================================"
 );
 
@@ -951,26 +951,78 @@ const provider =
     window.bitkeep?.ethereum;
 
 console.log(
-    "PROVIDER YANG AKAN DIPAKAI:",
+    "PROVIDER YANG DIPAKAI:",
     provider
 );
 
+if (!provider) {
+    throw new Error(
+        "Provider Bitget tidak ditemukan."
+    );
+}
+
+// ------------------------------------------
+// CEK AKUN LANGSUNG DARI PROVIDER
+// ------------------------------------------
+
+const providerAccounts =
+    await provider.request({
+        method: "eth_accounts"
+    });
+
 console.log(
-    "PROVIDER SELECTED ADDRESS:",
-    provider?.selectedAddress
+    "AKUN DARI PROVIDER:",
+    providerAccounts
 );
 
 console.log(
-    "AKUN KITA:",
+    "AKUN DARI APLIKASI:",
     akun
 );
 
+// ------------------------------------------
+// CEK CHAIN DARI PROVIDER
+// ------------------------------------------
+
+const providerChainId =
+    await provider.request({
+        method: "eth_chainId"
+    });
+
 console.log(
-    "===================================="
+    "CHAIN ID DARI PROVIDER:",
+    providerChainId
+);
+
+// ------------------------------------------
+// BANDINKAN AKUN
+// ------------------------------------------
+
+if (
+    !providerAccounts ||
+    providerAccounts.length === 0
+) {
+    throw new Error(
+        "Provider tidak mengembalikan akun aktif."
+    );
+}
+
+const providerAccount =
+    providerAccounts[0];
+
+console.log(
+    "AKUN PROVIDER:",
+    providerAccount
+);
+
+console.log(
+    "AKUN SAMA:",
+    providerAccount.toLowerCase() ===
+    akun.toLowerCase()
 );
 
 setStatus(
-    "DEBUG PROVIDER SELESAI. BELUM MENGIRIM TRANSAKSI."
+    "DEBUG AKUN PROVIDER SELESAI. BELUM MENGIRIM TRANSAKSI."
 );
 
 return;
