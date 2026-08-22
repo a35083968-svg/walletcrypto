@@ -776,15 +776,26 @@ console.log(
     txProvider
 );
 
+const providerGasPrice =
+    await txProvider.request({
+        method: "eth_gasPrice"
+    });
+
+console.log(
+    "GAS PRICE DARI PROVIDER BITGET:",
+    providerGasPrice
+);
+
 const gasEstimateHex =
     await txProvider.request({
         method: "eth_estimateGas",
         params: [{
             from: akun,
             to: tujuan,
-            value: web3.utils.toHex(valueWei)
+            value: web3.utils.toHex(valueWei),
+            gasPrice: providerGasPrice
         }]
-    });
+    });    
 
 console.log(
     "ESTIMASI GAS DARI PROVIDER BITGET:",
