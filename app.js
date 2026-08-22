@@ -756,15 +756,48 @@ try {
         "Menghitung estimasi gas..."
     );
 
-    const reader =
-        buatReadProvider();
+    // ==========================================
+// ESTIMASI GAS DARI PROVIDER YANG SAMA
+// DENGAN PROVIDER TRANSAKSI
+// ==========================================
 
-    const gasEstimate =
-        await web3.eth.estimateGas({
+const txProvider =
+    window.bitkeep?.ethereum ||
+    window.ethereum;
+
+if (!txProvider) {
+    throw new Error(
+        "Provider transaksi tidak ditemukan."
+    );
+}
+
+console.log(
+    "PROVIDER UNTUK ESTIMASI:",
+    txProvider
+);
+
+const gasEstimateHex =
+    await txProvider.request({
+        method: "eth_estimateGas",
+        params: [{
             from: akun,
             to: tujuan,
-            value: valueWei
-        });
+            value: web3.utils.toHex(valueWei)
+        }]
+    });
+
+console.log(
+    "ESTIMASI GAS DARI PROVIDER BITGET:",
+    gasEstimateHex
+);
+
+const gasEstimate =
+    BigInt(gasEstimateHex);
+
+console.log(
+    "ESTIMASI GAS DECIMAL:",
+    gasEstimate.toString()
+);
 
     console.log(
     "Estimasi gas dari wallet:",
