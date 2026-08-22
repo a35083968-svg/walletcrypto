@@ -759,12 +759,76 @@ try {
     // ==========================================
 // ESTIMASI GAS DARI PROVIDER YANG SAMA
 // DENGAN PROVIDER TRANSAKSI
-// ==========================================
+// ==========================================    
 
 const txProvider =
     window.bitkeep?.ethereum ||
     window.ethereum;
 
+const providerAccounts =
+    await txProvider.request({
+        method: "eth_accounts"
+    });
+
+const providerBalanceWei =
+    await txProvider.request({
+        method: "eth_getBalance",
+        params: [akun, "latest"]
+    });
+
+const providerChain =
+    await txProvider.request({
+        method: "eth_chainId"
+    });
+
+console.log(
+    "=== DIAGNOSIS PROVIDER ESTIMASI ==="
+);
+
+console.log(
+    "AKUN APLIKASI:",
+    akun
+);
+
+console.log(
+    "AKUN PROVIDER:",
+    providerAccounts
+);
+
+console.log(
+    "SALDO PROVIDER WEI:",
+    providerBalanceWei
+);
+
+console.log(
+    "SALDO PROVIDER ETH:",
+    web3.utils.fromWei(
+        providerBalanceWei,
+        "ether"
+    )
+);
+
+console.log(
+    "CHAIN PROVIDER:",
+    providerChain
+);
+
+console.log(
+    "AKUN SAMA:",
+    providerAccounts[0]?.toLowerCase() ===
+    akun.toLowerCase()
+);
+
+console.log(
+    "SALDO DARI WEB3:",
+    balanceWei
+);
+
+console.log(
+    "SALDO PROVIDER:",
+    providerBalanceWei
+);    
+    
 if (!txProvider) {
     throw new Error(
         "Provider transaksi tidak ditemukan."
@@ -792,8 +856,7 @@ const gasEstimateHex =
         params: [{
             from: akun,
             to: tujuan,
-            value: web3.utils.toHex(valueWei),
-            gasPrice: providerGasPrice
+            value: web3.utils.toHex(valueWei)
         }]
     });    
 
