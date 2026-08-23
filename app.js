@@ -765,18 +765,18 @@ const txProvider =
     window.bitkeep?.ethereum ||
     window.ethereum;
 
-const providerAccounts =
+const diagnosticAccounts =
     await txProvider.request({
         method: "eth_accounts"
     });
 
-const providerBalanceWei =
+const diagnosticBalanceWei =
     await txProvider.request({
         method: "eth_getBalance",
         params: [akun, "latest"]
     });
 
-const providerChain =
+const diagnosticChain =
     await txProvider.request({
         method: "eth_chainId"
     });
@@ -792,42 +792,42 @@ console.log(
 
 console.log(
     "AKUN PROVIDER:",
-    providerAccounts
+    diagnosticAccounts
 );
 
 console.log(
     "SALDO PROVIDER WEI:",
-    providerBalanceWei
+    diagnosticBalanceWei
 );
 
 console.log(
     "SALDO PROVIDER ETH:",
     web3.utils.fromWei(
-        providerBalanceWei,
+        diagnosticBalanceWei,
         "ether"
     )
 );
 
 console.log(
     "CHAIN PROVIDER:",
-    providerChain
+    diagnosticChain
 );
 
 console.log(
     "AKUN SAMA:",
-    providerAccounts[0]?.toLowerCase() ===
+    diagnosticAccounts[0]?.toLowerCase() ===
     akun.toLowerCase()
 );
 
 console.log(
+    "SALDO PROVIDER:",
+    diagnosticBalanceWei
+);        
+    
+console.log(
     "SALDO DARI WEB3:",
     balanceWei
 );
-
-console.log(
-    "SALDO PROVIDER:",
-    providerBalanceWei
-);    
     
 if (!txProvider) {
     throw new Error(
