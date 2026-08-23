@@ -756,146 +756,34 @@ try {
         "Menghitung estimasi gas..."
     );
 
-    // ==========================================
-// ESTIMASI GAS DARI PROVIDER YANG SAMA
-// DENGAN PROVIDER TRANSAKSI
-// ==========================================    
+// ==========================================
+// ESTIMASI GAS DARI PUBLICNODE RPC
+// ==========================================
 
-const txProvider =
-    window.bitkeep?.ethereum ||
-    window.ethereum;
-
-const diagnosticAccounts =
-    await txProvider.request({
-        method: "eth_accounts"
-    });
-
-const diagnosticBalanceWei =
-    await txProvider.request({
-        method: "eth_getBalance",
-        params: [akun, "latest"]
-    });
-
-const diagnosticChain =
-    await txProvider.request({
-        method: "eth_chainId"
-    });
+const reader =
+    buatReadProvider();
 
 console.log(
-    "=== DIAGNOSIS PROVIDER ESTIMASI ==="
-);
-
-console.log(
-    "AKUN APLIKASI:",
-    akun
-);
-
-console.log(
-    "AKUN PROVIDER:",
-    diagnosticAccounts
-);
-
-console.log(
-    "SALDO PROVIDER WEI:",
-    diagnosticBalanceWei
-);
-
-console.log(
-    "SALDO PROVIDER ETH:",
-    web3.utils.fromWei(
-        diagnosticBalanceWei,
-        "ether"
-    )
-);
-
-console.log(
-    "CHAIN PROVIDER:",
-    diagnosticChain
-);
-
-console.log(
-    "AKUN SAMA:",
-    diagnosticAccounts[0]?.toLowerCase() ===
-    akun.toLowerCase()
-);
-
-console.log(
-    "SALDO PROVIDER:",
-    diagnosticBalanceWei
-);        
-    
-console.log(
-    "SALDO DARI WEB3:",
-    balanceWei
-);
-    
-if (!txProvider) {
-    throw new Error(
-        "Provider transaksi tidak ditemukan."
-    );
-}
-
-console.log(
-    "PROVIDER UNTUK ESTIMASI:",
-    txProvider
-);
-
-const providerGasPrice =
-    await txProvider.request({
-        method: "eth_gasPrice"
-    });
-
-console.log(
-    "GAS PRICE DARI PROVIDER BITGET:",
-    providerGasPrice
-);
-
-const gasEstimateHex =
-    await txProvider.request({
-        method: "eth_estimateGas",
-        params: [{
-            from: akun,
-            to: tujuan,
-            value: web3.utils.toHex(valueWei)
-        }]
-    });    
-
-console.log(
-    "ESTIMASI GAS DARI PROVIDER BITGET:",
-    gasEstimateHex
+    "PROVIDER UNTUK ESTIMASI: PUBLICNODE RPC"
 );
 
 const gasEstimate =
-    BigInt(gasEstimateHex);
+    await reader.eth.estimateGas({
+        from: akun,
+        to: tujuan,
+        value: valueWei
+    });
+
+console.log(
+    "ESTIMASI GAS DARI RPC SEPOLIA:",
+    gasEstimate
+);
 
 console.log(
     "ESTIMASI GAS DECIMAL:",
     gasEstimate.toString()
 );
-
-    console.log(
-    "Estimasi gas dari wallet:",
-    gasEstimate
-);
-
-    const gasPrice =
-    await window.ethereum.request({
-    method: "eth_gasPrice"
-    });
-
-console.log(
-    "Gas Price dari Bitget:",
-    gasPrice
-);
-
-console.log(
-    "Gas Price ETH:",
-    web3.utils.fromWei(
-        gasPrice,
-        "ether"
-    )
-);
-
+    
 // ==========================================
 // HITUNG BIAYA GAS
 // ==========================================
