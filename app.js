@@ -783,6 +783,22 @@ console.log(
     "ESTIMASI GAS DECIMAL:",
     gasEstimate.toString()
 );
+
+const gasPrice =
+    await reader.eth.getGasPrice();
+
+console.log(
+    "GAS PRICE DARI PUBLICNODE RPC:",
+    gasPrice
+);
+
+console.log(
+    "GAS PRICE ETH:",
+    reader.utils.fromWei(
+        gasPrice,
+        "ether"
+    )
+);    
     
 // ==========================================
 // HITUNG BIAYA GAS
