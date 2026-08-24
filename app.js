@@ -1068,6 +1068,10 @@ console.log(
     txGasPrice
 );
 
+const tx =
+    await provider.request({
+        method: "eth_sendTransaction",    
+    
         params: [{
             from: providerAccount,
             to: tujuan,
