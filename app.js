@@ -1058,14 +1058,22 @@ console.log(
     providerAccount
 );
 
-const tx =
+const txGasPrice =
     await provider.request({
-        method: "eth_sendTransaction",
+        method: "eth_gasPrice"
+    });
+
+console.log(
+    "GAS PRICE DARI PROVIDER TRANSAKSI:",
+    txGasPrice
+);
 
         params: [{
             from: providerAccount,
             to: tujuan,
-            value: web3.utils.toHex(valueWei)            
+            value: web3.utils.toHex(valueWei),
+            gas: web3.utils.toHex(gasEstimate),
+            gasPrice: txGasPrice
         }]
     });
 
