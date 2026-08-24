@@ -1065,8 +1065,7 @@ const tx =
         params: [{
             from: providerAccount,
             to: tujuan,
-            value: web3.utils.toHex(valueWei),
-            gas: web3.utils.toHex(gasEstimate)
+            value: web3.utils.toHex(valueWei)            
         }]
     });
 
