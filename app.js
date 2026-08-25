@@ -246,11 +246,35 @@ if (btnConnect) {
                 // MINTA AKUN
                 // --------------------------------------
 
-                const accounts =
-                    await window.ethereum.request({
-                        method:
-                            "eth_requestAccounts"
-                    });
+                const walletProvider =
+    window.bitkeep?.ethereum ||
+    window.ethereum;
+
+console.log(
+    "PROVIDER CONNECT:",
+    walletProvider
+);
+
+if (!walletProvider) {
+    throw new Error(
+        "Provider wallet tidak ditemukan."
+    );
+}
+
+if (window.bitkeep?.ethereum) {
+
+    await window.bitkeep.ethereum.enable();
+
+    console.log(
+        "BITGET PROVIDER AKTIF"
+    );
+}
+
+const accounts =
+    await walletProvider.request({
+        method:
+            "eth_requestAccounts"
+    });
 
 
                 console.log(
@@ -304,7 +328,7 @@ if (window.bitkeep?.ethereum) {
 
 
                 const chainIdHex =
-                    await window.ethereum.request({
+                    await walletProvider..request({
                         method:
                             "eth_chainId"
                     });
@@ -372,7 +396,7 @@ if (window.bitkeep?.ethereum) {
 
                 web3 =
                     new Web3(
-                        window.ethereum
+                        walletProvider
                     );
 
 
