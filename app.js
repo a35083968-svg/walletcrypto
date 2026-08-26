@@ -1092,6 +1092,11 @@ console.log(
     txGasPrice
 );
 
+console.log(
+    "MENGIRIM TRANSAKSI DENGAN AKUN PROVIDER:",
+    providerAccount
+);    
+
 const tx =
     await provider.request({
         method: "eth_sendTransaction",    
@@ -1100,11 +1105,9 @@ const tx =
             from: providerAccount,
             to: tujuan,
             value: web3.utils.toHex(valueWei),
-            gas: web3.utils.toHex(gasEstimate),
-            gasPrice: txGasPrice
+            gas: web3.utils.toHex(gasEstimate)            
         }]
     });
-
 console.log(
     "TX HASH:",
     tx
