@@ -328,7 +328,7 @@ if (window.bitkeep?.ethereum) {
 
 
                 const chainIdHex =
-                    await walletProvider..request({
+                    await walletProvider.request({
                         method:
                             "eth_chainId"
                     });
