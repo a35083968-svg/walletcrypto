@@ -1113,8 +1113,69 @@ console.log(
 );
 
 setStatus(
-    "Transaksi berhasil dikirim."
+    "Transaksi dikirim. Menunggu konfirmasi..."
 );
+
+// ==========================================
+// TUNGGU KONFIRMASI TRANSAKSI
+// ==========================================
+
+let receipt = null;
+
+while (receipt === null) {
+
+    await new Promise(function(resolve) {
+        setTimeout(resolve, 2000);
+    });
+
+    receipt =
+        await web3.eth.getTransactionReceipt(tx);
+
+    console.log(
+        "CEK RECEIPT:",
+        receipt
+    );
+}
+
+// ==========================================
+// HASIL TRANSAKSI
+// ==========================================
+
+if (
+    receipt.status === true ||
+    receipt.status === "0x1" ||
+    receipt.status === 1 ||
+    receipt.status === "1"
+) {
+
+    console.log(
+        "TRANSAKSI SUDAH DIKONFIRMASI"
+    );
+
+    console.log(
+        "BLOCK NUMBER:",
+        receipt.blockNumber
+    );
+
+    console.log(
+        "TRANSACTION HASH:",
+        tx
+    );
+
+    setStatus(
+        "Transaksi berhasil dikonfirmasi ✅"
+    );
+
+} else {
+
+    console.error(
+        "TRANSAKSI MASUK BLOK TETAPI GAGAL"
+    );
+
+    setStatus(
+        "Transaksi gagal saat diproses blockchain."
+    );
+                }
     
 } catch (error) {
 
