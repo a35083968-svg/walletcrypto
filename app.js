@@ -1129,7 +1129,7 @@ while (receipt === null) {
     });
 
     receipt =
-        await web3.eth.getTransactionReceipt(tx);
+        reader.eth.getTransactionReceipt(tx);
 
     console.log(
         "CEK RECEIPT:",
