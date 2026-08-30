@@ -1192,6 +1192,11 @@ if (Number(receipt.status) === 1) {
     );
 
     console.log(
+    "DETAIL ERROR JSON:",
+        JSON.stringify(error, null, 2)
+    );
+
+    console.log(
         "TRANSAKSI ERROR MESSAGE:",
         error?.message
     );
