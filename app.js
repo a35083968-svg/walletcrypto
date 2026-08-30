@@ -1153,7 +1153,7 @@ while (receipt === null) {
 // HASIL TRANSAKSI
 // ==========================================
 
-if (Number(receipt.status) === 1)
+if (Number(receipt.status) === 1) {
 
     console.log(
         "TRANSAKSI SUDAH DIKONFIRMASI"
