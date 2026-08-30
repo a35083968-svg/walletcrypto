@@ -1128,6 +1128,8 @@ while (receipt === null) {
         setTimeout(resolve, 2000);
     });
 
+    try {
+
     receipt =
     await reader.eth.getTransactionReceipt(tx);
 
@@ -1135,6 +1137,16 @@ while (receipt === null) {
         "CEK RECEIPT:",
         receipt
     );
+        
+  } catch (error) {
+
+        console.log(
+            "RECEIPT BELUM TERSEDIA:",
+            error?.message || error
+        );
+
+        receipt = null;
+    }
 }
 
 // ==========================================
