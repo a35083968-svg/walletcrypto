@@ -1129,7 +1129,7 @@ while (receipt === null) {
     });
 
     receipt =
-        reader.eth.getTransactionReceipt(tx);
+    await reader.eth.getTransactionReceipt(tx);
 
     console.log(
         "CEK RECEIPT:",
