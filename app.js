@@ -1137,6 +1137,16 @@ while (receipt === null) {
         "CEK RECEIPT:",
         receipt
     );
+
+    console.log(
+    "RECEIPT STATUS:",
+    receipt?.status
+);
+
+console.log(
+    "RECEIPT STATUS TYPE:",
+    typeof receipt?.status
+);   
         
   } catch (error) {
 
