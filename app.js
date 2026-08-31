@@ -1163,8 +1163,12 @@ console.log(
 // HASIL TRANSAKSI
 // ==========================================
 
-if (Number(receipt.status) === 1) {
+if (receipt?.status === 1n) {
 
+    console.log(
+        "STATUS = 1n ✅"
+    );
+    
     console.log(
         "TRANSAKSI SUDAH DIKONFIRMASI"
     );
@@ -1185,6 +1189,16 @@ if (Number(receipt.status) === 1) {
 
 } else {
 
+    console.log(
+        "STATUS BUKAN 1n:",
+        receipt?.status
+    );
+
+    console.log(
+        "STATUS TYPE:",
+        typeof receipt?.status
+    );
+    
     console.error(
         "TRANSAKSI MASUK BLOK TETAPI GAGAL"
     );
