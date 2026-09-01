@@ -1196,6 +1196,26 @@ console.log(
 console.log(
     "Number(STATUS) === 1:",
     Number(receipt?.status) === 1
+); 
+
+const receiptTestGagal = {
+    ...receipt,
+    status: 0n
+};
+
+console.log(
+    "UJI RECEIPT STATUS 0n:",
+    receiptTestGagal.status
+);
+
+console.log(
+    "UJI STATUS 0n === 0n:",
+    receiptTestGagal.status === 0n
+);
+
+console.log(
+    "UJI STATUS 0n === 1n:",
+    receiptTestGagal.status === 1n
 );        
         
   } catch (error) {
