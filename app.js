@@ -1138,6 +1138,36 @@ while (receipt === null) {
         receipt
     );
 
+     console.log(
+    "RECEIPT KEYS:",
+    Object.keys(receipt)
+);
+
+console.log(
+    "RECEIPT TRANSACTION HASH:",
+    receipt?.transactionHash
+);
+
+console.log(
+    "RECEIPT BLOCK NUMBER:",
+    receipt?.blockNumber
+);
+
+console.log(
+    "RECEIPT FROM:",
+    receipt?.from
+);
+
+console.log(
+    "RECEIPT TO:",
+    receipt?.to
+);
+
+console.log(
+    "RECEIPT GAS USED:",
+    receipt?.gasUsed
+);
+        
     console.log(
     "RECEIPT STATUS:",
     receipt?.status
@@ -1146,7 +1176,27 @@ while (receipt === null) {
 console.log(
     "RECEIPT STATUS TYPE:",
     typeof receipt?.status
-);   
+);
+
+console.log(
+    "STATUS === 1n:",
+    receipt?.status === 1n
+);
+
+console.log(
+    "STATUS === 1:",
+    receipt?.status === 1
+);
+
+console.log(
+    'STATUS === "1":',
+    receipt?.status === "1"
+);
+
+console.log(
+    "Number(STATUS) === 1:",
+    Number(receipt?.status) === 1
+);        
         
   } catch (error) {
 
