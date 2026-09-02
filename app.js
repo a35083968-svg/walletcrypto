@@ -1204,6 +1204,23 @@ const receiptTestGagal = {
 };
 
 console.log(
+    "=== UJI ALUR STATUS 0n ==="
+);
+
+if (receiptTestGagal.status === 1n) {
+
+    console.log(
+        "HASIL: DIANGGAP BERHASIL ✅"
+    );
+
+} else {
+
+    console.log(
+        "HASIL: DIANGGAP GAGAL ❌"
+    );
+ }        
+
+console.log(
     "UJI RECEIPT STATUS 0n:",
     receiptTestGagal.status
 );
