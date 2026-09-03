@@ -1250,7 +1250,7 @@ console.log(
 // HASIL TRANSAKSI
 // ==========================================
 
-if (receiptTestGagal.status === 1n) {
+if (receipt?.status === 1n) {
 
     console.log(
         "STATUS = 1n ✅"
