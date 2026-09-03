@@ -183,6 +183,89 @@ function buatReadProvider() {
 }
 
 // ======================================================
+// MENUNGGU RECEIPT DENGAN RETRY + TIMEOUT
+// ======================================================
+
+async function tungguReceipt(
+    reader,
+    txHash,
+    intervalMs = 2000,
+    maxAttempts = 30
+) {
+
+    let lastError = null;
+
+    for (
+        let attempt = 1;
+        attempt <= maxAttempts;
+        attempt++
+    ) {
+
+        console.log(
+            "CEK RECEIPT - PERCOBAAN:",
+            attempt,
+            "/",
+            maxAttempts
+        );
+
+        try {
+
+            const receipt =
+                await reader.eth.getTransactionReceipt(
+                    txHash
+                );
+
+            if (receipt) {
+
+                console.log(
+                    "RECEIPT DITEMUKAN PADA PERCOBAAN:",
+                    attempt
+                );
+
+                return receipt;
+            }
+
+            console.log(
+                "RECEIPT MASIH NULL"
+            );
+
+        } catch (error) {
+
+            lastError = error;
+
+            console.log(
+                "RECEIPT BELUM TERSEDIA:",
+                error?.message || error
+            );
+        }
+
+        if (
+            attempt < maxAttempts
+        ) {
+
+            await new Promise(
+                function(resolve) {
+                    setTimeout(
+                        resolve,
+                        intervalMs
+                    );
+                }
+            );
+        }
+    }
+
+    const timeoutError =
+        new Error(
+            "Timeout menunggu receipt transaksi."
+        );
+
+    timeoutError.cause =
+        lastError;
+
+    throw timeoutError;
+    }
+
+// ======================================================
 // CEK WALLET
 // ======================================================
 
@@ -1120,131 +1203,17 @@ setStatus(
 // TUNGGU KONFIRMASI TRANSAKSI
 // ==========================================
 
-let receipt = null;
+setStatus(
+    "Transaksi dikirim. Menunggu konfirmasi..."
+);
 
-while (receipt === null) {
-
-    await new Promise(function(resolve) {
-        setTimeout(resolve, 2000);
-    });
-
-    try {
-
-    receipt =
-    await reader.eth.getTransactionReceipt(tx);
-
-    console.log(
-        "CEK RECEIPT:",
-        receipt
+const receipt =
+    await tungguReceipt(
+        reader,
+        tx,
+        2000,
+        30
     );
-
-     console.log(
-    "RECEIPT KEYS:",
-    Object.keys(receipt)
-);
-
-console.log(
-    "RECEIPT TRANSACTION HASH:",
-    receipt?.transactionHash
-);
-
-console.log(
-    "RECEIPT BLOCK NUMBER:",
-    receipt?.blockNumber
-);
-
-console.log(
-    "RECEIPT FROM:",
-    receipt?.from
-);
-
-console.log(
-    "RECEIPT TO:",
-    receipt?.to
-);
-
-console.log(
-    "RECEIPT GAS USED:",
-    receipt?.gasUsed
-);
-        
-    console.log(
-    "RECEIPT STATUS:",
-    receipt?.status
-);
-
-console.log(
-    "RECEIPT STATUS TYPE:",
-    typeof receipt?.status
-);
-
-console.log(
-    "STATUS === 1n:",
-    receipt?.status === 1n
-);
-
-console.log(
-    "STATUS === 1:",
-    receipt?.status === 1
-);
-
-console.log(
-    'STATUS === "1":',
-    receipt?.status === "1"
-);
-
-console.log(
-    "Number(STATUS) === 1:",
-    Number(receipt?.status) === 1
-); 
-
-const receiptTestGagal = {
-    ...receipt,
-    status: 0n
-};
-
-console.log(
-    "=== UJI ALUR STATUS 0n ==="
-);
-
-if (receiptTestGagal.status === 1n) {
-
-    console.log(
-        "HASIL: DIANGGAP BERHASIL ✅"
-    );
-
-} else {
-
-    console.log(
-        "HASIL: DIANGGAP GAGAL ❌"
-    );
- }        
-
-console.log(
-    "UJI RECEIPT STATUS 0n:",
-    receiptTestGagal.status
-);
-
-console.log(
-    "UJI STATUS 0n === 0n:",
-    receiptTestGagal.status === 0n
-);
-
-console.log(
-    "UJI STATUS 0n === 1n:",
-    receiptTestGagal.status === 1n
-);        
-        
-  } catch (error) {
-
-        console.log(
-            "RECEIPT BELUM TERSEDIA:",
-            error?.message || error
-        );
-
-        receipt = null;
-    }
-}
 
 // ==========================================
 // HASIL TRANSAKSI
