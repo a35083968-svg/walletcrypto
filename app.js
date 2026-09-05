@@ -42,6 +42,14 @@ const toAddress =
 const amountInput =
     document.getElementById("amount");
 
+const inputHash =
+    document.getElementById("inputHash");
+
+const btnCekRiwayat =
+    document.getElementById("btnCekRiwayat");
+
+const riwayatStatus =
+    document.getElementById("riwayatStatus");
 
 // ======================================================
 // CEK AWAL
@@ -84,6 +92,70 @@ function buatReadProvider() {
     }
 
     return readWeb3;
+}
+
+// ======================================================
+// CEK RIWAYAT TRANSAKSI BERDASARKAN TX HASH
+// ======================================================
+
+async function cekRiwayatTransaksi(txHash) {
+
+    if (!txHash) {
+
+        throw new Error(
+            "Anda belum memasukkan hash transaksi."
+        );
+    }
+
+    const formatHash =
+        /^0x[a-fA-F0-9]{64}$/;
+
+    if (!formatHash.test(txHash)) {
+
+        throw new Error(
+            "Format TX hash tidak valid."
+        );
+    }
+
+    const reader =
+        buatReadProvider();
+
+    console.log(
+        "MENCARI TRANSAKSI:",
+        txHash
+    );
+
+    const transaksi =
+        await reader.eth.getTransaction(
+            txHash
+        );
+
+    if (!transaksi) {
+
+        throw new Error(
+            "Transaksi tidak ditemukan."
+        );
+    }
+
+    console.log(
+        "TRANSAKSI DITEMUKAN:",
+        transaksi
+    );
+
+    const receipt =
+        await reader.eth.getTransactionReceipt(
+            txHash
+        );
+
+    console.log(
+        "RECEIPT RIWAYAT:",
+        receipt
+    );
+
+    return {
+        transaksi,
+        receipt
+    };
 }
 
 // ======================================================
@@ -525,6 +597,106 @@ console.log(
 
 }
 
+// ======================================================
+// TOMBOL CEK RIWAYAT TRANSAKSI
+// ======================================================
+
+if (btnCekRiwayat) {
+
+    btnCekRiwayat.addEventListener(
+        "click",
+        async function () {
+
+            if (!riwayatStatus) {
+                return;
+            }
+
+            const hash =
+                inputHash.value.trim();
+
+            riwayatStatus.innerText =
+                "Mengecek transaksi...";
+
+            console.log(
+                "HASH YANG DIPERIKSA:",
+                hash
+            );
+
+            try {
+
+                const hasil =
+                    await cekRiwayatTransaksi(
+                        hash
+                    );
+
+                const transaksi =
+                    hasil.transaksi;
+
+                const receipt =
+                    hasil.receipt;
+
+                const statusTransaksi =
+                    receipt?.status;
+
+                console.log(
+                    "RIWAYAT - STATUS:",
+                    statusTransaksi
+                );
+
+                console.log(
+                    "RIWAYAT - STATUS TYPE:",
+                    typeof statusTransaksi
+                );
+
+                if (
+                    statusTransaksi === 1n
+                ) {
+
+                    riwayatStatus.innerText =
+                        "Transaksi ditemukan dan berhasil ✅";
+
+                } else if (
+                    statusTransaksi === 0n
+                ) {
+
+                    riwayatStatus.innerText =
+                        "Transaksi ditemukan tetapi gagal ❌";
+
+                } else {
+
+                    riwayatStatus.innerText =
+                        "Transaksi ditemukan, status tidak dikenal.";
+                }
+
+                console.log(
+                    "RIWAYAT FROM:",
+                    transaksi.from
+                );
+
+                console.log(
+                    "RIWAYAT TO:",
+                    transaksi.to
+                );
+
+                console.log(
+                    "RIWAYAT BLOCK:",
+                    receipt?.blockNumber
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "CEK RIWAYAT ERROR:",
+                    error
+                );
+
+                riwayatStatus.innerText =
+                    error?.message ||
+                    "Gagal mengecek transaksi.";
+            }
+        }
+    );
+}
 
 // ======================================================
 // CEK SALDO
