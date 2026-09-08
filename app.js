@@ -1,4 +1,3 @@
-
 // ======================================================
 // CRYPTO WALLET - CONNECT TEST
 // SEPOLIA
@@ -42,6 +41,16 @@ const toAddress =
 
 const amountInput =
     document.getElementById("amount");
+
+// ======================================================
+// ELEMENT TRANSACTION HASH
+// ======================================================
+
+const txHashValue =
+document.getElementById("txHashValue");
+
+const btnSalinHash =
+document.getElementById("btnSalinHash");
 
 const inputHash =
     document.getElementById("inputHash");
@@ -93,6 +102,84 @@ function buatReadProvider() {
     }
 
     return readWeb3;
+}
+
+// ======================================================
+// TOMBOL SALIN TRANSACTION HASH
+// ======================================================
+
+if (btnSalinHash) {
+
+    btnSalinHash.addEventListener(
+        "click",
+        async function () {
+
+            const hash =
+                txHashValue?.innerText.trim();
+
+            // ------------------------------------------
+            // CEK HASH
+            // ------------------------------------------
+
+            if (
+                !hash ||
+                hash === "Belum ada transaksi" ||
+                hash === "silahkan jalankan transaksi terlebih dahulu"
+            ) {
+
+                setStatus(
+                    "Belum ada transaction hash untuk disalin."
+                );
+
+                return;
+            }
+
+            // ------------------------------------------
+            // SALIN HASH
+            // ------------------------------------------
+
+            try {
+
+                await navigator.clipboard.writeText(
+                    hash
+                );
+
+                btnSalinHash.innerText =
+                    "Hash Tersalin ✅";
+
+                console.log(
+                    "TRANSACTION HASH BERHASIL DISALIN:",
+                    hash
+                );
+
+                setStatus(
+                    "Transaction hash berhasil disalin ✅"
+                );
+
+                // Kembalikan teks tombol setelah 2 detik
+                setTimeout(
+                    function () {
+
+                        btnSalinHash.innerText =
+                            "Salin";
+
+                    },
+                    2000
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "SALIN HASH ERROR:",
+                    error
+                );
+
+                setStatus(
+                    "Gagal menyalin transaction hash."
+                );
+            }
+        }
+    );
 }
 
 // ======================================================
@@ -1315,6 +1402,20 @@ if (receipt?.status === 1n) {
         "TRANSACTION HASH:",
         tx
     );
+
+// ==========================================
+    // TAMPILKAN TX HASH KE WEBSITE
+    // ==========================================
+
+    if (txHashValue) {
+
+        txHashValue.innerText = tx;
+
+        console.log(
+            "TX HASH BERHASIL DITAMPILKAN:",
+            tx
+        );
+    }
 
     setStatus(
         "Transaksi berhasil dikonfirmasi ✅"
