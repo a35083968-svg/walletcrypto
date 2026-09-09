@@ -349,7 +349,7 @@ async function tungguReceipt(
     reader,
     txHash,
     intervalMs = 2000,
-    maxAttempts = 60
+    maxAttempts = 30
 ) {
 
     let lastError = null;
