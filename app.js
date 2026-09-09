@@ -349,7 +349,7 @@ async function tungguReceipt(
     reader,
     txHash,
     intervalMs = 2000,
-    maxAttempts = 30
+    maxAttempts = 60
 ) {
 
     let lastError = null;
@@ -369,6 +369,10 @@ async function tungguReceipt(
 
         try {
 
+            // ------------------------------------------
+            // CEK RECEIPT
+            // ------------------------------------------            
+
             const receipt =
                 await reader.eth.getTransactionReceipt(
                     txHash
@@ -385,7 +389,7 @@ async function tungguReceipt(
             }
 
             console.log(
-                "RECEIPT MASIH NULL"
+                "RECEIPT MASIH BELUM TERSEDIA"
             );
 
         } catch (error) {
@@ -398,6 +402,53 @@ async function tungguReceipt(
             );
         }
 
+        // ------------------------------------------
+        // CEK APAKAH TRANSAKSI SUDAH TERLIHAT RPC
+        // ------------------------------------------
+
+       try {
+
+                const transaksi =
+                    await reader.eth.getTransaction(
+                        txHash
+                    );
+
+                if (transaksi) {
+
+                    console.log(
+                        "TRANSAKSI SUDAH TERLIHAT RPC"
+                    );
+
+                    console.log(
+                        "BLOCK TRANSAKSI:",
+                        transaksi.blockNumber
+                    );
+
+                    console.log(
+                        "TRANSAKSI MASIH MENUNGGU RECEIPT"
+                    );
+
+                } else {
+
+                    console.log(
+                        "TRANSAKSI BELUM TERLIHAT RPC"
+                    );
+                }
+
+            } catch (transactionError) {
+
+                console.log(
+                    "CEK TRANSAKSI JUGA BELUM TERSEDIA:",
+                    transactionError?.message ||
+                    transactionError
+                );
+            }
+    }
+
+    // ------------------------------------------
+        // TUNGGU SEBELUM PERCOBAAN BERIKUTNYA
+        // ------------------------------------------
+            
         if (
             attempt < maxAttempts
         ) {
@@ -412,6 +463,10 @@ async function tungguReceipt(
             );
         }
     }
+
+// ------------------------------------------
+    // TIMEOUT
+    // ------------------------------------------
 
     const timeoutError =
         new Error(
