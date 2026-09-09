@@ -354,6 +354,10 @@ async function tungguReceipt(
 
     let lastError = null;
 
+    // ------------------------------------------
+    // RETRY LOOP
+    // ------------------------------------------
+
     for (
         let attempt = 1;
         attempt <= maxAttempts;
@@ -367,11 +371,11 @@ async function tungguReceipt(
             maxAttempts
         );
 
-        try {
+        // ------------------------------------------
+        // CEK RECEIPT
+        // ------------------------------------------
 
-            // ------------------------------------------
-            // CEK RECEIPT
-            // ------------------------------------------            
+        try {
 
             const receipt =
                 await reader.eth.getTransactionReceipt(
@@ -403,66 +407,78 @@ async function tungguReceipt(
         }
 
         // ------------------------------------------
-        // CEK APAKAH TRANSAKSI SUDAH TERLIHAT RPC
+        // CEK TRANSAKSI PADA RPC
         // ------------------------------------------
 
-       try {
+        try {
 
-                const transaksi =
-                    await reader.eth.getTransaction(
-                        txHash
-                    );
+            const transaksi =
+                await reader.eth.getTransaction(
+                    txHash
+                );
 
-                if (transaksi) {
+            if (transaksi) {
+
+                console.log(
+                    "TRANSAKSI SUDAH TERLIHAT RPC"
+                );
+
+                console.log(
+                    "BLOCK TRANSAKSI:",
+                    transaksi.blockNumber
+                );
+
+                if (
+                    transaksi.blockNumber === null
+                ) {
 
                     console.log(
-                        "TRANSAKSI SUDAH TERLIHAT RPC"
-                    );
-
-                    console.log(
-                        "BLOCK TRANSAKSI:",
-                        transaksi.blockNumber
-                    );
-
-                    console.log(
-                        "TRANSAKSI MASIH MENUNGGU RECEIPT"
+                        "TRANSAKSI MASIH PENDING"
                     );
 
                 } else {
 
                     console.log(
-                        "TRANSAKSI BELUM TERLIHAT RPC"
+                        "TRANSAKSI SUDAH MASUK BLOK"
                     );
                 }
 
-            } catch (transactionError) {
+            } else {
 
                 console.log(
-                    "CEK TRANSAKSI JUGA BELUM TERSEDIA:",
-                    transactionError?.message ||
-                    transactionError
+                    "TRANSAKSI BELUM TERLIHAT RPC"
                 );
             }
-    }
 
-    // ------------------------------------------
-        // TUNGGU SEBELUM PERCOBAAN BERIKUTNYA
+        } catch (transactionError) {
+
+            console.log(
+                "CEK TRANSAKSI ERROR:",
+                transactionError?.message ||
+                transactionError
+            );
+        }
+
         // ------------------------------------------
-            
+        // TUNGGU SEBELUM RETRY BERIKUTNYA
+        // ------------------------------------------
+
         if (
             attempt < maxAttempts
         ) {
 
             await new Promise(
                 function(resolve) {
+
                     setTimeout(
                         resolve,
                         intervalMs
                     );
+
                 }
             );
         }
-    }
+  }
 
 // ------------------------------------------
     // TIMEOUT
