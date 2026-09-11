@@ -25,46 +25,28 @@
   <input type="number" id="amount" placeholder="Jumlah ETH" step="0.001" />
   <button id="sendBtn" class="wallet-button">Kirim</button>
   <p id="txStatus"></p>
-   <!-- ==========================================
-     INFORMASI TRANSACTION HASH
+<!-- ==========================================
+     STATUS TRANSAKSI
 ========================================== -->
 
-<div id="txHashBox">
+<div id="transactionResult">
 
-    <h3 class="tx-hash-title">
-        TRANSACTION HASH:
-    </h3>
+    <p id="txStatus">
+        Belum ada transaksi
+    </p>
 
-    <div class="tx-hash-row">
+</div>
 
-    <div id="txHashValue">
-        silahkan jalankan 
-        transaksi 
-        terlebih dahulu 
-    </div>
+<!-- ==========================================
+     RIWAYAT TRANSAKSI
+========================================== -->
 
-    <button
-        id="btnSalinHash"
-        type="button"
-    >
-        Salin 
-    </button>
-
- </div>      
-
-</div>     
-  <hr style="margin:15px 0; border-color:#334155;">
-<input
-    type="text"
-    id="inputHash"
-    placeholder="Masukkan hash transaksi 0x..."
+<a
+    href="riwayat.html"
+    class="history-button"
 >
-
-<button id="btnCekRiwayat">
-    Cek Riwayat Transaksi
-</button>
-
-<p id="riwayatStatus"></p>
+    Riwayat Transaksi
+</a>
 </div>
     <script src="app.js"></script>
 </body>
