@@ -222,3 +222,57 @@ button:hover{
 #txStatus {
     color: white;
 }
+
+/* ==========================================
+   HASIL TRANSAKSI
+========================================== */
+
+#transactionResult {
+    margin-top: 15px;
+    padding: 14px;
+    border: 1px solid #00ff88;
+    border-radius: 10px;
+    background: #0f172a;
+    text-align: center;
+}
+
+#txStatus {
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
+/* ==========================================
+   TOMBOL RIWAYAT TRANSAKSI
+========================================== */
+
+.history-button {
+    display: block;
+    width: 100%;
+    margin-top: 15px;
+    padding: 16px;
+
+    border-radius: 15px;
+
+    background: linear-gradient(
+        90deg,
+        #22c55e,
+        #16a34a
+    );
+
+    color: #ffffff;
+    text-decoration: none;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    text-align: center;
+
+    transition: .3s;
+}
+
+.history-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #22c55e;
+    }
