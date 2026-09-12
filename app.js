@@ -1307,20 +1307,6 @@ if (receipt?.status === 1n) {
         tx
     );
 
-// ==========================================
-    // TAMPILKAN TX HASH KE WEBSITE
-    // ==========================================
-
-    if (txHashValue) {
-
-        txHashValue.innerText = tx;
-
-        console.log(
-            "TX HASH BERHASIL DITAMPILKAN:",
-            tx
-        );
-    }
-
     setStatus(
         "Transaksi berhasil dikonfirmasi ✅"
     );
