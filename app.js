@@ -1244,10 +1244,11 @@ setStatus(
 
 const receipt =
     await tungguReceipt(
+        provider,
         reader,
         tx,
         2000,
-        30
+        60
     );
 
 // ==========================================
