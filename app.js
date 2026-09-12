@@ -181,21 +181,17 @@ function buatReadProvider() {
 }            
 
 // ======================================================
-// MENUNGGU RECEIPT DENGAN RETRY + TIMEOUT
+// MENUNGGU RECEIPT
+// PROVIDER WALLET + FALLBACK RPC
 // ======================================================
 
 async function tungguReceipt(
+    walletProvider,
     reader,
     txHash,
     intervalMs = 2000,
-    maxAttempts = 30
+    maxAttempts = 60
 ) {
-
-    let lastError = null;
-
-    // ------------------------------------------
-    // RETRY LOOP
-    // ------------------------------------------
 
     for (
         let attempt = 1;
@@ -210,9 +206,58 @@ async function tungguReceipt(
             maxAttempts
         );
 
-        // ------------------------------------------
-        // CEK RECEIPT
-        // ------------------------------------------
+        // ==========================================
+        // CEK PROVIDER WALLET
+        // ==========================================
+
+        try {
+
+            const receipt =
+                await walletProvider.request({
+                    method:
+                        "eth_getTransactionReceipt",
+                    params: [txHash]
+                });
+
+            if (receipt) {
+
+                console.log(
+                    "RECEIPT DITEMUKAN DARI PROVIDER WALLET"
+                );
+
+                return {
+                    status:
+                        receipt.status === "0x1"
+                            ? 1n
+                            : 0n,
+
+                    blockNumber:
+                        receipt.blockNumber
+                            ? parseInt(
+                                receipt.blockNumber,
+                                16
+                            )
+                            : undefined,
+
+                    transactionHash:
+                        receipt.transactionHash
+                };
+            }
+
+            console.log(
+                "PROVIDER WALLET: RECEIPT BELUM ADA"
+            );
+
+        } catch (error) {
+
+            console.log(
+                "PROVIDER WALLET ERROR:",
+                error?.message || error
+            );
+                    }
+// ==========================================
+        // FALLBACK PUBLICNODE
+        // ==========================================
 
         try {
 
@@ -224,83 +269,28 @@ async function tungguReceipt(
             if (receipt) {
 
                 console.log(
-                    "RECEIPT DITEMUKAN PADA PERCOBAAN:",
-                    attempt
+                    "RECEIPT DITEMUKAN DARI PUBLICNODE"
                 );
 
                 return receipt;
             }
 
             console.log(
-                "RECEIPT MASIH BELUM TERSEDIA"
+                "PUBLICNODE: RECEIPT BELUM ADA"
             );
 
         } catch (error) {
 
-            lastError = error;
-
             console.log(
-                "RECEIPT BELUM TERSEDIA:",
+                "PUBLICNODE ERROR:",
                 error?.message || error
             );
         }
-
-        // ------------------------------------------
-        // CEK TRANSAKSI PADA RPC
-        // ------------------------------------------
-
-        try {
-
-            const transaksi =
-                await reader.eth.getTransaction(
-                    txHash
-                );
-
-            if (transaksi) {
-
-                console.log(
-                    "TRANSAKSI SUDAH TERLIHAT RPC"
-                );
-
-                console.log(
-                    "BLOCK TRANSAKSI:",
-                    transaksi.blockNumber
-                );
-
-                if (
-                    transaksi.blockNumber === null
-                ) {
-
-                    console.log(
-                        "TRANSAKSI MASIH PENDING"
-                    );
-
-                } else {
-
-                    console.log(
-                        "TRANSAKSI SUDAH MASUK BLOK"
-                    );
-                }
-
-            } else {
-
-                console.log(
-                    "TRANSAKSI BELUM TERLIHAT RPC"
-                );
-            }
-
-        } catch (transactionError) {
-
-            console.log(
-                "CEK TRANSAKSI ERROR:",
-                transactionError?.message ||
-                transactionError
-            );
-        }
-
-        // ------------------------------------------
-        // TUNGGU SEBELUM RETRY BERIKUTNYA
-        // ------------------------------------------
+        
+                
+// ==========================================
+        // TUNGGU
+        // ==========================================
 
         if (
             attempt < maxAttempts
@@ -317,36 +307,13 @@ async function tungguReceipt(
                 }
             );
         }
-  }
-
-// ------------------------------------------
-    // TIMEOUT
-    // ------------------------------------------
-
-    const timeoutError =
-        new Error(
-            "Timeout menunggu receipt transaksi."
-        );
-
-    timeoutError.cause =
-        lastError;
-
-    throw timeoutError;
     }
-
-// ======================================================
-// CEK WALLET
-// ======================================================
-
-function walletTersedia() {
-
-    return (
-        typeof window.ethereum !== "undefined"
+        
+throw new Error(
+        "Transaksi sudah dikirim, tetapi belum terkonfirmasi."
     );
-
 }
-
-
+    
 // ======================================================
 // CONNECT WALLET
 // ======================================================
