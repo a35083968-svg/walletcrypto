@@ -313,6 +313,18 @@ throw new Error(
         "Transaksi sudah dikirim, tetapi belum terkonfirmasi."
     );
 }
+
+// ======================================================
+// CEK WALLET
+// ======================================================
+
+function walletTersedia() {
+
+    return (
+        typeof window.ethereum !== "undefined"
+    );
+
+}
     
 // ======================================================
 // CONNECT WALLET
