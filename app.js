@@ -101,6 +101,7 @@ console.error = function (...args) {
 let web3 = null;
 let readWeb3 = null;
 let akun = null;
+let walletProviderAktif = null;
 
 const SEPOLIA_CHAIN_ID = 11155111;
 
@@ -309,9 +310,14 @@ async function tungguReceipt(
         }
     }
         
-throw new Error(
-        "Transaksi sudah dikirim, tetapi belum terkonfirmasi."
-    );
+const timeoutError = new Error(
+    "Transaksi sudah dikirim, tetapi konfirmasi belum dapat diverifikasi."
+);
+
+timeoutError.code = "TX_CONFIRMATION_TIMEOUT";
+timeoutError.txHash = txHash;
+
+throw timeoutError;
 }
 
 // ======================================================
@@ -381,10 +387,17 @@ if (btnConnect) {
     window.bitkeep?.ethereum ||
     window.ethereum;
 
-console.log(
-    "PROVIDER CONNECT:",
-    walletProvider
+    walletProviderAktif = walletProvider;
+                
+    console.log(
+      "PROVIDER CONNECT:",
+      walletProvider
 );
+
+console.log(
+    "PROVIDER AKTIF:",
+    walletProviderAktif
+);                
 
 if (!walletProvider) {
     throw new Error(
@@ -1127,7 +1140,7 @@ console.log(
 );
 
 const provider =
-    window.bitkeep?.ethereum;
+    walletProviderAktif;
 
 console.log(
     "PROVIDER YANG DIPAKAI:",
@@ -1135,9 +1148,10 @@ console.log(
 );
 
 if (!provider) {
+
     throw new Error(
-        "Provider Bitget tidak ditemukan."
-    );
+        "Provider wallet belum tersedia."
+    );  
 }
 
 // ------------------------------------------
@@ -1338,6 +1352,22 @@ if (receipt?.status === 1n) {
         "TRANSAKSI ERROR DATA:",
         error?.data
     );
+
+    if (
+    error?.code === "TX_CONFIRMATION_TIMEOUT"
+) {
+
+    console.warn(
+        "TX SUDAH DIKIRIM, TETAPI BELUM TERKONFIRMASI:",
+        error.txHash
+    );
+
+    setStatus(
+        "Transaksi sudah dikirim. Konfirmasi masih menunggu..."
+    );
+
+    return;
+    }
 
     setStatus(
         "Transaksi gagal: " +
