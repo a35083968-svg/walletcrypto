@@ -99,14 +99,29 @@ console.error = function (...args) {
 // ======================================================
 
 let web3 = null;
-let readWeb3 = null;
 let akun = null;
 let walletProviderAktif = null;
 
+let readProviders = [];
+
 const SEPOLIA_CHAIN_ID = 11155111;
 
-const SEPOLIA_RPC =
-    "https://ethereum-sepolia-rpc.publicnode.com";
+const SEPOLIA_RPCS = [
+    {
+        name: "PublicNode",
+        url: "https://ethereum-sepolia-rpc.publicnode.com"
+    },
+
+    {
+        name: "Sepolia.org",
+        url: "https://rpc.sepolia.org"
+    },
+
+    {
+        name: "Sepolia Online",
+        url: "https://rpc.sepolia.online"
+    }
+];
 
 // ======================================================
 // ELEMENT HTML
@@ -168,17 +183,32 @@ function setStatus(message) {
     }
 }
 
-function buatReadProvider() {
+function buatReadProviders() {
 
-    if (!readWeb3) {
-        readWeb3 = new Web3(SEPOLIA_RPC);
+    if (readProviders.length === 0) {
+
+        readProviders =
+            SEPOLIA_RPCS.map(function (rpc) {
+
+                console.log(
+                    "MEMBUAT READ PROVIDER:",
+                    rpc.name
+                );
+
+                return {
+                    name: rpc.name,
+                    web3: new Web3(rpc.url)
+                };
+
+            });
 
         console.log(
-            "READ PROVIDER BERHASIL DIBUAT"
+            "TOTAL READ PROVIDER:",
+            readProviders.length
         );
     }
 
-    return readWeb3;
+    return readProviders;
 }            
 
 // ======================================================
@@ -188,12 +218,12 @@ function buatReadProvider() {
 
 async function tungguReceipt(
     walletProvider,
-    reader,
+    readers,
     txHash,
     intervalMs = 2000,
     maxAttempts = 60
 ) {
-
+    
     for (
         let attempt = 1;
         attempt <= maxAttempts;
@@ -256,39 +286,58 @@ async function tungguReceipt(
                 error?.message || error
             );
                     }
+
 // ==========================================
-        // FALLBACK PUBLICNODE
-        // ==========================================
+// FALLBACK MULTI-RPC
+// ==========================================
 
-        try {
+for (
+    let rpcIndex = 0;
+    rpcIndex < readers.length;
+    rpcIndex++
+) {
 
-            const receipt =
-                await reader.eth.getTransactionReceipt(
-                    txHash
-                );
+    const rpc =
+        readers[rpcIndex];
 
-            if (receipt) {
+    try {
 
-                console.log(
-                    "RECEIPT DITEMUKAN DARI PUBLICNODE"
-                );
+        console.log(
+            "CEK RPC:",
+            rpc.name
+        );
 
-                return receipt;
-            }
-
-            console.log(
-                "PUBLICNODE: RECEIPT BELUM ADA"
+        const receipt =
+            await rpc.web3.eth.getTransactionReceipt(
+                txHash
             );
 
-        } catch (error) {
+        if (receipt) {
 
             console.log(
-                "PUBLICNODE ERROR:",
-                error?.message || error
+                "RECEIPT DITEMUKAN DARI RPC:",
+                rpc.name
             );
+
+            return receipt;
         }
+
+        console.log(
+            rpc.name +
+            ": RECEIPT BELUM ADA"
+        );
+
+    } catch (error) {
+
+        console.log(
+            rpc.name +
+            " ERROR:",
+            error?.message ||
+            error
+        );
+    }
+}
         
-                
 // ==========================================
         // TUNGGU
         // ==========================================
@@ -927,8 +976,11 @@ try {
 // ESTIMASI GAS DARI PUBLICNODE RPC
 // ==========================================
 
+const readers =
+    buatReadProviders();
+
 const reader =
-    buatReadProvider();
+    readers[0].web3;
 
 console.log(
     "PROVIDER UNTUK ESTIMASI: PUBLICNODE RPC"
@@ -1269,13 +1321,13 @@ setStatus(
 );
 
 const receipt =
-    await tungguReceipt(
-        provider,
-        reader,
-        tx,
-        2000,
-        60
-    );
+await tungguReceipt(
+    provider,
+    readers,
+    tx,
+    2000,
+    60
+);
 
 // ==========================================
 // HASIL TRANSAKSI
