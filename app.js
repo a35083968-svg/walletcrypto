@@ -638,16 +638,31 @@ if (window.bitkeep?.ethereum) {
                     "Mengambil saldo..."
                 );
 
-                const reader = buatReadProvider();
+                const readers =
+    buatReadProviders();
 
-                console.log("Meminta saldo ke RPC Sepolia...");
-                console.log("Alamat:", akun);
+const reader =
+    readers[0].web3;
 
-                const balanceWei =
-                await reader.eth.getBalance(
-                    akun
-                );
+console.log(
+    "MEMAKAI READ RPC:",
+    readers[0].name
+);
 
+console.log(
+    "Meminta saldo ke RPC Sepolia..."
+);
+
+console.log(
+    "Alamat:",
+    akun
+);
+
+const balanceWei =
+    await reader.eth.getBalance(
+        akun
+    );
+                
                 console.log(
                     "Balance Wei:",
                     balanceWei
