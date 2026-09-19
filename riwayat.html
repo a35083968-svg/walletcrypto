@@ -23,88 +23,284 @@
 
     <main class="history-page">
 
-        <header class="history-header">
+        <!-- ==========================================
+             HALAMAN DAFTAR RIWAYAT
+        ========================================== -->
 
-            <a
-                href="index.html"
-                class="back-button"
+        <section id="historyPage">
+
+            <header class="history-header">
+
+                <a
+                    href="index.html"
+                    class="back-button"
+                >
+                    ←
+                </a>
+
+                <h1>
+                    Riwayat Transaksi
+                </h1>
+
+            </header>
+
+
+            <section
+                id="transactionList"
+                class="transaction-list"
             >
-                ←
-            </a>
 
-            <h1>
-                Riwayat Transaksi
-            </h1>
+                <!-- TRANSAKSI 1 -->
 
-        </header>
+                <button
+                    class="transaction-item"
+                    data-tx-id="1"
+                    type="button"
+                >
 
+                    <div class="transaction-info">
+
+                        <strong>
+                            Transfer
+                        </strong>
+
+                        <span>
+                            0xEE...29A6
+                        </span>
+
+                    </div>
+
+                    <time>
+                        07.15
+                    </time>
+
+                </button>
+
+
+                <!-- TRANSAKSI 2 -->
+
+                <button
+                    class="transaction-item"
+                    data-tx-id="2"
+                    type="button"
+                >
+
+                    <div class="transaction-info">
+
+                        <strong>
+                            Transfer
+                        </strong>
+
+                        <span>
+                            0x85...E829
+                        </span>
+
+                    </div>
+
+                    <time>
+                        08.21
+                    </time>
+
+                </button>
+
+
+                <!-- TRANSAKSI 3 -->
+
+                <button
+                    class="transaction-item"
+                    data-tx-id="3"
+                    type="button"
+                >
+
+                    <div class="transaction-info">
+
+                        <strong>
+                            Transfer
+                        </strong>
+
+                        <span>
+                            0x12...ABCD
+                        </span>
+
+                    </div>
+
+                    <time>
+                        09.42
+                    </time>
+
+                </button>
+
+            </section>
+
+        </section>
+
+
+        <!-- ==========================================
+             HALAMAN DETAIL TRANSAKSI
+        ========================================== -->
 
         <section
-            id="transactionList"
-            class="transaction-list"
+            id="detailPage"
+            class="detail-page"
+            hidden
         >
 
-            <!-- DATA TRANSAKSI AKAN DIISI NANTI -->
+            <header class="detail-header">
 
-            <div class="transaction-item">
+                <button
+                    id="backToHistory"
+                    class="back-button"
+                    type="button"
+                >
+                    ←
+                </button>
 
-                <div class="transaction-info">
+                <h1>
+                    Detail Transaksi
+                </h1>
 
-                    <strong>
-                        Transfer
-                    </strong>
+            </header>
+
+
+            <div class="detail-card">
+
+                <div class="detail-status success">
 
                     <span>
-                        0xEE...29A6
+                        Status
                     </span>
+
+                    <strong id="detailStatus">
+                        Berhasil ✅
+                    </strong>
 
                 </div>
 
-                <time>
-                    07.15
-                </time>
 
-            </div>
-
-
-            <div class="transaction-item">
-
-                <div class="transaction-info">
-
-                    <strong>
-                        Transfer
-                    </strong>
+                <div class="detail-row">
 
                     <span>
-                        0x85...E829
+                        Alamat pengirim
                     </span>
+
+                    <strong id="detailFrom">
+                        -
+                    </strong>
 
                 </div>
 
-                <time>
-                    08.21
-                </time>
 
-            </div>
-
-
-            <div class="transaction-item">
-
-                <div class="transaction-info">
-
-                    <strong>
-                        Transfer
-                    </strong>
+                <div class="detail-row">
 
                     <span>
-                        0x12...ABCD
+                        Alamat tujuan
                     </span>
+
+                    <strong id="detailTo">
+                        -
+                    </strong>
 
                 </div>
 
-                <time>
-                    09.42
-                </time>
+
+                <div class="detail-row">
+
+                    <span>
+                        Jaringan
+                    </span>
+
+                    <strong id="detailNetwork">
+                        Ethereum Sepolia
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span>
+                        Jumlah
+                    </span>
+
+                    <strong id="detailAmount">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span>
+                        Biaya jaringan
+                    </span>
+
+                    <strong id="detailGas">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span>
+                        Block
+                    </span>
+
+                    <strong id="detailBlock">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span>
+                        Waktu dan tanggal
+                    </span>
+
+                    <strong id="detailTime">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-hash">
+
+                    <span>
+                        Transaction Hash
+                    </span>
+
+                    <code id="detailHash">
+                        -
+                    </code>
+
+                </div>
+
+
+                <div class="detail-actions">
+
+                    <button
+                        id="copyHashButton"
+                        type="button"
+                    >
+                        Salin Hash
+                    </button>
+
+
+                    <a
+                        id="explorerButton"
+                        href="#"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Buka Explorer
+                    </a>
+
+                </div>
 
             </div>
 
@@ -112,6 +308,9 @@
 
     </main>
 
+
+    <script src="riwayat.js"></script>
+
 </body>
 
-</html>
+                    </html>
