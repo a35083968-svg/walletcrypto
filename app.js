@@ -114,7 +114,249 @@ function buatReadProviders() {
     }
 
     return readProviders;
-}            
+}
+
+// ======================================================
+// PENYIMPANAN TRANSAKSI NYATA
+// ======================================================
+
+const TRANSACTION_STORAGE_KEY =
+    "walletcrypto_transactions_v1";
+
+
+// ======================================================
+// BACA TRANSAKSI TERSIMPAN
+// ======================================================
+
+function bacaTransaksiTersimpan() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                TRANSACTION_STORAGE_KEY
+            );
+
+        if (!raw) {
+            return [];
+        }
+
+        const data =
+            JSON.parse(raw);
+
+        if (!Array.isArray(data)) {
+            return [];
+        }
+
+        return data;
+
+    } catch (error) {
+
+        console.log(
+            "GAGAL MEMBACA DATA TRANSAKSI:",
+            error?.message || error
+        );
+
+        return [];
+    }
+}
+
+
+// ======================================================
+// SIMPAN TRANSAKSI NYATA
+// ======================================================
+
+async function simpanTransaksiNyata(
+    reader,
+    txHash,
+    fallbackFrom,
+    fallbackTo,
+    fallbackValueWei
+) {
+
+    // ------------------------------------------
+    // AMBIL DATA TRANSAKSI
+    // ------------------------------------------
+
+    const transaksi =
+        await reader.eth.getTransaction(
+            txHash
+        );
+
+
+    // ------------------------------------------
+    // AMBIL RECEIPT LENGKAP
+    // ------------------------------------------
+
+    const receipt =
+        await reader.eth.getTransactionReceipt(
+            txHash
+        );
+
+
+    if (
+        !receipt ||
+        receipt.blockNumber === null ||
+        receipt.blockNumber === undefined
+    ) {
+
+        throw new Error(
+            "Receipt transaksi belum lengkap."
+        );
+    }
+
+
+    // ------------------------------------------
+    // AMBIL BLOCK UNTUK TIMESTAMP
+    // ------------------------------------------
+
+    const block =
+        await reader.eth.getBlock(
+            receipt.blockNumber
+        );
+
+
+    // ------------------------------------------
+    // HITUNG GAS FEE SEBENARNYA
+    // ------------------------------------------
+
+    const gasUsed =
+        BigInt(
+            receipt.gasUsed
+        );
+
+
+    const gasPriceRaw =
+        receipt.effectiveGasPrice ??
+        receipt.gasPrice ??
+        transaksi?.gasPrice;
+
+
+    if (
+        gasPriceRaw === null ||
+        gasPriceRaw === undefined
+    ) {
+
+        throw new Error(
+            "Harga gas efektif tidak tersedia."
+        );
+    }
+
+
+    const gasFeeWei =
+        gasUsed *
+        BigInt(gasPriceRaw);
+
+
+    // ------------------------------------------
+    // NILAI ETH TRANSAKSI
+    // ------------------------------------------
+
+    const valueWei =
+        transaksi?.value ??
+        fallbackValueWei;
+
+
+    // ------------------------------------------
+    // TIMESTAMP BLOCKCHAIN
+    // ------------------------------------------
+
+    const timestamp =
+        Number(
+            block.timestamp
+        );
+
+
+    // ------------------------------------------
+    // BENTUK DATA UNTUK RIWAYAT
+    // ------------------------------------------
+
+    const record = {
+
+        txHash: txHash,
+
+        from:
+            transaksi?.from ??
+            fallbackFrom,
+
+        to:
+            transaksi?.to ??
+            fallbackTo,
+
+        network:
+            "Ethereum Sepolia",
+
+        amount:
+            reader.utils.fromWei(
+                String(valueWei),
+                "ether"
+            ),
+
+        gasFee:
+            reader.utils.fromWei(
+                gasFeeWei.toString(),
+                "ether"
+            ),
+
+        gasUsed:
+            gasUsed.toString(),
+
+        block:
+            String(
+                receipt.blockNumber
+            ),
+
+        timestamp:
+            new Date(
+                timestamp * 1000
+            ).toISOString()
+    };
+
+
+    // ------------------------------------------
+    // SIMPAN KE LOCAL STORAGE
+    // ------------------------------------------
+
+    const existing =
+        bacaTransaksiTersimpan();
+
+
+    // Hindari TX duplikat
+
+    const filtered =
+        existing.filter(
+            function(item) {
+
+                return (
+                    item.txHash !==
+                    txHash
+                );
+
+            }
+        );
+
+
+    // Transaksi terbaru di paling atas
+
+    filtered.unshift(
+        record
+    );
+
+
+    localStorage.setItem(
+        TRANSACTION_STORAGE_KEY,
+        JSON.stringify(filtered)
+    );
+
+
+    console.log(
+        "TRANSAKSI NYATA BERHASIL DISIMPAN:",
+        record
+    );
+
+
+    return record;
+}
 
 // ======================================================
 // MENUNGGU RECEIPT
@@ -1269,13 +1511,48 @@ if (receipt?.status === 1n) {
     );
 
     console.log(
-        "TRANSACTION HASH:",
-        tx
+    "TRANSACTION HASH:",
+    tx
+);
+
+
+// ==================================================
+// SIMPAN TRANSAKSI NYATA
+// ==================================================
+
+try {
+
+    await simpanTransaksiNyata(
+        reader,
+        tx,
+        akun,
+        tujuan,
+        valueWei
     );
 
-    setStatus(
-        "Transaksi berhasil dikonfirmasi ✅"
+    console.log(
+        "DATA TRANSAKSI BERHASIL DISIMPAN"
     );
+
+} catch (saveError) {
+
+    console.log(
+        "PERINGATAN: TRANSAKSI BERHASIL, " +
+        "TETAPI DATA RIWAYAT GAGAL DISIMPAN:",
+        saveError?.message ||
+        saveError
+    );
+
+}
+
+
+// ==================================================
+// STATUS AKHIR
+// ==================================================
+
+setStatus(
+    "Transaksi berhasil dikonfirmasi ✅"
+);
 
 } else {
 
