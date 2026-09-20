@@ -1,103 +1,10 @@
 // ======================================================
-// DATA TRANSAKSI CONTOH
-// TAHAP PERTAMA: UI DETAIL TRANSAKSI
+// RIWAYAT TRANSAKSI
+// DATA DARI APP.JS
 // ======================================================
 
-const transaksiData = {
-
-    1: {
-
-        status: "Berhasil ✅",
-
-        from:
-            "0x85489A2B16d5195F3c5ca6Fb2Fdf74958c259A7E",
-
-        to:
-            "0xEE91B1Bbef00Cb1348FE1F31f214A7dFB6E829A6",
-
-        network:
-            "Ethereum Sepolia",
-
-        amount:
-            "0.0100 ETH",
-
-        gas:
-            "0.00002 ETH",
-
-        block:
-            "11666841",
-
-        timestamp:
-            "2026-09-10T07:15:00",
-
-        hash:
-            "0x809901da844d32b3f81b9a8c8c061223dc32229c331b68fe538ce4a015030305"
-
-    },
-
-
-    2: {
-
-        status: "Berhasil ✅",
-
-        from:
-            "0x85ABCDEF12345678901234567890ABCDEF123456",
-
-        to:
-            "0xE829123456789012345678901234567890123456",
-
-        network:
-            "Ethereum Sepolia",
-
-        amount:
-            "0.0050 ETH",
-
-        gas:
-            "0.00002 ETH",
-
-        block:
-            "11713072",
-
-        timestamp:
-            "2026-09-10T08:21:00",
-
-        hash:
-            "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
-
-    },
-
-
-    3: {
-
-        status: "Berhasil ✅",
-
-        from:
-            "0x123456789012345678901234567890123456ABCD",
-
-        to:
-            "0x12ABCDEF12345678901234567890123456789012",
-
-        network:
-            "Ethereum Sepolia",
-
-        amount:
-            "0.0020 ETH",
-
-        gas:
-            "0.00002 ETH",
-
-        block:
-            "11717702",
-
-        timestamp:
-            "2026-09-10T09:42:00",
-
-        hash:
-            "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
-
-    }
-
-};
+const TRANSACTION_STORAGE_KEY =
+    "walletcrypto_transactions_v1";
 
 
 // ======================================================
@@ -105,49 +12,115 @@ const transaksiData = {
 // ======================================================
 
 const historyPage =
-    document.getElementById("historyPage");
+    document.getElementById(
+        "historyPage"
+    );
 
 const detailPage =
-    document.getElementById("detailPage");
+    document.getElementById(
+        "detailPage"
+    );
 
-const transactionItems =
-    document.querySelectorAll(".transaction-item");
+const transactionList =
+    document.getElementById(
+        "transactionList"
+    );
 
 const backToHistory =
-    document.getElementById("backToHistory");
+    document.getElementById(
+        "backToHistory"
+    );
 
 const detailStatus =
-    document.getElementById("detailStatus");
+    document.getElementById(
+        "detailStatus"
+    );
 
 const detailFrom =
-    document.getElementById("detailFrom");
+    document.getElementById(
+        "detailFrom"
+    );
 
 const detailTo =
-    document.getElementById("detailTo");
+    document.getElementById(
+        "detailTo"
+    );
 
 const detailNetwork =
-    document.getElementById("detailNetwork");
+    document.getElementById(
+        "detailNetwork"
+    );
 
 const detailAmount =
-    document.getElementById("detailAmount");
+    document.getElementById(
+        "detailAmount"
+    );
 
 const detailGas =
-    document.getElementById("detailGas");
+    document.getElementById(
+        "detailGas"
+    );
 
 const detailBlock =
-    document.getElementById("detailBlock");
+    document.getElementById(
+        "detailBlock"
+    );
 
 const detailTime =
-    document.getElementById("detailTime");
+    document.getElementById(
+        "detailTime"
+    );
 
 const detailHash =
-    document.getElementById("detailHash");
+    document.getElementById(
+        "detailHash"
+    );
 
 const copyHashButton =
-    document.getElementById("copyHashButton");
+    document.getElementById(
+        "copyHashButton"
+    );
 
 const explorerButton =
-    document.getElementById("explorerButton");
+    document.getElementById(
+        "explorerButton"
+    );
+
+
+// ======================================================
+// BACA DATA TRANSAKSI
+// ======================================================
+
+function bacaTransaksi() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                TRANSACTION_STORAGE_KEY
+            );
+
+        if (!raw) {
+            return [];
+        }
+
+        const data =
+            JSON.parse(raw);
+
+        return Array.isArray(data)
+            ? data
+            : [];
+
+    } catch (error) {
+
+        console.error(
+            "GAGAL MEMBACA RIWAYAT:",
+            error
+        );
+
+        return [];
+    }
+}
 
 
 // ======================================================
@@ -169,10 +142,49 @@ function formatAddress(address) {
 
 
 // ======================================================
-// FORMAT WAKTU
+// FORMAT ETH
 // ======================================================
 
-function formatTimestamp(timestamp) {
+function formatEth(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return "-";
+    }
+
+    const parts =
+        String(value).split(".");
+
+    const whole =
+        parts[0];
+
+    const fraction =
+        parts[1] || "";
+
+
+    const shown =
+        fraction
+            .slice(0, 8)
+            .replace(/0+$/, "");
+
+
+    return (
+        whole +
+        "." +
+        shown.padEnd(4, "0") +
+        " ETH"
+    );
+}
+
+
+// ======================================================
+// FORMAT JAM
+// ======================================================
+
+function formatTime(timestamp) {
 
     if (!timestamp) {
         return "-";
@@ -181,7 +193,50 @@ function formatTimestamp(timestamp) {
     const date =
         new Date(timestamp);
 
-    if (Number.isNaN(date.getTime())) {
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return "-";
+    }
+
+    const jam =
+        String(
+            date.getHours()
+        ).padStart(2, "0");
+
+    const menit =
+        String(
+            date.getMinutes()
+        ).padStart(2, "0");
+
+    return (
+        jam +
+        "." +
+        menit
+    );
+}
+
+
+// ======================================================
+// FORMAT TANGGAL LENGKAP
+// ======================================================
+
+function formatDateTime(timestamp) {
+
+    if (!timestamp) {
+        return "-";
+    }
+
+    const date =
+        new Date(timestamp);
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
         return "-";
     }
 
@@ -223,19 +278,186 @@ function formatTimestamp(timestamp) {
 
 
 // ======================================================
+// TAMPILKAN DAFTAR TRANSAKSI
+// ======================================================
+
+function tampilkanDaftar() {
+
+    const transactions =
+        bacaTransaksi();
+
+
+    transactionList.innerHTML =
+        "";
+
+
+    // ------------------------------------------
+    // BELUM ADA DATA
+    // ------------------------------------------
+
+    if (
+        transactions.length === 0
+    ) {
+
+        const empty =
+            document.createElement(
+                "p"
+            );
+
+        empty.textContent =
+            "Belum ada transaksi.";
+
+        transactionList.appendChild(
+            empty
+        );
+
+        return;
+    }
+
+
+    // ------------------------------------------
+    // BUAT KARTU TRANSAKSI
+    // ------------------------------------------
+
+    transactions.forEach(
+        function(transaction) {
+
+            const item =
+                document.createElement(
+                    "button"
+                );
+
+            item.type =
+                "button";
+
+            item.className =
+                "transaction-item";
+
+
+            const info =
+                document.createElement(
+                    "div"
+                );
+
+            info.className =
+                "transaction-info";
+
+
+            const title =
+                document.createElement(
+                    "strong"
+                );
+
+            title.textContent =
+                "Transfer";
+
+
+            const address =
+                document.createElement(
+                    "span"
+                );
+
+            address.textContent =
+                formatAddress(
+                    transaction.to
+                );
+
+
+            const time =
+                document.createElement(
+                    "time"
+                );
+
+            time.textContent =
+                formatTime(
+                    transaction.timestamp
+                );
+
+
+            info.appendChild(
+                title
+            );
+
+            info.appendChild(
+                address
+            );
+
+            item.appendChild(
+                info
+            );
+
+            item.appendChild(
+                time
+            );
+
+
+            // --------------------------------------
+            // KLIK KARTU
+            // --------------------------------------
+
+            item.addEventListener(
+                "click",
+                function() {
+
+                    tampilkanDetail(
+                        transaction.txHash
+                    );
+
+                }
+            );
+
+
+            transactionList.appendChild(
+                item
+            );
+
+        }
+    );
+}
+
+
+// ======================================================
+// CARI TRANSAKSI
+// ======================================================
+
+function cariTransaksi(txHash) {
+
+    const transactions =
+        bacaTransaksi();
+
+    return transactions.find(
+        function(transaction) {
+
+            return (
+                transaction.txHash ===
+                txHash
+            );
+
+        }
+    );
+}
+
+
+// ======================================================
 // TAMPILKAN DETAIL
 // ======================================================
 
-function tampilkanDetail(id) {
+function tampilkanDetail(
+    txHash,
+    updateUrl = true
+) {
 
-    const transaksi =
-        transaksiData[id];
+    const transaction =
+        cariTransaksi(
+            txHash
+        );
 
-    if (!transaksi) {
+
+    if (!transaction) {
 
         console.error(
             "TRANSAKSI TIDAK DITEMUKAN:",
-            id
+            txHash
         );
 
         return;
@@ -243,42 +465,54 @@ function tampilkanDetail(id) {
 
 
     detailStatus.textContent =
-        transaksi.status;
+        "Berhasil ✅";
+
 
     detailFrom.textContent =
         formatAddress(
-            transaksi.from
+            transaction.from
         );
+
 
     detailTo.textContent =
         formatAddress(
-            transaksi.to
+            transaction.to
         );
+
 
     detailNetwork.textContent =
-        transaksi.network;
+        transaction.network;
+
 
     detailAmount.textContent =
-        transaksi.amount;
-
-    detailGas.textContent =
-        transaksi.gas;
-
-    detailBlock.textContent =
-        transaksi.block;
-
-    detailTime.textContent =
-        formatTimestamp(
-            transaksi.timestamp
+        formatEth(
+            transaction.amount
         );
 
+
+    detailGas.textContent =
+        formatEth(
+            transaction.gasFee
+        );
+
+
+    detailBlock.textContent =
+        transaction.block;
+
+
+    detailTime.textContent =
+        formatDateTime(
+            transaction.timestamp
+        );
+
+
     detailHash.textContent =
-        transaksi.hash;
+        transaction.txHash;
 
 
     explorerButton.href =
         "https://sepolia.etherscan.io/tx/" +
-        transaksi.hash;
+        transaction.txHash;
 
 
     historyPage.hidden =
@@ -288,47 +522,32 @@ function tampilkanDetail(id) {
         false;
 
 
-    window.history.pushState(
-        {
-            transactionId: id
-        },
-        "",
-        "?tx=" + encodeURIComponent(id)
-    );
+    if (updateUrl) {
+
+        window.history.pushState(
+            {
+                transactionHash:
+                    transaction.txHash
+            },
+            "",
+            "?tx=" +
+            encodeURIComponent(
+                transaction.txHash
+            )
+        );
+
+    }
 
 
     console.log(
         "DETAIL TRANSAKSI DIBUKA:",
-        id
+        transaction.txHash
     );
 }
 
 
 // ======================================================
-// KLIK TRANSAKSI
-// ======================================================
-
-transactionItems.forEach(
-    function(item) {
-
-        item.addEventListener(
-            "click",
-            function() {
-
-                const id =
-                    item.dataset.txId;
-
-                tampilkanDetail(id);
-
-            }
-        );
-
-    }
-);
-
-
-// ======================================================
-// KEMBALI KE DAFTAR
+// KEMBALI
 // ======================================================
 
 backToHistory.addEventListener(
@@ -341,14 +560,14 @@ backToHistory.addEventListener(
         historyPage.hidden =
             false;
 
+
+        tampilkanDaftar();
+
+
         window.history.pushState(
             {},
             "",
             "riwayat.html"
-        );
-
-        console.log(
-            "KEMBALI KE DAFTAR RIWAYAT"
         );
 
     }
@@ -366,8 +585,11 @@ copyHashButton.addEventListener(
         const hash =
             detailHash.textContent.trim();
 
-        if (!hash || hash === "-") {
 
+        if (
+            !hash ||
+            hash === "-"
+        ) {
             return;
         }
 
@@ -377,6 +599,7 @@ copyHashButton.addEventListener(
             await navigator.clipboard.writeText(
                 hash
             );
+
 
             copyHashButton.textContent =
                 "Hash Tersalin ✅";
@@ -412,25 +635,31 @@ copyHashButton.addEventListener(
 
 
 // ======================================================
-// DETEKSI ?tx= DI URL
+// BUKA TRANSAKSI DARI URL
 // ======================================================
 
-function bukaTransaksiDariURL() {
+function bukaDariURL() {
 
     const params =
         new URLSearchParams(
             window.location.search
         );
 
-    const id =
-        params.get("tx");
 
-    if (id) {
+    const txHash =
+        params.get(
+            "tx"
+        );
 
-        tampilkanDetail(id);
+
+    if (txHash) {
+
+        tampilkanDetail(
+            txHash,
+            false
+        );
 
     }
-
 }
 
 
@@ -447,12 +676,19 @@ window.addEventListener(
                 window.location.search
             );
 
-        const id =
-            params.get("tx");
 
-        if (id) {
+        const txHash =
+            params.get(
+                "tx"
+            );
 
-            tampilkanDetail(id);
+
+        if (txHash) {
+
+            tampilkanDetail(
+                txHash,
+                false
+            );
 
         } else {
 
@@ -461,6 +697,8 @@ window.addEventListener(
 
             historyPage.hidden =
                 false;
+
+            tampilkanDaftar();
 
         }
 
@@ -472,7 +710,9 @@ window.addEventListener(
 // MULAI
 // ======================================================
 
-bukaTransaksiDariURL();
+tampilkanDaftar();
+
+bukaDariURL();
 
 console.log(
     "RIWAYAT.JS BERHASIL DIMUAT"
