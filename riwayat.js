@@ -122,6 +122,694 @@ function bacaTransaksi() {
     }
 }
 
+// ======================================================
+// BLOCKCHAIN HISTORY - SEPOLIA
+// ======================================================
+
+const BLOCKSCOUT_API_BASE =
+    "https://eth-sepolia.blockscout.com/api/v2";
+
+const MAX_HISTORY_PAGES = 20;
+
+
+// ======================================================
+// AMBIL ADDRESS DARI OBJECT BLOCKSCOUT
+// ======================================================
+
+function ambilAddress(value) {
+
+    if (!value) {
+        return null;
+    }
+
+    if (typeof value === "string") {
+        return value;
+    }
+
+    return value.hash || null;
+}
+
+
+// ======================================================
+// KONVERSI WEI → ETH
+// Tanpa membutuhkan Web3.js
+// ======================================================
+
+function formatWeiToEth(wei) {
+
+    if (
+        wei === null ||
+        wei === undefined ||
+        wei === ""
+    ) {
+        return "0";
+    }
+
+    const raw =
+        String(wei).trim();
+
+    if (!/^\d+$/.test(raw)) {
+        return "0";
+    }
+
+    const padded =
+        raw.padStart(19, "0");
+
+    const whole =
+        padded.slice(0, -18);
+
+    const fraction =
+        padded
+            .slice(-18)
+            .slice(0, 8)
+            .replace(/0+$/, "");
+
+    return (
+        whole +
+        "." +
+        (
+            fraction ||
+            "0"
+        )
+    );
+}
+
+
+// ======================================================
+// HITUNG GAS FEE
+// ======================================================
+
+function ambilGasFeeWei(transaction) {
+
+    const feeValue =
+        transaction?.fee?.value ??
+        transaction?.fee;
+
+    if (
+        feeValue !== null &&
+        feeValue !== undefined &&
+        feeValue !== ""
+    ) {
+
+        return String(
+            feeValue
+        );
+    }
+
+
+    try {
+
+        if (
+            transaction?.gas_used !== undefined &&
+            transaction?.gas_price !== undefined
+        ) {
+
+            return (
+                BigInt(
+                    transaction.gas_used
+                ) *
+                BigInt(
+                    transaction.gas_price
+                )
+            ).toString();
+
+        }
+
+    } catch (error) {
+
+        console.warn(
+            "GAGAL MENGHITUNG GAS FEE:",
+            error?.message ||
+            error
+        );
+
+    }
+
+
+    return "0";
+}
+
+
+// ======================================================
+// TENTUKAN STATUS TRANSAKSI
+// ======================================================
+
+function tentukanStatus(transaction) {
+
+    if (
+        transaction?.status === "ok" ||
+        transaction?.result === "success" ||
+        transaction?.result === "ok"
+    ) {
+
+        return "Berhasil ✅";
+    }
+
+
+    if (
+        transaction?.status === "error" ||
+        transaction?.result === "error"
+    ) {
+
+        return "Gagal ❌";
+    }
+
+
+    return "Berhasil ✅";
+}
+
+
+// ======================================================
+// NORMALISASI DATA BLOCKCHAIN
+// ======================================================
+
+function normalisasiTransaksiBlockchain(
+    transaction
+) {
+
+    const valueWei =
+        String(
+            transaction?.value ??
+            "0"
+        );
+
+
+    // ------------------------------------------
+    // HANYA TRANSAKSI ETH
+    // ------------------------------------------
+
+    if (
+        BigInt(valueWei) === 0n
+    ) {
+
+        return null;
+    }
+
+
+    const txHash =
+        transaction?.hash;
+
+    const from =
+        ambilAddress(
+            transaction?.from
+        );
+
+    const to =
+        ambilAddress(
+            transaction?.to
+        );
+
+
+    if (
+        !txHash ||
+        !from
+    ) {
+
+        return null;
+    }
+
+
+    const gasFeeWei =
+        ambilGasFeeWei(
+            transaction
+        );
+
+
+    return {
+
+        txHash:
+
+            txHash,
+
+        from:
+
+            from,
+
+        to:
+
+            to,
+
+        network:
+
+            "Ethereum Sepolia",
+
+        amount:
+
+            formatWeiToEth(
+                valueWei
+            ),
+
+        gasFee:
+
+            formatWeiToEth(
+                gasFeeWei
+            ),
+
+        gasUsed:
+
+            String(
+                transaction?.gas_used ??
+                "0"
+            ),
+
+        block:
+
+            String(
+                transaction?.block_number ??
+                "-"
+            ),
+
+        timestamp:
+
+            transaction?.timestamp ??
+            null,
+
+        status:
+
+            tentukanStatus(
+                transaction
+            )
+    };
+}
+
+
+// ======================================================
+// GABUNGKAN DATA BLOCKCHAIN + LOCAL STORAGE
+// ======================================================
+
+function gabungkanTransaksiBlockchain(
+    records
+) {
+
+    const existing =
+        bacaTransaksi();
+
+
+    const byHash =
+        new Map();
+
+
+    // ------------------------------------------
+    // MASUKKAN DATA LAMA
+    // ------------------------------------------
+
+    existing.forEach(
+        function(transaction) {
+
+            if (
+                transaction?.txHash
+            ) {
+
+                byHash.set(
+                    transaction.txHash,
+                    transaction
+                );
+
+            }
+
+        }
+    );
+
+
+    // ------------------------------------------
+    // MASUKKAN DATA BLOCKCHAIN
+    // ------------------------------------------
+
+    records.forEach(
+        function(record) {
+
+            if (
+                !record?.txHash
+            ) {
+                return;
+            }
+
+
+            const previous =
+                byHash.get(
+                    record.txHash
+                ) || {};
+
+
+            byHash.set(
+                record.txHash,
+                {
+                    ...previous,
+                    ...record
+                }
+            );
+
+        }
+    );
+
+
+    // ------------------------------------------
+    // URUTKAN TERBARU → TERLAMA
+    // ------------------------------------------
+
+    const merged =
+        Array.from(
+            byHash.values()
+        ).sort(
+            function(a, b) {
+
+                const timeA =
+                    new Date(
+                        a.timestamp || 0
+                    ).getTime();
+
+                const timeB =
+                    new Date(
+                        b.timestamp || 0
+                    ).getTime();
+
+                return (
+                    timeB -
+                    timeA
+                );
+            }
+        );
+
+
+    localStorage.setItem(
+        TRANSACTION_STORAGE_KEY,
+        JSON.stringify(
+            merged
+        )
+    );
+
+
+    return merged;
+}
+
+
+// ======================================================
+// DETEKSI WALLET AKTIF
+// ======================================================
+
+async function ambilAkunWallet() {
+
+    // ------------------------------------------
+    // PRIORITAS 1: PROVIDER WALLET
+    // ------------------------------------------
+
+    if (
+        window.ethereum?.request
+    ) {
+
+        try {
+
+            const accounts =
+                await window.ethereum.request({
+                    method:
+                        "eth_accounts"
+                });
+
+
+            if (
+                Array.isArray(accounts) &&
+                accounts[0]
+            ) {
+
+                console.log(
+                    "AKUN WALLET DITEMUKAN:",
+                    accounts[0]
+                );
+
+                return accounts[0];
+            }
+
+        } catch (error) {
+
+            console.warn(
+                "ETH_ACCOUNTS ERROR:",
+                error?.message ||
+                error
+            );
+
+        }
+
+    }
+
+
+    // ------------------------------------------
+    // PRIORITAS 2: DATA LOCAL STORAGE
+    // ------------------------------------------
+
+    const existing =
+        bacaTransaksi();
+
+
+    if (
+        existing.length > 0 &&
+        existing[0]?.from
+    ) {
+
+        console.log(
+            "AKUN DARI DATA LOCAL:",
+            existing[0].from
+        );
+
+        return existing[0].from;
+    }
+
+
+    return null;
+}
+
+
+// ======================================================
+// AMBIL RIWAYAT DARI BLOCKCHAIN
+// ======================================================
+
+async function ambilRiwayatDariBlockchain(
+    address
+) {
+
+    if (!address) {
+
+        throw new Error(
+            "Alamat wallet belum terdeteksi."
+        );
+    }
+
+
+    const transactions =
+        [];
+
+    let nextPageParams =
+        null;
+
+
+    // ------------------------------------------
+    // PAGINATION
+    // ------------------------------------------
+
+    for (
+        let page = 1;
+        page <= MAX_HISTORY_PAGES;
+        page++
+    ) {
+
+        const url =
+            new URL(
+
+                BLOCKSCOUT_API_BASE +
+                "/addresses/" +
+                encodeURIComponent(
+                    address
+                ) +
+                "/transactions"
+
+            );
+
+
+        // --------------------------------------
+        // PARAMETER HALAMAN BERIKUTNYA
+        // --------------------------------------
+
+        if (
+            nextPageParams
+        ) {
+
+            Object.entries(
+                nextPageParams
+            ).forEach(
+                function([key, value]) {
+
+                    if (
+                        value !== null &&
+                        value !== undefined
+                    ) {
+
+                        url.searchParams.set(
+                            key,
+                            String(value)
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        console.log(
+            "AMBIL RIWAYAT BLOCKCHAIN - HALAMAN:",
+            page
+        );
+
+
+        const response =
+            await fetch(
+                url.toString(),
+                {
+                    method: "GET",
+                    headers: {
+                        Accept:
+                            "application/json"
+                    }
+                }
+            );
+
+
+        if (
+            !response.ok
+        ) {
+
+            throw new Error(
+                "Blockscout HTTP " +
+                response.status
+            );
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const items =
+            Array.isArray(
+                data.items
+            )
+                ? data.items
+                : [];
+
+
+        // --------------------------------------
+        // NORMALISASI DATA
+        // --------------------------------------
+
+        items.forEach(
+            function(item) {
+
+                try {
+
+                    const record =
+                        normalisasiTransaksiBlockchain(
+                            item
+                        );
+
+
+                    if (
+                        record
+                    ) {
+
+                        transactions.push(
+                            record
+                        );
+
+                    }
+
+                } catch (error) {
+
+                    console.warn(
+                        "TRANSAKSI BLOCKCHAIN DIABAIKAN:",
+                        error?.message ||
+                        error
+                    );
+
+                }
+
+            }
+        );
+
+
+        // --------------------------------------
+        // NEXT PAGE
+        // --------------------------------------
+
+        nextPageParams =
+            data.next_page_params ||
+            null;
+
+
+        if (
+            !nextPageParams ||
+            items.length === 0
+        ) {
+
+            break;
+        }
+
+    }
+
+
+    return transactions;
+}
+
+
+// ======================================================
+// SINKRONKAN RIWAYAT BLOCKCHAIN
+// ======================================================
+
+async function sinkronkanRiwayatBlockchain() {
+
+    const address =
+        await ambilAkunWallet();
+
+
+    if (!address) {
+
+        console.log(
+            "RIWAYAT BLOCKCHAIN DILEWATI: " +
+            "WALLET BELUM TERDETEKSI"
+        );
+
+        return;
+    }
+
+
+    console.log(
+        "WALLET UNTUK RIWAYAT:",
+        address
+    );
+
+
+    const records =
+        await ambilRiwayatDariBlockchain(
+            address
+        );
+
+
+    console.log(
+        "TRANSAKSI BLOCKCHAIN DITEMUKAN:",
+        records.length
+    );
+
+
+    const merged =
+        gabungkanTransaksiBlockchain(
+            records
+        );
+
+
+    console.log(
+        "TOTAL RIWAYAT TERSIMPAN:",
+        merged.length
+    );
+            }
 
 // ======================================================
 // FORMAT ALAMAT
@@ -465,7 +1153,8 @@ function tampilkanDetail(
 
 
     detailStatus.textContent =
-        "Berhasil ✅";
+    transaction.status ||
+    "Berhasil ✅";
 
 
     detailFrom.textContent =
@@ -707,13 +1396,52 @@ window.addEventListener(
 
 
 // ======================================================
-// MULAI
+// MULAI RIWAYAT
 // ======================================================
 
-tampilkanDaftar();
+async function mulaiRiwayat() {
 
-bukaDariURL();
+    // ------------------------------------------
+    // Tampilkan data lokal terlebih dahulu
+    // ------------------------------------------
 
-console.log(
-    "RIWAYAT.JS BERHASIL DIMUAT"
-);
+    tampilkanDaftar();
+
+
+    // ------------------------------------------
+    // Sinkronkan dengan blockchain
+    // ------------------------------------------
+
+    try {
+
+        await sinkronkanRiwayatBlockchain();
+
+        // Setelah blockchain selesai,
+        // render ulang data terbaru.
+
+        tampilkanDaftar();
+
+    } catch (error) {
+
+        console.error(
+            "GAGAL MENGAMBIL RIWAYAT BLOCKCHAIN:",
+            error
+        );
+
+    }
+
+
+    // ------------------------------------------
+    // Buka detail dari URL
+    // ------------------------------------------
+
+    bukaDariURL();
+
+
+    console.log(
+        "RIWAYAT.JS BERHASIL DIMUAT"
+    );
+}
+
+
+mulaiRiwayat();
