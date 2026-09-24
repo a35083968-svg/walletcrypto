@@ -9,6 +9,17 @@ let walletProviderAktif = null;
 
 let readProviders = [];
 
+// ======================================================
+// AUTO-CONNECT / PROVIDER DISCOVERY
+// ======================================================
+
+let walletProvidersTerdeteksi = [];
+
+let autoConnectSedangBerjalan = false;
+
+const providerListeners =
+    new WeakSet();
+
 const SEPOLIA_CHAIN_ID = 11155111;
 
 const SEPOLIA_RPCS = [
@@ -527,6 +538,551 @@ function walletTersedia() {
     );
 
 }
+
+// ======================================================
+// TAMBAHKAN PROVIDER WALLET
+// ======================================================
+
+function tambahProviderWallet(detail) {
+
+    const provider =
+        detail?.provider ??
+        detail;
+
+
+    if (
+        !provider ||
+        typeof provider.request !== "function"
+    ) {
+
+        return;
+    }
+
+
+    const sudahAda =
+        walletProvidersTerdeteksi.some(
+            function(item) {
+
+                return (
+                    item.provider ===
+                    provider
+                );
+
+            }
+        );
+
+
+    if (sudahAda) {
+        return;
+    }
+
+
+    walletProvidersTerdeteksi.push({
+
+        provider:
+
+            provider,
+
+        info:
+
+            detail?.info ??
+            null
+
+    });
+
+
+    console.log(
+        "PROVIDER WALLET TERDETEKSI:",
+        detail?.info?.name ||
+        "Injected Wallet"
+    );
+}
+
+
+// ======================================================
+// EIP-6963 WALLET DISCOVERY
+// ======================================================
+
+function mulaiDiscoveryWallet() {
+
+    // ------------------------------------------
+    // Provider dari EIP-6963
+    // ------------------------------------------
+
+    window.addEventListener(
+        "eip6963:announceProvider",
+        function(event) {
+
+            tambahProviderWallet(
+                event.detail
+            );
+
+        }
+    );
+
+
+    // ------------------------------------------
+    // Minta semua provider mengumumkan diri
+    // ------------------------------------------
+
+    window.dispatchEvent(
+        new Event(
+            "eip6963:requestProvider"
+        )
+    );
+
+
+    // ------------------------------------------
+    // FALLBACK WALLET LAMA
+    // ------------------------------------------
+
+    tambahProviderWallet(
+        window.bitkeep?.ethereum
+    );
+
+
+    tambahProviderWallet(
+        window.ethereum
+    );
+
+}
+
+// ======================================================
+// CARI PROVIDER YANG SUDAH DIBERI IZIN
+// ======================================================
+
+async function cariWalletSudahTerhubung() {
+
+    mulaiDiscoveryWallet();
+
+
+    // Beri waktu provider EIP-6963
+    // mengumumkan dirinya.
+
+    await new Promise(
+        function(resolve) {
+
+            setTimeout(
+                resolve,
+                200
+            );
+
+        }
+    );
+
+
+    for (
+        let index = 0;
+        index <
+        walletProvidersTerdeteksi.length;
+        index++
+    ) {
+
+        const item =
+            walletProvidersTerdeteksi[index];
+
+
+        try {
+
+            const accounts =
+                await item.provider.request({
+
+                    method:
+                        "eth_accounts"
+
+                });
+
+
+            if (
+                Array.isArray(accounts) &&
+                accounts.length > 0
+            ) {
+
+                console.log(
+                    "AUTO-CONNECT WALLET DITEMUKAN:",
+                    item.info?.name ||
+                    "Injected Wallet"
+                );
+
+
+                console.log(
+                    "AUTO-CONNECT ACCOUNT:",
+                    accounts[0]
+                );
+
+
+                return {
+
+                    provider:
+                        item.provider,
+
+                    info:
+                        item.info,
+
+                    accounts:
+                        accounts
+
+                };
+
+            }
+
+        } catch (error) {
+
+            console.log(
+                "AUTO-CONNECT PROVIDER ERROR:",
+                error?.message ||
+                error
+            );
+
+        }
+
+    }
+
+
+    return null;
+                }
+
+// ======================================================
+// AUTO-CONNECT WALLET
+// ======================================================
+
+async function autoConnectWallet() {
+
+    if (
+        autoConnectSedangBerjalan
+    ) {
+
+        return;
+    }
+
+
+    autoConnectSedangBerjalan =
+        true;
+
+
+    try {
+
+        console.log(
+            "AUTO-CONNECT DIMULAI"
+        );
+
+
+        const hasil =
+            await cariWalletSudahTerhubung();
+
+
+        // ------------------------------------------
+        // TIDAK ADA WALLET YANG SUDAH DIBERI IZIN
+        // ------------------------------------------
+
+        if (!hasil) {
+
+            console.log(
+                "AUTO-CONNECT: TIDAK ADA WALLET TERHUBUNG"
+            );
+
+            return;
+        }
+
+
+        // ------------------------------------------
+        // AKTIFKAN PROVIDER
+        // ------------------------------------------
+
+        walletProviderAktif =
+            hasil.provider;
+
+
+        akun =
+            hasil.accounts[0];
+
+
+        console.log(
+            "AUTO-CONNECT PROVIDER:",
+            hasil.info?.name ||
+            "Injected Wallet"
+        );
+
+
+        console.log(
+            "AUTO-CONNECT ACCOUNT:",
+            akun
+        );
+
+
+        // ------------------------------------------
+        // CEK NETWORK
+        // ------------------------------------------
+
+        const chainIdHex =
+            await walletProviderAktif.request({
+
+                method:
+                    "eth_chainId"
+
+            });
+
+
+        const chainId =
+            parseInt(
+                chainIdHex,
+                16
+            );
+
+
+        console.log(
+            "AUTO-CONNECT CHAIN ID:",
+            chainId
+        );
+
+
+        if (
+            chainId !==
+            SEPOLIA_CHAIN_ID
+        ) {
+
+            if (alamat) {
+
+                alamat.innerHTML = `
+
+                    <b>Alamat:</b><br>
+
+                    ${akun.slice(0, 6)}
+                    ...
+                    ${akun.slice(-4)}
+
+                    <br><br>
+
+                    <b>Network:</b><br>
+
+                    Bukan Ethereum Sepolia
+
+                `;
+
+            }
+
+
+            setStatus(
+                "Wallet terhubung, tetapi network bukan Sepolia."
+            );
+
+
+            console.log(
+                "AUTO-CONNECT NETWORK BUKAN SEPOLIA"
+            );
+
+
+            return;
+        }
+
+
+        console.log(
+            "AUTO-CONNECT SEPOLIA TERDETEKSI"
+        );
+
+
+        // ------------------------------------------
+        // BUAT WEB3
+        // ------------------------------------------
+
+        if (
+            typeof Web3 ===
+            "undefined"
+        ) {
+
+            throw new Error(
+                "Web3.js tidak ditemukan."
+            );
+        }
+
+
+        web3 =
+            new Web3(
+                walletProviderAktif
+            );
+
+
+        console.log(
+            "AUTO-CONNECT WEB3 BERHASIL"
+        );
+
+
+        // ------------------------------------------
+        // SEMBUNYIKAN CONNECT WALLET
+        // ------------------------------------------
+
+        if (btnConnect) {
+
+            btnConnect.hidden =
+                true;
+
+        }
+
+
+        // ------------------------------------------
+        // TAMPILKAN ALAMAT
+        // ------------------------------------------
+
+        if (alamat) {
+
+            alamat.innerHTML = `
+
+                <b>Alamat:</b><br>
+
+                ${akun.slice(0, 6)}
+                ...
+                ${akun.slice(-4)}
+
+                <br><br>
+
+                <b>Saldo ETH:</b><br>
+                Mengambil saldo...
+
+            `;
+
+        }
+
+
+        // ------------------------------------------
+        // AMBIL SALDO
+        // ------------------------------------------
+
+        setStatus(
+            "Auto-connect: mengambil saldo..."
+        );
+
+
+        const readers =
+            buatReadProviders();
+
+
+        const reader =
+            readers[0].web3;
+
+
+        console.log(
+            "AUTO-CONNECT MEMAKAI READ RPC:",
+            readers[0].name
+        );
+
+
+        const balanceWei =
+            await reader.eth.getBalance(
+                akun
+            );
+
+
+        const balanceETH =
+            reader.utils.fromWei(
+                balanceWei,
+                "ether"
+            );
+
+
+        console.log(
+            "AUTO-CONNECT BALANCE WEI:",
+            balanceWei
+        );
+
+
+        console.log(
+            "AUTO-CONNECT BALANCE ETH:",
+            balanceETH
+        );
+
+
+        if (alamat) {
+
+            alamat.innerHTML = `
+
+                <b>Alamat:</b><br>
+
+                ${akun.slice(0, 6)}
+                ...
+                ${akun.slice(-4)}
+
+                <br><br>
+
+                <b>Saldo ETH:</b><br>
+
+                ${parseFloat(
+                    balanceETH
+                ).toFixed(6)}
+
+                ETH
+
+            `;
+
+        }
+
+
+        setStatus(
+            "Wallet otomatis terhubung ✅"
+        );
+
+
+        console.log(
+            "================================"
+        );
+
+
+        console.log(
+            "AUTO-CONNECT BERHASIL ✅"
+        );
+
+
+        console.log(
+            "Akun:",
+            akun
+        );
+
+
+        console.log(
+            "Wallet:",
+            hasil.info?.name ||
+            "Injected Wallet"
+        );
+
+
+        console.log(
+            "Saldo:",
+            balanceETH
+        );
+
+
+        console.log(
+            "================================"
+        );
+
+
+        // ------------------------------------------
+        // PASANG EVENT PROVIDER
+        // ------------------------------------------
+
+        pasangEventProvider(
+            walletProviderAktif
+        );
+
+    } catch (error) {
+
+        console.error(
+            "AUTO-CONNECT ERROR:",
+            error
+        );
+
+
+        setStatus(
+            "Auto-connect gagal."
+        );
+
+    } finally {
+
+        autoConnectSedangBerjalan =
+            false;
+
+    }
+
+            }
     
 // ======================================================
 // CONNECT WALLET
@@ -1648,6 +2204,181 @@ setStatus(
 }
 
 // ======================================================
+// EVENT PROVIDER
+// ======================================================
+
+function pasangEventProvider(
+    provider
+) {
+
+    if (
+        !provider ||
+        typeof provider.on !== "function"
+    ) {
+
+        return;
+    }
+
+
+    if (
+        providerListeners.has(
+            provider
+        )
+    ) {
+
+        return;
+    }
+
+
+    providerListeners.add(
+        provider
+    );
+
+
+    // ==========================================
+    // ACCOUNT BERUBAH
+    // ==========================================
+
+    provider.on(
+        "accountsChanged",
+        async function(accounts) {
+
+            console.log(
+                "ACCOUNT BERUBAH:",
+                accounts
+            );
+
+
+            if (
+                !accounts ||
+                accounts.length === 0
+            ) {
+
+                akun = null;
+
+                web3 = null;
+
+
+                if (btnConnect) {
+
+                    btnConnect.hidden =
+                        false;
+
+                    btnConnect.innerText =
+                        "Connect Wallet";
+
+                    btnConnect.disabled =
+                        false;
+
+                }
+
+
+                if (alamat) {
+
+                    alamat.innerText =
+                        "Belum terhubung";
+
+                }
+
+
+                setStatus(
+                    "Wallet terputus."
+                );
+
+
+                return;
+            }
+
+
+            akun =
+                accounts[0];
+
+
+            console.log(
+                "AKUN BARU:",
+                akun
+            );
+
+
+            walletProviderAktif =
+                provider;
+
+
+            web3 =
+                new Web3(
+                    provider
+                );
+
+
+            if (btnConnect) {
+
+                btnConnect.hidden =
+                    true;
+
+            }
+
+
+            await updateSaldo();
+
+        }
+    );
+
+
+    // ==========================================
+    // NETWORK BERUBAH
+    // ==========================================
+
+    provider.on(
+        "chainChanged",
+        function(chainId) {
+
+            console.log(
+                "NETWORK BERUBAH:",
+                chainId
+            );
+
+
+            const number =
+                parseInt(
+                    chainId,
+                    16
+                );
+
+
+            if (
+                number !==
+                SEPOLIA_CHAIN_ID
+            ) {
+
+                setStatus(
+                    "Wallet terhubung, tetapi network bukan Sepolia."
+                );
+
+
+                return;
+            }
+
+
+            setStatus(
+                "Network Sepolia ✅"
+            );
+
+
+            if (
+                akun &&
+                web3
+            ) {
+
+                updateSaldo();
+
+            }
+
+        }
+    );
+
+}
+
+// ======================================================
 // ACCOUNT BERUBAH
 // ======================================================
 
@@ -1838,3 +2569,9 @@ async function updateSaldo() {
 console.log(
     "Crypto Wallet JS selesai dimuat."
 );
+
+// ======================================================
+// AUTO-CONNECT SAAT APP DIBUKA
+// ======================================================
+
+autoConnectWallet();
