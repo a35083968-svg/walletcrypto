@@ -229,6 +229,84 @@ function buatReadProviders() {
 const TRANSACTION_STORAGE_KEY =
     "walletcrypto_transactions_v1";
 
+const SETTINGS_STORAGE_KEY =
+    "walletcrypto_settings_v1";
+
+function bacaPengaturanWallet() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                SETTINGS_STORAGE_KEY
+            );
+
+
+        if (!raw) {
+
+            return {
+
+                autoConnect:
+                    true,
+
+                reconnectOnLaunch:
+                    true,
+
+                rememberWallet:
+                    true,
+
+                preferredProvider:
+                    null
+
+            };
+
+        }
+
+
+        return {
+
+            autoConnect:
+                true,
+
+            reconnectOnLaunch:
+                true,
+
+            rememberWallet:
+                true,
+
+            preferredProvider:
+                null,
+
+            ...JSON.parse(raw)
+
+        };
+
+    } catch (error) {
+
+        console.warn(
+            "GAGAL MEMBACA PENGATURAN:",
+            error
+        );
+
+
+        return {
+
+            autoConnect:
+                true,
+
+            reconnectOnLaunch:
+                true,
+
+            rememberWallet:
+                true,
+
+            preferredProvider:
+                null
+
+        };
+
+    }
+}
 
 // ======================================================
 // BACA TRANSAKSI TERSIMPAN
@@ -765,6 +843,84 @@ async function cariWalletSudahTerhubung() {
         }
     );
 
+        const settings =
+        bacaPengaturanWallet();
+
+
+    if (
+        settings.rememberWallet &&
+        settings.preferredProvider
+    ) {
+
+        const preferred =
+            settings.preferredProvider;
+
+
+        walletProvidersTerdeteksi.sort(
+            function(a, b) {
+
+                const aMatch =
+
+                    a.info &&
+
+                    (
+                        a.info.uuid ===
+                        preferred.uuid
+
+                        ||
+
+                        a.info.rdns ===
+                        preferred.rdns
+                    );
+
+
+                const bMatch =
+
+                    b.info &&
+
+                    (
+                        b.info.uuid ===
+                        preferred.uuid
+
+                        ||
+
+                        b.info.rdns ===
+                        preferred.rdns
+                    );
+
+
+                if (
+                    aMatch &&
+                    !bMatch
+                ) {
+
+                    return -1;
+
+                }
+
+
+                if (
+                    !aMatch &&
+                    bMatch
+                ) {
+
+                    return 1;
+
+                }
+
+
+                return 0;
+
+            }
+        );
+
+
+        console.log(
+            "PREFERRED WALLET:",
+            preferred.name
+        );
+
+    }
 
     for (
         let index = 0;
@@ -842,6 +998,23 @@ async function cariWalletSudahTerhubung() {
 // ======================================================
 
 async function autoConnectWallet() {
+
+    const settings =
+        bacaPengaturanWallet();
+
+
+    if (
+        !settings.autoConnect ||
+        !settings.reconnectOnLaunch
+    ) {
+
+        console.log(
+            "AUTO-CONNECT DINONAKTIFKAN DARI SETTINGS"
+        );
+
+        return;
+    }
+
 
     if (
         autoConnectSedangBerjalan
