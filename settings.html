@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Pengaturan Wallet</title>
+
+    <link
+        rel="stylesheet"
+        href="settings.css"
+    >
+
+</head>
+
+<body>
+
+<main class="settings-page">
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <header class="settings-header">
+
+        <a
+            href="index.html"
+            class="back-button"
+        >
+            ←
+        </a>
+
+        <div>
+            <h1>
+                Pengaturan
+            </h1>
+
+            <p>
+                Kelola wallet, auto-connect, dan network
+            </p>
+        </div>
+
+    </header>
+
+
+    <!-- ==========================================
+         AUTO CONNECT
+    =========================================== -->
+
+    <section class="settings-card">
+
+        <div class="section-title">
+
+            <span class="section-icon">
+                🔄
+            </span>
+
+            <div>
+
+                <h2>
+                    Auto Connect
+                </h2>
+
+                <p>
+                    Sambungkan kembali wallet
+                    yang sudah memberikan izin.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- AUTO CONNECT -->
+
+        <div class="setting-row">
+
+            <div>
+
+                <strong>
+                    Auto Connect
+                </strong>
+
+                <span>
+                    Deteksi wallet secara otomatis
+                </span>
+
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    id="autoConnectToggle"
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <!-- RECONNECT -->
+
+        <div class="setting-row">
+
+            <div>
+
+                <strong>
+                    Reconnect on Launch
+                </strong>
+
+                <span>
+                    Cek koneksi wallet saat aplikasi dibuka
+                </span>
+
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    id="reconnectToggle"
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <!-- REMEMBER WALLET -->
+
+        <div class="setting-row">
+
+            <div>
+
+                <strong>
+                    Remember Last Wallet
+                </strong>
+
+                <span>
+                    Prioritaskan wallet yang terakhir dipilih
+                </span>
+
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    id="rememberWalletToggle"
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         WALLET SELECTOR
+    =========================================== -->
+
+    <section class="settings-card">
+
+        <div class="section-title">
+
+            <span class="section-icon">
+                👛
+            </span>
+
+            <div>
+
+                <h2>
+                    Wallet Selector
+                </h2>
+
+                <p>
+                    Wallet yang terdeteksi pada perangkat
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="walletList"
+            class="wallet-list"
+        >
+
+            <div class="loading">
+                Mendeteksi wallet...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         ACCOUNT
+    =========================================== -->
+
+    <section class="settings-card">
+
+        <div class="section-title">
+
+            <span class="section-icon">
+                👤
+            </span>
+
+            <div>
+
+                <h2>
+                    Akun Wallet
+                </h2>
+
+                <p>
+                    Akun yang saat ini tersedia
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="accountList"
+            class="account-list"
+        >
+
+            <div class="empty-state">
+                Belum ada wallet terhubung.
+            </div>
+
+        </div>
+
+
+        <button
+            id="refreshAccounts"
+            class="secondary-button"
+            type="button"
+        >
+            ↻ Periksa Akun
+        </button>
+
+
+        <div class="account-note">
+
+            <strong>
+                Catatan:
+            </strong>
+
+            <p>
+                Pergantian akun dilakukan melalui
+                wallet. Setelah akun berubah,
+                aplikasi akan menerima event
+                <code>accountsChanged</code>.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         NETWORK MANAGER
+    =========================================== -->
+
+    <section class="settings-card">
+
+        <div class="section-title">
+
+            <span class="section-icon">
+                🌐
+            </span>
+
+            <div>
+
+                <h2>
+                    Network Manager
+                </h2>
+
+                <p>
+                    Pilih jaringan yang didukung aplikasi
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- SEPOLIA -->
+
+        <button
+            class="network-item active"
+            type="button"
+            data-chain-id="0xaa36a7"
+        >
+
+            <div>
+
+                <strong>
+                    Ethereum Sepolia
+                </strong>
+
+                <span>
+                    Testnet
+                </span>
+
+            </div>
+
+            <span
+                class="network-status"
+                id="sepoliaStatus"
+            >
+                Aktif
+            </span>
+
+        </button>
+
+
+        <!-- MAINNET LOCKED -->
+
+        <button
+            class="network-item disabled"
+            type="button"
+            disabled
+        >
+
+            <div>
+
+                <strong>
+                    Ethereum
+                </strong>
+
+                <span>
+                    Mainnet
+                </span>
+
+            </div>
+
+            <span class="network-status">
+                Belum didukung
+            </span>
+
+        </button>
+
+
+        <!-- NETWORK LAIN -->
+
+        <button
+            class="network-item disabled"
+            type="button"
+            disabled
+        >
+
+            <div>
+
+                <strong>
+                    Network Lain
+                </strong>
+
+                <span>
+                    Polygon / Arbitrum / Base / lainnya
+                </span>
+
+            </div>
+
+            <span class="network-status">
+                Segera
+            </span>
+
+        </button>
+
+    </section>
+
+
+    <!-- ==========================================
+         STATUS
+    =========================================== -->
+
+    <div
+        id="settingsStatus"
+        class="settings-status"
+    >
+        Pengaturan siap.
+    </div>
+
+</main>
+
+
+<script src="settings.js"></script>
+
+</body>
+
+  </html>
