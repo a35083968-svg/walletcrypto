@@ -1,0 +1,695 @@
+* {
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+
+body {
+
+    min-height: 100vh;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f172a,
+            #111827,
+            #020617
+        );
+
+    color: #ffffff;
+
+    padding: 20px;
+}
+
+
+.settings-page {
+
+    width: 100%;
+
+    max-width: 520px;
+
+    margin: auto;
+}
+
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.settings-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 25px;
+}
+
+
+.settings-header h1 {
+
+    font-size: 28px;
+
+    margin-bottom: 5px;
+}
+
+
+.settings-header p {
+
+    color: #94a3b8;
+
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   BACK BUTTON
+========================================== */
+
+.back-button {
+
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #1e293b;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 28px;
+
+    flex-shrink: 0;
+}
+
+
+/* ==========================================
+   CARD
+========================================== */
+
+.settings-card {
+
+    margin-bottom: 18px;
+
+    padding: 20px;
+
+    border-radius: 20px;
+
+    background: #18232b;
+
+    border: 1px solid #26343c;
+
+    box-shadow:
+        0 0 20px
+        rgba(
+            0,
+            255,
+            136,
+            0.08
+        );
+}
+
+
+/* ==========================================
+   SECTION TITLE
+========================================== */
+
+.section-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+}
+
+
+.section-icon {
+
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #0f172a;
+
+    font-size: 24px;
+}
+
+
+.section-title h2 {
+
+    font-size: 20px;
+}
+
+
+.section-title p {
+
+    margin-top: 4px;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+    line-height: 1.4;
+}
+
+
+/* ==========================================
+   SETTING ROW
+========================================== */
+
+.setting-row {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 15px 0;
+
+    border-top: 1px solid #26343c;
+}
+
+
+.setting-row div {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.setting-row strong {
+
+    font-size: 16px;
+}
+
+
+.setting-row span {
+
+    color: #94a3b8;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+}
+
+
+/* ==========================================
+   SWITCH
+========================================== */
+
+.switch {
+
+    position: relative;
+
+    width: 56px;
+    height: 30px;
+
+    flex-shrink: 0;
+}
+
+
+.switch input {
+
+    opacity: 0;
+
+    width: 0;
+    height: 0;
+}
+
+
+.slider {
+
+    position: absolute;
+
+    inset: 0;
+
+    cursor: pointer;
+
+    border-radius: 30px;
+
+    background: #334155;
+
+    transition: .25s;
+}
+
+
+.slider::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 22px;
+    height: 22px;
+
+    left: 4px;
+    top: 4px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    transition: .25s;
+}
+
+
+.switch input:checked + .slider {
+
+    background:
+        linear-gradient(
+            90deg,
+            #22c55e,
+            #16a34a
+        );
+
+    box-shadow:
+        0 0 15px
+        rgba(
+            34,
+            197,
+            94,
+            0.45
+        );
+}
+
+
+.switch input:checked +
+.slider::before {
+
+    transform:
+        translateX(26px);
+}
+
+
+/* ==========================================
+   WALLET LIST
+========================================== */
+
+.wallet-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+.wallet-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 14px;
+
+    border-radius: 15px;
+
+    background: #0f172a;
+
+    border: 1px solid #26343c;
+}
+
+
+.wallet-icon {
+
+    width: 44px;
+    height: 44px;
+
+    border-radius: 12px;
+
+    object-fit: contain;
+
+    background: #1e293b;
+}
+
+
+.wallet-info {
+
+    flex: 1;
+
+    min-width: 0;
+}
+
+
+.wallet-info strong {
+
+    display: block;
+
+    font-size: 16px;
+}
+
+
+.wallet-info span {
+
+    display: block;
+
+    margin-top: 4px;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+}
+
+
+.wallet-select-button {
+
+    border: none;
+
+    padding: 9px 12px;
+
+    border-radius: 10px;
+
+    background: #22c55e;
+
+    color: #ffffff;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+
+.wallet-select-button.selected {
+
+    background: #334155;
+
+    color: #86efac;
+
+    border: 1px solid #22c55e;
+}
+
+
+/* ==========================================
+   ACCOUNT
+========================================== */
+
+.account-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    margin-bottom: 12px;
+}
+
+
+.account-item {
+
+    padding: 14px;
+
+    border-radius: 14px;
+
+    background: #0f172a;
+
+    border: 1px solid #26343c;
+}
+
+
+.account-item strong {
+
+    display: block;
+
+    color: #86efac;
+
+    margin-bottom: 5px;
+}
+
+
+.account-item code {
+
+    word-break: break-all;
+
+    color: #cbd5e1;
+
+    font-size: 12px;
+}
+
+
+.account-item.active {
+
+    border-color: #22c55e;
+
+    box-shadow:
+        0 0 12px
+        rgba(
+            34,
+            197,
+            94,
+            0.15
+        );
+}
+
+
+.secondary-button {
+
+    width: 100%;
+
+    padding: 13px;
+
+    border: 1px solid #22c55e;
+
+    border-radius: 12px;
+
+    background: transparent;
+
+    color: #86efac;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+/* ==========================================
+   ACCOUNT NOTE
+========================================== */
+
+.account-note {
+
+    margin-top: 15px;
+
+    padding: 12px;
+
+    border-radius: 12px;
+
+    background: #0f172a;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+.account-note strong {
+
+    color: #ffffff;
+}
+
+
+.account-note code {
+
+    color: #86efac;
+}
+
+
+/* ==========================================
+   NETWORK
+========================================== */
+
+.network-item {
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 15px;
+
+    margin-bottom: 10px;
+
+    border-radius: 15px;
+
+    background: #0f172a;
+
+    color: #ffffff;
+
+    border: 1px solid #26343c;
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+
+.network-item div {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.network-item strong {
+
+    font-size: 15px;
+}
+
+
+.network-item span {
+
+    color: #94a3b8;
+
+    font-size: 12px;
+}
+
+
+.network-item.active {
+
+    border-color: #22c55e;
+
+    box-shadow:
+        0 0 12px
+        rgba(
+            34,
+            197,
+            94,
+            0.15
+        );
+}
+
+
+.network-item.disabled {
+
+    opacity: 0.5;
+
+    cursor: not-allowed;
+}
+
+
+.network-status {
+
+    color: #86efac !important;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================================
+   STATUS
+========================================== */
+
+.settings-status {
+
+    padding: 15px;
+
+    margin-top: 5px;
+
+    border-radius: 14px;
+
+    background: #0f172a;
+
+    border: 1px solid #26343c;
+
+    color: #cbd5e1;
+
+    text-align: center;
+
+    font-size: 13px;
+}
+
+
+/* ==========================================
+   EMPTY / LOADING
+========================================== */
+
+.loading,
+.empty-state {
+
+    padding: 20px;
+
+    text-align: center;
+
+    color: #94a3b8;
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 420px) {
+
+    body {
+
+        padding: 14px;
+    }
+
+
+    .settings-card {
+
+        padding: 16px;
+    }
+
+
+    .settings-header h1 {
+
+        font-size: 24px;
+    }
+
+
+    .wallet-select-button {
+
+        padding: 8px 10px;
+
+        font-size: 12px;
+    }
+
+  }
