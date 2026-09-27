@@ -693,3 +693,165 @@ body {
     }
 
   }
+
+/* ==========================================
+   MODE TESTNET
+========================================== */
+
+.mode-note {
+
+    margin-top: 15px;
+
+    padding: 13px;
+
+    border-radius: 14px;
+
+    background: #0f172a;
+
+    border: 1px solid #26343c;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+.mode-note strong {
+
+    display: block;
+
+    color: #86efac;
+
+    margin-bottom: 5px;
+}
+
+
+/* ==========================================
+   NETWORK LIST
+========================================== */
+
+.network-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+.network-item {
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 15px;
+
+    border-radius: 15px;
+
+    background: #0f172a;
+
+    color: #ffffff;
+
+    border: 1px solid #26343c;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+
+.network-item:hover {
+
+    border-color: #22c55e;
+
+    transform: translateY(-1px);
+}
+
+
+.network-item.selected {
+
+    border-color: #22c55e;
+
+    box-shadow:
+        0 0 14px
+        rgba(
+            34,
+            197,
+            94,
+            .18
+        );
+}
+
+
+.network-main {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.network-main strong {
+
+    font-size: 15px;
+}
+
+
+.network-main span {
+
+    color: #94a3b8;
+
+    font-size: 12px;
+}
+
+
+.network-badge {
+
+    padding: 6px 9px;
+
+    border-radius: 9px;
+
+    font-size: 11px;
+
+    white-space: nowrap;
+
+    background: #1e293b;
+
+    color: #94a3b8;
+}
+
+
+.network-badge.active {
+
+    background: #14532d;
+
+    color: #86efac;
+
+    border: 1px solid #22c55e;
+}
+
+
+.network-badge.testnet {
+
+    color: #86efac;
+}
+
+
+.network-badge.mainnet {
+
+    color: #facc15;
+    }
