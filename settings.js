@@ -14,6 +14,8 @@ const DEFAULT_SETTINGS = {
 
     reconnectOnLaunch: true,
 
+    testnetMode: true,
+
     preferredProvider: null,
 
     preferredNetwork:
@@ -419,7 +421,7 @@ async function ambilChainIdWallet() {
 
         return null;
     }
-            }
+ }
 
 // ======================================================
 // TOGGLE EVENTS
@@ -1547,11 +1549,11 @@ async function initSettings() {
     );
 
 
-    renderWalletList();
+    await renderWalletList();
 
-await periksaAkun();
+    await periksaAkun();
 
-await renderNetworkList();
+    await renderNetworkList();
 
 
     console.log(
