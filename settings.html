@@ -275,118 +275,118 @@
 
     </section>
 
-
     <!-- ==========================================
-         NETWORK MANAGER
-    =========================================== -->
+     MODE TESTNET
+========================================== -->
 
-    <section class="settings-card">
+<section class="settings-card">
 
-        <div class="section-title">
+    <div class="section-title">
 
-            <span class="section-icon">
-                🌐
-            </span>
+        <span class="section-icon">
+            🧪
+        </span>
 
-            <div>
+        <div>
 
-                <h2>
-                    Network Manager
-                </h2>
+            <h2>
+                Mode Testnet
+            </h2>
 
-                <p>
-                    Pilih jaringan yang didukung aplikasi
-                </p>
-
-            </div>
+            <p>
+                Gunakan jaringan uji coba untuk pengembangan
+                dan pengujian.
+            </p>
 
         </div>
 
+    </div>
 
-        <!-- SEPOLIA -->
 
-        <button
-            class="network-item active"
-            type="button"
-            data-chain-id="0xaa36a7"
-        >
+    <div class="setting-row">
 
-            <div>
+        <div>
 
-                <strong>
-                    Ethereum Sepolia
-                </strong>
+            <strong>
+                Mode Testnet
+            </strong>
 
-                <span>
-                    Testnet
-                </span>
+            <span>
+                Saat aktif, pilihan Mainnet akan diarahkan
+                ke jaringan testnet yang sesuai.
+            </span>
 
-            </div>
+        </div>
 
-            <span
-                class="network-status"
-                id="sepoliaStatus"
+        <label class="switch">
+
+            <input
+                type="checkbox"
+                id="testnetToggle"
             >
-                Aktif
-            </span>
 
-        </button>
+            <span class="slider"></span>
 
+        </label>
 
-        <!-- MAINNET LOCKED -->
-
-        <button
-            class="network-item disabled"
-            type="button"
-            disabled
-        >
-
-            <div>
-
-                <strong>
-                    Ethereum
-                </strong>
-
-                <span>
-                    Mainnet
-                </span>
-
-            </div>
-
-            <span class="network-status">
-                Belum didukung
-            </span>
-
-        </button>
+    </div>
 
 
-        <!-- NETWORK LAIN -->
+    <div class="mode-note">
 
-        <button
-            class="network-item disabled"
-            type="button"
-            disabled
-        >
+        <strong>
+            🛡️ Proteksi transaksi
+        </strong>
 
-            <div>
+        <p>
+            Mode Testnet tidak mengubah transaksi Mainnet
+            menjadi transaksi palsu. Mode ini hanya memilih
+            jaringan testnet yang terpisah.
+        </p>
 
-                <strong>
-                    Network Lain
-                </strong>
+    </div>
 
-                <span>
-                    Polygon / Arbitrum / Base / lainnya
-                </span>
+</section>
 
-            </div>
+    <!-- ==========================================
+     NETWORK MANAGER
+========================================== -->
 
-            <span class="network-status">
-                Segera
-            </span>
+<section class="settings-card">
 
-        </button>
+    <div class="section-title">
 
-    </section>
+        <span class="section-icon">
+            🌐
+        </span>
+
+        <div>
+
+            <h2>
+                Network Manager
+            </h2>
+
+            <p>
+                Pilih jaringan yang akan digunakan wallet.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="networkList"
+        class="network-list"
+    >
+
+        <div class="loading">
+            Memuat jaringan...
+        </div>
+
+    </div>
+
+</section>
 
 
     <!-- ==========================================
