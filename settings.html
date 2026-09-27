@@ -257,6 +257,13 @@
             ↻ Periksa Akun
         </button>
 
+        <button
+    id="requestAccountButton"
+    class="secondary-button"
+    type="button"
+>
+    👤 Pilih / Perbarui Akun
+        </button>
 
         <div class="account-note">
 
@@ -264,12 +271,13 @@
                 Catatan:
             </strong>
 
-            <p>
-                Pergantian akun dilakukan melalui
-                wallet. Setelah akun berubah,
-                aplikasi akan menerima event
-                <code>accountsChanged</code>.
-            </p>
+    <p>
+    Settings dapat memilih provider wallet.
+    Untuk mengganti akun di dalam provider,
+    wallet akan menentukan akun yang tersedia.
+    Setelah akun berubah, aplikasi menerima
+    event <code>accountsChanged</code>.
+</p>
 
         </div>
 
