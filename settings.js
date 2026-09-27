@@ -21,6 +21,81 @@ const DEFAULT_SETTINGS = {
 
 };
 
+// ======================================================
+// NETWORK PROFILES
+// ======================================================
+
+const NETWORK_PROFILES = [
+
+    {
+        key: "ethereum",
+
+        name: "Ethereum",
+
+        mainnet: {
+            chainId: "0x1",
+            name: "Ethereum Mainnet"
+        },
+
+        testnet: {
+            chainId: "0xaa36a7",
+            name: "Ethereum Sepolia"
+        }
+    },
+
+
+    {
+        key: "polygon",
+
+        name: "Polygon",
+
+        mainnet: {
+            chainId: "0x89",
+            name: "Polygon"
+        },
+
+        testnet: {
+            chainId: "0x13882",
+            name: "Polygon Amoy"
+        }
+    },
+
+
+    {
+        key: "arbitrum",
+
+        name: "Arbitrum",
+
+        mainnet: {
+            chainId: "0xa4b1",
+            name: "Arbitrum One"
+        },
+
+        testnet: {
+            chainId: "0x66eee",
+            name: "Arbitrum Sepolia"
+        }
+    },
+
+
+    {
+        key: "base",
+
+        name: "Base",
+
+        mainnet: {
+            chainId: "0x2105",
+            name: "Base"
+        },
+
+        testnet: {
+            chainId: "0x14a34",
+            name: "Base Sepolia"
+        }
+    }
+
+];
+
 
 // ======================================================
 // ELEMENT HTML
@@ -67,6 +142,86 @@ const settingsStatus =
         "settingsStatus"
     );
 
+const testnetToggle =
+    document.getElementById(
+        "testnetToggle"
+    );
+
+
+const networkList =
+    document.getElementById(
+        "networkList"
+    );
+
+const requestAccountButton =
+    document.getElementById(
+        "requestAccountButton"
+    );
+
+async function mintaPemilihanAkun() {
+
+    if (!providerAktif) {
+
+        setSettingsStatus(
+            "Pilih wallet terlebih dahulu."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        setSettingsStatus(
+            "Meminta wallet memilih akun..."
+        );
+
+
+        const accounts =
+            await providerAktif.provider.request({
+
+                method:
+                    "eth_requestAccounts"
+
+            });
+
+
+        renderAccounts(
+            accounts
+        );
+
+
+        setSettingsStatus(
+            "Akun wallet diperbarui ✅"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "GAGAL MEMINTA AKUN:",
+            error
+        );
+
+
+        setSettingsStatus(
+
+            "Akun tidak berubah: " +
+            (
+                error?.message ||
+                "permintaan dibatalkan"
+            )
+
+        );
+
+    }
+}
+
+
+requestAccountButton.addEventListener(
+    "click",
+    mintaPemilihanAkun
+);
 
 // ======================================================
 // STATE
@@ -189,8 +344,82 @@ function renderSettings() {
 
     rememberWalletToggle.checked =
         settings.rememberWallet;
+
+
+    testnetToggle.checked =
+        settings.testnetMode;
 }
 
+testnetToggle.addEventListener(
+    "change",
+    function() {
+
+        settings.testnetMode =
+            testnetToggle.checked;
+
+
+        simpanSettings();
+
+
+        renderNetworkList();
+
+
+        setSettingsStatus(
+
+            settings.testnetMode
+
+                ? "Mode Testnet aktif 🧪"
+
+                : "Mode Testnet nonaktif."
+
+        );
+
+    }
+);
+
+function networkUntukDipilih(
+    profile
+) {
+
+    return settings.testnetMode
+
+        ? profile.testnet
+
+        : profile.mainnet;
+
+}
+
+async function ambilChainIdWallet() {
+
+    if (
+        !providerAktif ||
+        !providerAktif.provider
+    ) {
+
+        return null;
+    }
+
+
+    try {
+
+        return await providerAktif.provider.request({
+
+            method:
+                "eth_chainId"
+
+        });
+
+    } catch (error) {
+
+        console.warn(
+            "GAGAL MEMBACA CHAIN:",
+            error?.message ||
+            error
+        );
+
+        return null;
+    }
+            }
 
 // ======================================================
 // TOGGLE EVENTS
@@ -985,39 +1214,9 @@ refreshAccounts.addEventListener(
 // NETWORK
 // ======================================================
 
-async function pilihSepolia() {
-
-    if (!providerAktif) {
-
-        const preferred =
-            settings.preferredProvider;
-
-
-        if (preferred) {
-
-            providerAktif =
-                providers.find(
-                    function(item) {
-
-                        return (
-
-                            item.info.uuid ===
-                            preferred.uuid
-
-                            ||
-
-                            item.info.rdns ===
-                            preferred.rdns
-
-                        );
-
-                    }
-                ) || null;
-
-        }
-
-    }
-
+async function pilihNetwork(
+    profile
+) {
 
     if (!providerAktif) {
 
@@ -1029,7 +1228,26 @@ async function pilihSepolia() {
     }
 
 
+    const network =
+        networkUntukDipilih(
+            profile
+        );
+
+
+    if (!network) {
+
+        return;
+    }
+
+
     try {
+
+        setSettingsStatus(
+            "Mengganti network ke " +
+            network.name +
+            "..."
+        );
+
 
         await providerAktif.provider.request({
 
@@ -1037,49 +1255,93 @@ async function pilihSepolia() {
                 "wallet_switchEthereumChain",
 
             params: [
-
                 {
                     chainId:
-                        "0xaa36a7"
+                        network.chainId
                 }
-
             ]
 
         });
 
 
         settings.preferredNetwork =
-            "0xaa36a7";
+            network.chainId;
 
 
         simpanSettings();
 
 
+        renderNetworkList();
+
+
         setSettingsStatus(
-            "Ethereum Sepolia dipilih ✅"
+
+            network.name +
+            " berhasil dipilih ✅"
+
         );
 
     } catch (error) {
 
         console.error(
-            "GAGAL MENGGANTI NETWORK:",
+            "GAGAL SWITCH NETWORK:",
             error
         );
 
 
+        if (
+            error?.code === 4001
+        ) {
+
+            setSettingsStatus(
+                "Pergantian network dibatalkan."
+            );
+
+            return;
+        }
+
+
+        if (
+            error?.code === 4902
+        ) {
+
+            setSettingsStatus(
+
+                network.name +
+                " belum ditambahkan di wallet."
+
+            );
+
+            return;
+        }
+
+
+        if (
+            error?.code === 4200
+        ) {
+
+            setSettingsStatus(
+
+                "Wallet tidak mendukung pergantian network dari website."
+
+            );
+
+            return;
+        }
+
+
         setSettingsStatus(
 
-            "Network tidak berubah: " +
+            "Gagal mengganti network: " +
             (
                 error?.message ||
-                "provider menolak"
+                "error tidak diketahui"
             )
 
         );
 
     }
 }
-
 
 // ======================================================
 // NETWORK BUTTON
@@ -1099,6 +1361,163 @@ document
 
         }
     );
+
+async function renderNetworkList() {
+
+    if (!networkList) {
+
+        return;
+    }
+
+
+    networkList.innerHTML =
+        "";
+
+
+    const currentChain =
+        await ambilChainIdWallet();
+
+
+    NETWORK_PROFILES.forEach(
+        function(profile) {
+
+            const network =
+                networkUntukDipilih(
+                    profile
+                );
+
+
+            const item =
+                document.createElement(
+                    "button"
+                );
+
+
+            item.type =
+                "button";
+
+
+            item.className =
+                "network-item";
+
+
+            if (
+                currentChain ===
+                network.chainId
+            ) {
+
+                item.classList.add(
+                    "selected"
+                );
+
+            }
+
+
+            const main =
+                document.createElement(
+                    "div"
+                );
+
+
+            main.className =
+                "network-main";
+
+
+            const title =
+                document.createElement(
+                    "strong"
+                );
+
+
+            title.textContent =
+                network.name;
+
+
+            const family =
+                document.createElement(
+                    "span"
+                );
+
+
+            family.textContent =
+                settings.testnetMode
+
+                    ? profile.name +
+                      " • Testnet"
+
+                    : profile.name +
+                      " • Mainnet";
+
+
+            main.appendChild(
+                title
+            );
+
+
+            main.appendChild(
+                family
+            );
+
+
+            const badge =
+                document.createElement(
+                    "span"
+                );
+
+
+            badge.className =
+                "network-badge";
+
+
+            if (
+                currentChain ===
+                network.chainId
+            ) {
+
+                badge.classList.add(
+                    "active"
+                );
+
+                badge.textContent =
+                    "Aktif";
+
+            } else {
+
+                badge.textContent =
+                    "Pilih";
+
+            }
+
+
+            item.appendChild(
+                main
+            );
+
+
+            item.appendChild(
+                badge
+            );
+
+
+            item.addEventListener(
+                "click",
+                function() {
+
+                    pilihNetwork(
+                        profile
+                    );
+
+                }
+            );
+
+
+            networkList.appendChild(
+                item
+            );
+
+        }
+    );
+}
 
 
 // ======================================================
@@ -1130,8 +1549,9 @@ async function initSettings() {
 
     renderWalletList();
 
+await periksaAkun();
 
-    await periksaAkun();
+await renderNetworkList();
 
 
     console.log(
