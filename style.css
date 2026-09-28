@@ -198,12 +198,12 @@ button:hover{
     }
 
 /* ==========================================
-   SETTINGS BUTTON - FIXED FLOATING
+   SETTINGS BUTTON - FIXED VIEWPORT
 ========================================== */
 
 .settings-button {
 
-    position: fixed !important;
+    position: fixed;
 
     top: 12px;
     right: 12px;
@@ -217,6 +217,8 @@ button:hover{
 
     align-items: center;
     justify-content: center;
+
+    margin: 0;
 
     border-radius: 14px;
 
@@ -239,26 +241,24 @@ button:hover{
             0.15
         );
 
+    transform: none;
+
+    will-change: auto;
+
     transition:
         transform .2s,
         border-color .2s,
         box-shadow .2s;
-
-    /* Pastikan tombol tidak mengikuti layout halaman */
-    margin: 0;
-
-    /* Optimasi rendering pada browser mobile */
-    transform: translateZ(0);
-
-    will-change: transform;
 }
 
 
+/* ==========================================
+   SETTINGS BUTTON - HOVER
+========================================== */
+
 .settings-button:hover {
 
-    transform:
-        translateZ(0)
-        scale(1.08);
+    transform: scale(1.08);
 
     border-color: #22c55e;
 
