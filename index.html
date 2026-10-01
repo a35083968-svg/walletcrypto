@@ -1,37 +1,79 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
     <title>crypto Wallet</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"
+    ></script>
+
 </head>
+
 <body>
+
+    <!-- ==========================================
+         TOP ACTIONS
+         FIXED - TIDAK IKUT SCROLL
+    =========================================== -->
 
     <nav
         class="top-actions"
         aria-label="Navigasi cepat"
     >
 
+        <!-- RIWAYAT -->
         <a
             href="riwayat.html"
             class="top-action"
             aria-label="Riwayat Transaksi"
             title="Riwayat Transaksi"
         >
+
             <svg
                 viewBox="0 0 24 24"
                 aria-hidden="true"
             >
-                <path d="M6 3.5h9l3 3V20.5H6z"></path>
-                <path d="M14 3.5v4h4"></path>
-                <path d="M9 11h6"></path>
-                <path d="M9 14h6"></path>
-                <path d="M9 17h4"></path>
+
+                <path
+                    d="M6 3.5h9l3 3V20.5H6z"
+                ></path>
+
+                <path
+                    d="M14 3.5v4h4"
+                ></path>
+
+                <path
+                    d="M9 11h6"
+                ></path>
+
+                <path
+                    d="M9 14h6"
+                ></path>
+
+                <path
+                    d="M9 17h4"
+                ></path>
+
             </svg>
+
         </a>
 
+
+        <!-- SETTINGS -->
         <a
             href="settings.html"
             class="top-action settings-action"
@@ -43,9 +85,102 @@
 
     </nav>
 
+
+    <!-- ==========================================
+         WALLET CONNECTION
+    =========================================== -->
+
     <div class="container">
-    
-</div>
+
+        <div class="logo">
+            💎
+        </div>
+
+
+        <h1>
+            crypto Wallet
+        </h1>
+
+
+        <p class="subtitle">
+            Connect your wallet securely
+        </p>
+
+
+        <button
+            id="btnConnect"
+            type="button"
+        >
+            Connect Wallet
+        </button>
+
+
+        <p id="alamat">
+            Belum terhubung
+        </p>
+
+    </div>
+
+
+    <!-- ==========================================
+         SEND ETH
+    =========================================== -->
+
+    <div class="send-box">
+
+        <h3>
+            Kirim ETH
+        </h3>
+
+
+        <input
+            type="text"
+            id="toAddress"
+            placeholder="Alamat tujuan 0x..."
+            autocomplete="off"
+        >
+
+
+        <input
+            type="number"
+            id="amount"
+            placeholder="Jumlah ETH"
+            step="0.001"
+            min="0"
+            inputmode="decimal"
+        >
+
+
+        <button
+            id="sendBtn"
+            class="wallet-button"
+            type="button"
+        >
+            Kirim
+        </button>
+
+
+        <!-- ======================================
+             TRANSACTION STATUS
+        ======================================= -->
+
+        <div id="transactionResult">
+
+            <p id="txStatus">
+                Belum ada transaksi
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         APP JAVASCRIPT
+    =========================================== -->
+
     <script src="app.js"></script>
+
 </body>
+
 </html>
