@@ -24,145 +24,213 @@ const DEFAULT_SETTINGS = {
 };
 
 // ======================================================
-// NETWORK PROFILES
+// NETWORK MANAGER
 // ======================================================
 
-const NETWORK_PROFILES = [
+const CHAINS_JSON_URL = "chains.json";
 
-    {
-        key: "ethereum",
+let chainCatalog = null;
 
-        name: "Ethereum",
 
-        mainnet: {
-            chainId: "0x1",
-            name: "Ethereum Mainnet"
-        },
+// ======================================================
+// LOAD CHAIN CATALOG
+// ======================================================
 
-        testnet: {
-            chainId: "0xaa36a7",
-            name: "Ethereum Sepolia"
+async function loadChainCatalog() {
+
+    try {
+
+        const response =
+            await fetch(CHAINS_JSON_URL, {
+                cache: "no-store"
+            });
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+
         }
-    },
 
 
-    {
-        key: "polygon",
+        const data =
+            await response.json();
 
-        name: "Polygon",
 
-        mainnet: {
-            chainId: "0x89",
-            name: "Polygon"
-        },
+        if (
+            !data ||
+            !Array.isArray(data.blockchains)
+        ) {
 
-        testnet: {
-            chainId: "0x13882",
-            name: "Polygon Amoy"
+            throw new Error(
+                "Format chains.json tidak valid."
+            );
+
         }
-    },
 
 
-    {
-        key: "arbitrum",
+        chainCatalog = data;
 
-        name: "Arbitrum",
 
-        mainnet: {
-            chainId: "0xa4b1",
-            name: "Arbitrum One"
-        },
+        console.log(
+            "CHAIN CATALOG BERHASIL DIMUAT:",
+            chainCatalog
+        );
 
-        testnet: {
-            chainId: "0x66eee",
-            name: "Arbitrum Sepolia"
+
+        return chainCatalog;
+
+    } catch (error) {
+
+        console.error(
+            "GAGAL MEMUAT chains.json:",
+            error
+        );
+
+
+        chainCatalog = null;
+
+
+        if (networkList) {
+
+            networkList.innerHTML = `
+
+                <div class="empty-state">
+
+                    Gagal memuat daftar jaringan.
+
+                    <br>
+
+                    <small>
+                        Periksa file chains.json
+                        dan koneksi halaman.
+                    </small>
+
+                </div>
+
+            `;
+
         }
-    },
 
 
-    {
-        key: "base",
+        setSettingsStatus(
+            "Gagal memuat daftar jaringan."
+        );
 
-        name: "Base",
 
-        mainnet: {
-            chainId: "0x2105",
-            name: "Base"
-        },
+        return null;
+    }
+}
 
-        testnet: {
-            chainId: "0x14a34",
-            name: "Base Sepolia"
-        }
+
+// ======================================================
+// NORMALIZE CHAIN ID
+// ======================================================
+
+function chainIdToHex(chainId) {
+
+    if (
+        chainId === null ||
+        chainId === undefined
+    ) {
+
+        return null;
     }
 
-];
+
+    if (
+        typeof chainId === "string" &&
+        chainId.startsWith("0x")
+    ) {
+
+        return chainId.toLowerCase();
+    }
+
+
+    return (
+        "0x" +
+        Number(chainId).toString(16)
+    ).toLowerCase();
+}
 
 
 // ======================================================
-// ELEMENT HTML
+// NETWORK TYPE LABEL
 // ======================================================
 
-const autoConnectToggle =
-    document.getElementById(
-        "autoConnectToggle"
-    );
+function networkTypeLabel(network) {
+
+    if (
+        network.type ===
+        "public-mainnet"
+    ) {
+
+        return "Public Mainnet";
+    }
 
 
-const reconnectToggle =
-    document.getElementById(
-        "reconnectToggle"
-    );
+    if (
+        network.type ===
+        "private-mainnet"
+    ) {
+
+        return "Private Mainnet";
+    }
 
 
-const rememberWalletToggle =
-    document.getElementById(
-        "rememberWalletToggle"
-    );
+    if (
+        network.type ===
+        "testnet"
+    ) {
+
+        return "Testnet";
+    }
 
 
-const walletList =
-    document.getElementById(
-        "walletList"
-    );
+    return "Network";
+}
 
 
-const accountList =
-    document.getElementById(
-        "accountList"
-    );
+// ======================================================
+// NETWORK STATUS LABEL
+// ======================================================
+
+function networkStatusLabel(network) {
+
+    if (
+        network.status ===
+        "deprecated"
+    ) {
+
+        return "Deprecated";
+    }
 
 
-const refreshAccounts =
-    document.getElementById(
-        "refreshAccounts"
-    );
+    if (
+        network.status ===
+        "custom"
+    ) {
+
+        return "Custom";
+    }
 
 
-const settingsStatus =
-    document.getElementById(
-        "settingsStatus"
-    );
-
-const testnetToggle =
-    document.getElementById(
-        "testnetToggle"
-    );
+    return "Active";
+}
 
 
-const networkList =
-    document.getElementById(
-        "networkList"
-    );
+// ======================================================
+// SELECT NETWORK
+// ======================================================
 
-const requestAccountButton =
-    document.getElementById(
-        "requestAccountButton"
-    );
+async function pilihNetwork(network) {
 
-async function mintaPemilihanAkun() {
-
-    if (!providerAktif) {
+    if (
+        !providerAktif ||
+        !providerAktif.provider
+    ) {
 
         setSettingsStatus(
             "Pilih wallet terlebih dahulu."
@@ -172,46 +240,84 @@ async function mintaPemilihanAkun() {
     }
 
 
+    if (
+        network.selectable === false
+    ) {
+
+        setSettingsStatus(
+            `${network.name} tidak dapat dipilih.`
+        );
+
+        return;
+    }
+
+
+    const chainId =
+        chainIdToHex(
+            network.chainId
+        );
+
+
+    if (!chainId) {
+
+        setSettingsStatus(
+            "Chain ID jaringan tidak tersedia."
+        );
+
+        return;
+    }
+
+
     try {
 
         setSettingsStatus(
-            "Meminta wallet memilih akun..."
+            `Mengganti jaringan ke ${network.name}...`
         );
 
 
-        const accounts =
-            await providerAktif.provider.request({
+        await providerAktif.provider.request({
 
-                method:
-                    "eth_requestAccounts"
+            method:
+                "wallet_switchEthereumChain",
 
-            });
+            params: [
+                {
+                    chainId:
+                        chainId
+                }
+            ]
+
+        });
 
 
-        renderAccounts(
-            accounts
-        );
+        settings.preferredNetwork =
+            chainId;
+
+
+        simpanSettings();
+
+
+        await renderNetworkList();
 
 
         setSettingsStatus(
-            "Akun wallet diperbarui ✅"
+            `${network.name} berhasil dipilih ✅`
         );
-
 
     } catch (error) {
 
         console.error(
-            "GAGAL MEMINTA AKUN:",
+            "GAGAL SWITCH NETWORK:",
             error
         );
 
 
         setSettingsStatus(
 
-            "Akun tidak berubah: " +
+            "Gagal mengganti jaringan: " +
             (
                 error?.message ||
-                "permintaan dibatalkan"
+                "permintaan ditolak"
             )
 
         );
@@ -220,208 +326,324 @@ async function mintaPemilihanAkun() {
 }
 
 
-requestAccountButton.addEventListener(
-    "click",
-    mintaPemilihanAkun
-);
-
 // ======================================================
-// STATE
+// RENDER NETWORK LIST
 // ======================================================
 
-let settings = bacaSettings();
+async function renderNetworkList() {
 
-let providers = [];
+    if (!networkList) {
 
-let providerAktif =
-    null;
-
-
-// ======================================================
-// STATUS
-// ======================================================
-
-function setSettingsStatus(message) {
-
-    if (settingsStatus) {
-
-        settingsStatus.textContent =
-            message;
+        return;
     }
 
-    console.log(
-        "SETTINGS:",
-        message
-    );
-}
+
+    if (!chainCatalog) {
+
+        await loadChainCatalog();
+    }
 
 
-// ======================================================
-// BACA SETTINGS
-// ======================================================
+    if (!chainCatalog) {
 
-function bacaSettings() {
-
-    try {
-
-        const raw =
-            localStorage.getItem(
-                SETTINGS_STORAGE_KEY
-            );
+        return;
+    }
 
 
-        if (!raw) {
-
-            return {
-                ...DEFAULT_SETTINGS
-            };
-        }
+    networkList.innerHTML = "";
 
 
-        const data =
-            JSON.parse(
-                raw
-            );
-
-
-        return {
-
-            ...DEFAULT_SETTINGS,
-
-            ...data
-
-        };
-
-    } catch (error) {
-
-        console.error(
-            "GAGAL MEMBACA SETTINGS:",
-            error
+    const searchInput =
+        document.getElementById(
+            "networkSearch"
         );
 
 
-        return {
-            ...DEFAULT_SETTINGS
-        };
-    }
-}
-
-
-// ======================================================
-// SIMPAN SETTINGS
-// ======================================================
-
-function simpanSettings() {
-
-    localStorage.setItem(
-
-        SETTINGS_STORAGE_KEY,
-
-        JSON.stringify(
-            settings
+    const searchQuery =
+        (
+            searchInput?.value ||
+            ""
         )
-
-    );
-
-    console.log(
-        "SETTINGS TERSIMPAN:",
-        settings
-    );
-}
+        .trim()
+        .toLowerCase();
 
 
-// ======================================================
-// RENDER TOGGLE
-// ======================================================
+    const filteredBlockchains =
+        chainCatalog.blockchains
+            .map(function(blockchain) {
 
-function renderSettings() {
+                const networks =
+                    blockchain.networks.filter(
+                        function(network) {
 
-    autoConnectToggle.checked =
-        settings.autoConnect;
+                            const searchableText = (
 
+                                blockchain.name +
+                                " " +
+                                network.name +
+                                " " +
+                                networkTypeLabel(network) +
+                                " " +
+                                networkStatusLabel(network)
 
-    reconnectToggle.checked =
-        settings.reconnectOnLaunch;
-
-
-    rememberWalletToggle.checked =
-        settings.rememberWallet;
-
-
-    testnetToggle.checked =
-        settings.testnetMode;
-}
-
-testnetToggle.addEventListener(
-    "change",
-    function() {
-
-        settings.testnetMode =
-            testnetToggle.checked;
+                            ).toLowerCase();
 
 
-        simpanSettings();
+                            return searchableText.includes(
+                                searchQuery
+                            );
+
+                        }
+                    );
 
 
-        renderNetworkList();
+                return {
+                    ...blockchain,
+                    networks
+                };
 
+            })
+            .filter(function(blockchain) {
 
-        setSettingsStatus(
+                return (
+                    blockchain.networks.length > 0
+                );
 
-            settings.testnetMode
+            });
 
-                ? "Mode Testnet aktif 🧪"
-
-                : "Mode Testnet nonaktif."
-
-        );
-
-    }
-);
-
-function networkUntukDipilih(
-    profile
-) {
-
-    return settings.testnetMode
-
-        ? profile.testnet
-
-        : profile.mainnet;
-
-}
-
-async function ambilChainIdWallet() {
 
     if (
-        !providerAktif ||
-        !providerAktif.provider
+        filteredBlockchains.length === 0
     ) {
 
-        return null;
+        networkList.innerHTML = `
+
+            <div class="empty-state">
+
+                Jaringan tidak ditemukan.
+
+            </div>
+
+        `;
+
+        return;
     }
 
 
-    try {
+    const activeChainId =
+        await ambilChainIdWallet();
 
-        return await providerAktif.provider.request({
 
-            method:
-                "eth_chainId"
+    filteredBlockchains.forEach(
+        function(blockchain) {
 
-        });
+            const blockchainGroup =
+                document.createElement(
+                    "div"
+                );
 
-    } catch (error) {
 
-        console.warn(
-            "GAGAL MEMBACA CHAIN:",
-            error?.message ||
-            error
+            blockchainGroup.className =
+                "network-group";
+
+
+            const title =
+                document.createElement(
+                    "h4"
+                );
+
+
+            title.textContent =
+                blockchain.name;
+
+
+            blockchainGroup.appendChild(
+                title
+            );
+
+
+            blockchain.networks.forEach(
+                function(network) {
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    item.className =
+                        "network-item";
+
+
+                    const content =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    content.className =
+                        "network-info";
+
+
+                    const name =
+                        document.createElement(
+                            "strong"
+                        );
+
+
+                    name.textContent =
+                        network.name;
+
+
+                    const meta =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    meta.textContent =
+
+                        `${networkTypeLabel(network)} • ` +
+                        `${networkStatusLabel(network)}`;
+
+
+                    content.appendChild(
+                        name
+                    );
+
+
+                    content.appendChild(
+                        meta
+                    );
+
+
+                    const button =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    button.type =
+                        "button";
+
+
+                    button.className =
+                        "network-select-button";
+
+
+                    const networkChainId =
+                        chainIdToHex(
+                            network.chainId
+                        );
+
+
+                    const isActive =
+                        activeChainId &&
+                        networkChainId &&
+                        activeChainId.toLowerCase() ===
+                        networkChainId;
+
+
+                    if (isActive) {
+
+                        button.textContent =
+                            "Aktif ✓";
+
+                        button.classList.add(
+                            "selected"
+                        );
+
+                    } else if (
+                        network.selectable === false
+                    ) {
+
+                        button.textContent =
+                            "Tidak tersedia";
+
+                        button.disabled =
+                            true;
+
+                    } else {
+
+                        button.textContent =
+                            "Pilih";
+
+                    }
+
+
+                    if (
+                        network.selectable !== false &&
+                        !isActive
+                    ) {
+
+                        button.addEventListener(
+                            "click",
+                            function() {
+
+                                pilihNetwork(
+                                    network
+                                );
+
+                            }
+                        );
+
+                    }
+
+
+                    item.appendChild(
+                        content
+                    );
+
+
+                    item.appendChild(
+                        button
+                    );
+
+
+                    blockchainGroup.appendChild(
+                        item
+                    );
+
+                }
+            );
+
+
+            networkList.appendChild(
+                blockchainGroup
+            );
+
+        }
+    );
+}
+
+
+// ======================================================
+// NETWORK SEARCH
+// ======================================================
+
+function setupNetworkSearch() {
+
+    const searchInput =
+        document.getElementById(
+            "networkSearch"
         );
 
-        return null;
+
+    if (!searchInput) {
+
+        return;
     }
- }
+
+
+    searchInput.addEventListener(
+        "input",
+        function() {
+
+            renderNetworkList();
+
+        }
+    );
+}
 
 // ======================================================
 // TOGGLE EVENTS
@@ -1528,9 +1750,8 @@ async function renderNetworkList() {
 
 async function initSettings() {
 
-    renderSettings();
-
-    discoverWallets();
+    setupNetworkSearch();
+    loadChainCatalog();
 
     setSettingsStatus(
         "Mendeteksi wallet..."
