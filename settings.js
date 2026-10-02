@@ -494,36 +494,25 @@ async function pilihNetwork(network) {
 async function renderNetworkList() {
 
     if (!networkList) {
-
         return;
     }
 
-
     if (!chainCatalog) {
-
         await loadChainCatalog();
     }
 
-
     if (!chainCatalog) {
-
         return;
     }
-
-
-    networkList.innerHTML = "";
-
 
     const searchInput =
         document.getElementById(
             "networkSearch"
         );
 
-
     const searchQuery =
         (
-            searchInput?.value ||
-            ""
+            searchInput?.value || ""
         )
         .trim()
         .toLowerCase();
@@ -531,36 +520,47 @@ async function renderNetworkList() {
 
     const filteredBlockchains =
         chainCatalog.blockchains
-            .map(function(blockchain) {
+
+            .map(function (blockchain) {
+
+                // ==========================================
+                // 1. FILTER BERDASARKAN MODE
+                // ==========================================
 
                 const modeNetworks =
-    blockchain.networks.filter(
-        function (network) {
+                    blockchain.networks.filter(
+                        function (network) {
 
-            if (
-                settings.testnetMode
-            ) {
+                            if (
+                                settings.testnetMode
+                            ) {
 
-                return (
-                    network.type ===
-                    "testnet"
-                );
+                                return (
+                                    network.type ===
+                                    "testnet"
+                                );
 
-            }
+                            }
 
-            return (
-                network.type ===
-                    "public-mainnet" ||
-                network.type ===
-                    "private-mainnet"
-            );
+                            return (
+                                network.type ===
+                                    "public-mainnet" ||
 
-        }
-    );
+                                network.type ===
+                                    "private-mainnet"
+                            );
+
+                        }
+                    );
+
+
+                // ==========================================
+                // 2. FILTER BERDASARKAN SEARCH
+                // ==========================================
 
                 const networks =
-                    blockchain.networks.filter(
-                        function(network) {
+                    modeNetworks.filter(
+                        function (network) {
 
                             const searchableText = (
 
@@ -568,9 +568,13 @@ async function renderNetworkList() {
                                 " " +
                                 network.name +
                                 " " +
-                                networkTypeLabel(network) +
+                                networkTypeLabel(
+                                    network
+                                ) +
                                 " " +
-                                networkStatusLabel(network)
+                                networkStatusLabel(
+                                    network
+                                )
 
                             ).toLowerCase();
 
@@ -589,14 +593,21 @@ async function renderNetworkList() {
                 };
 
             })
-            .filter(function(blockchain) {
 
-                return (
-                    blockchain.networks.length > 0
-                );
+            .filter(
+                function (blockchain) {
 
-            });
+                    return (
+                        blockchain.networks.length > 0
+                    );
 
+                }
+            );
+
+
+    // ==========================================
+    // TIDAK ADA HASIL
+    // ==========================================
 
     if (
         filteredBlockchains.length === 0
@@ -616,18 +627,28 @@ async function renderNetworkList() {
     }
 
 
+    // ==========================================
+    // CEK NETWORK AKTIF
+    // ==========================================
+
     const activeChainId =
         await ambilChainIdWallet();
 
 
+    networkList.innerHTML = "";
+
+
+    // ==========================================
+    // RENDER BLOCKCHAIN
+    // ==========================================
+
     filteredBlockchains.forEach(
-        function(blockchain) {
+        function (blockchain) {
 
             const blockchainGroup =
                 document.createElement(
                     "div"
                 );
-
 
             blockchainGroup.className =
                 "network-group";
@@ -638,7 +659,6 @@ async function renderNetworkList() {
                     "h4"
                 );
 
-
             title.textContent =
                 blockchain.name;
 
@@ -648,14 +668,17 @@ async function renderNetworkList() {
             );
 
 
+            // ==========================================
+            // RENDER NETWORK
+            // ==========================================
+
             blockchain.networks.forEach(
-                function(network) {
+                function (network) {
 
                     const item =
                         document.createElement(
                             "div"
                         );
-
 
                     item.className =
                         "network-item";
@@ -666,7 +689,6 @@ async function renderNetworkList() {
                             "div"
                         );
 
-
                     content.className =
                         "network-info";
 
@@ -675,7 +697,6 @@ async function renderNetworkList() {
                         document.createElement(
                             "strong"
                         );
-
 
                     name.textContent =
                         network.name;
@@ -686,9 +707,7 @@ async function renderNetworkList() {
                             "span"
                         );
 
-
                     meta.textContent =
-
                         `${networkTypeLabel(network)} • ` +
                         `${networkStatusLabel(network)}`;
 
@@ -697,21 +716,22 @@ async function renderNetworkList() {
                         name
                     );
 
-
                     content.appendChild(
                         meta
                     );
 
+
+                    // ==========================================
+                    // BUTTON
+                    // ==========================================
 
                     const button =
                         document.createElement(
                             "button"
                         );
 
-
                     button.type =
                         "button";
-
 
                     button.className =
                         "network-select-button";
@@ -764,7 +784,7 @@ async function renderNetworkList() {
 
                         button.addEventListener(
                             "click",
-                            function() {
+                            function () {
 
                                 pilihNetwork(
                                     network
@@ -779,7 +799,6 @@ async function renderNetworkList() {
                     item.appendChild(
                         content
                     );
-
 
                     item.appendChild(
                         button
@@ -800,8 +819,7 @@ async function renderNetworkList() {
 
         }
     );
-}
-
+}                    
 
 // ======================================================
 // NETWORK SEARCH
@@ -1606,318 +1624,7 @@ async function periksaAkun() {
 refreshAccounts.addEventListener(
     "click",
     periksaAkun
-);
-
-
-// ======================================================
-// NETWORK
-// ======================================================
-
-async function pilihNetwork(
-    profile
-) {
-
-    if (!providerAktif) {
-
-        setSettingsStatus(
-            "Pilih wallet terlebih dahulu."
-        );
-
-        return;
-    }
-
-
-    const network =
-        networkUntukDipilih(
-            profile
-        );
-
-
-    if (!network) {
-
-        return;
-    }
-
-
-    try {
-
-        setSettingsStatus(
-            "Mengganti network ke " +
-            network.name +
-            "..."
-        );
-
-
-        await providerAktif.provider.request({
-
-            method:
-                "wallet_switchEthereumChain",
-
-            params: [
-                {
-                    chainId:
-                        network.chainId
-                }
-            ]
-
-        });
-
-
-        settings.preferredNetwork =
-            network.chainId;
-
-
-        simpanSettings();
-
-
-        renderNetworkList();
-
-
-        setSettingsStatus(
-
-            network.name +
-            " berhasil dipilih ✅"
-
-        );
-
-    } catch (error) {
-
-        console.error(
-            "GAGAL SWITCH NETWORK:",
-            error
-        );
-
-
-        if (
-            error?.code === 4001
-        ) {
-
-            setSettingsStatus(
-                "Pergantian network dibatalkan."
-            );
-
-            return;
-        }
-
-
-        if (
-            error?.code === 4902
-        ) {
-
-            setSettingsStatus(
-
-                network.name +
-                " belum ditambahkan di wallet."
-
-            );
-
-            return;
-        }
-
-
-        if (
-            error?.code === 4200
-        ) {
-
-            setSettingsStatus(
-
-                "Wallet tidak mendukung pergantian network dari website."
-
-            );
-
-            return;
-        }
-
-
-        setSettingsStatus(
-
-            "Gagal mengganti network: " +
-            (
-                error?.message ||
-                "error tidak diketahui"
-            )
-
-        );
-
-    }
-}
-
-// ======================================================
-// NETWORK BUTTON
-// ======================================================
-
-document
-    .querySelectorAll(
-        ".network-item.active"
-    )
-    .forEach(
-        function(button) {
-
-            button.addEventListener(
-                "click",
-                pilihSepolia
-            );
-
-        }
-    );
-
-async function renderNetworkList() {
-
-    if (!networkList) {
-
-        return;
-    }
-
-
-    networkList.innerHTML =
-        "";
-
-
-    const currentChain =
-        await ambilChainIdWallet();
-
-
-    NETWORK_PROFILES.forEach(
-        function(profile) {
-
-            const network =
-                networkUntukDipilih(
-                    profile
-                );
-
-
-            const item =
-                document.createElement(
-                    "button"
-                );
-
-
-            item.type =
-                "button";
-
-
-            item.className =
-                "network-item";
-
-
-            if (
-                currentChain ===
-                network.chainId
-            ) {
-
-                item.classList.add(
-                    "selected"
-                );
-
-            }
-
-
-            const main =
-                document.createElement(
-                    "div"
-                );
-
-
-            main.className =
-                "network-main";
-
-
-            const title =
-                document.createElement(
-                    "strong"
-                );
-
-
-            title.textContent =
-                network.name;
-
-
-            const family =
-                document.createElement(
-                    "span"
-                );
-
-
-            family.textContent =
-                settings.testnetMode
-
-                    ? profile.name +
-                      " • Testnet"
-
-                    : profile.name +
-                      " • Mainnet";
-
-
-            main.appendChild(
-                title
-            );
-
-
-            main.appendChild(
-                family
-            );
-
-
-            const badge =
-                document.createElement(
-                    "span"
-                );
-
-
-            badge.className =
-                "network-badge";
-
-
-            if (
-                currentChain ===
-                network.chainId
-            ) {
-
-                badge.classList.add(
-                    "active"
-                );
-
-                badge.textContent =
-                    "Aktif";
-
-            } else {
-
-                badge.textContent =
-                    "Pilih";
-
-            }
-
-
-            item.appendChild(
-                main
-            );
-
-
-            item.appendChild(
-                badge
-            );
-
-
-            item.addEventListener(
-                "click",
-                function() {
-
-                    pilihNetwork(
-                        profile
-                    );
-
-                }
-            );
-
-
-            networkList.appendChild(
-                item
-            );
-
-        }
-    );
-}
-
+);        
 
 // ======================================================
 // INIT
