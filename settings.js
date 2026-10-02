@@ -24,6 +24,40 @@ const DEFAULT_SETTINGS = {
 };
 
 // ======================================================
+// DOM ELEMENTS
+// ======================================================
+
+const autoConnectToggle =
+    document.getElementById("autoConnectToggle");
+
+const reconnectToggle =
+    document.getElementById("reconnectToggle");
+
+const rememberWalletToggle =
+    document.getElementById("rememberWalletToggle");
+
+const testnetToggle =
+    document.getElementById("testnetToggle");
+
+const networkList =
+    document.getElementById("networkList");
+
+const settingsStatus =
+    document.getElementById("settingsStatus");
+
+const walletList =
+    document.getElementById("walletList");
+
+const accountList =
+    document.getElementById("accountList");
+
+const refreshAccounts =
+    document.getElementById("refreshAccounts");
+
+const requestAccountButton =
+    document.getElementById("requestAccountButton");
+
+// ======================================================
 // NETWORK MANAGER
 // ======================================================
 
@@ -31,6 +65,107 @@ const CHAINS_JSON_URL = "chains.json";
 
 let chainCatalog = null;
 
+let settings = bacaSettings();
+
+function bacaSettings() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                SETTINGS_STORAGE_KEY
+            );
+
+        if (!raw) {
+
+            return {
+                ...DEFAULT_SETTINGS
+            };
+
+        }
+
+        return {
+            ...DEFAULT_SETTINGS,
+            ...JSON.parse(raw)
+        };
+
+    } catch (error) {
+
+        console.error(
+            "GAGAL MEMBACA SETTINGS:",
+            error
+        );
+
+        return {
+            ...DEFAULT_SETTINGS
+        };
+    }
+}
+
+function simpanSettings() {
+
+    try {
+
+        localStorage.setItem(
+            SETTINGS_STORAGE_KEY,
+            JSON.stringify(settings)
+        );
+
+    } catch (error) {
+
+        console.error(
+            "GAGAL MENYIMPAN SETTINGS:",
+            error
+        );
+
+    }
+}
+
+function setSettingsStatus(message) {
+
+    console.log(
+        "SETTINGS STATUS:",
+        message
+    );
+
+    if (settingsStatus) {
+
+        settingsStatus.textContent =
+            message;
+
+    }
+}
+
+function renderSettingsState() {
+
+    if (autoConnectToggle) {
+
+        autoConnectToggle.checked =
+            settings.autoConnect;
+
+    }
+
+    if (reconnectToggle) {
+
+        reconnectToggle.checked =
+            settings.reconnectOnLaunch;
+
+    }
+
+    if (rememberWalletToggle) {
+
+        rememberWalletToggle.checked =
+            settings.rememberWallet;
+
+    }
+
+    if (testnetToggle) {
+
+        testnetToggle.checked =
+            settings.testnetMode;
+
+    }
+}
 
 // ======================================================
 // LOAD CHAIN CATALOG
@@ -220,6 +355,32 @@ function networkStatusLabel(network) {
     return "Active";
 }
 
+// ======================================================
+// MODE TESTNET 
+// ======================================================
+
+testnetToggle.addEventListener(
+    "change",
+    async function () {
+
+        settings.testnetMode =
+            testnetToggle.checked;
+
+        simpanSettings();
+
+        await renderNetworkList();
+
+        setSettingsStatus(
+
+            settings.testnetMode
+
+                ? "Mode Testnet aktif 🧪"
+                : "Mode Mainnet aktif 🌐"
+
+        );
+
+    }
+);
 
 // ======================================================
 // SELECT NETWORK
@@ -371,6 +532,31 @@ async function renderNetworkList() {
     const filteredBlockchains =
         chainCatalog.blockchains
             .map(function(blockchain) {
+
+                const modeNetworks =
+    blockchain.networks.filter(
+        function (network) {
+
+            if (
+                settings.testnetMode
+            ) {
+
+                return (
+                    network.type ===
+                    "testnet"
+                );
+
+            }
+
+            return (
+                network.type ===
+                    "public-mainnet" ||
+                network.type ===
+                    "private-mainnet"
+            );
+
+        }
+    );
 
                 const networks =
                     blockchain.networks.filter(
@@ -674,20 +860,16 @@ autoConnectToggle.addEventListener(
 
 reconnectToggle.addEventListener(
     "change",
-    function() {
+    function () {
 
         settings.reconnectOnLaunch =
             reconnectToggle.checked;
 
-
         simpanSettings();
-
 
         setSettingsStatus(
             settings.reconnectOnLaunch
-
                 ? "Reconnect on Launch diaktifkan ✅"
-
                 : "Reconnect on Launch dinonaktifkan."
         );
 
@@ -697,31 +879,24 @@ reconnectToggle.addEventListener(
 
 rememberWalletToggle.addEventListener(
     "change",
-    function() {
+    function () {
 
         settings.rememberWallet =
             rememberWalletToggle.checked;
 
-
-        if (
-            !settings.rememberWallet
-        ) {
+        if (!settings.rememberWallet) {
 
             settings.preferredProvider =
                 null;
 
         }
 
-
         simpanSettings();
-
 
         setSettingsStatus(
             settings.rememberWallet
-
-                ? "Wallet terakhir akan diingat ✅"
-
-                : "Wallet terakhir tidak lagi diingat."
+                ? "Remember Last Wallet diaktifkan ✅"
+                : "Remember Last Wallet dinonaktifkan."
         );
 
     }
@@ -1775,7 +1950,6 @@ async function initSettings() {
     await periksaAkun();
 
     await renderNetworkList();
-
 
     console.log(
         "SETTINGS.JS BERHASIL DIMUAT"
