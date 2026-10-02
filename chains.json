@@ -1,1 +1,290 @@
-
+{
+  "version": 1,
+  "updated": "2026-10-02",
+  "description": "Walletcrypto blockchain network catalog",
+  "blockchains": [
+    {
+      "key": "ethereum",
+      "name": "Ethereum",
+      "category": "Layer 1",
+      "networks": [
+        {
+          "key": "ethereum-mainnet",
+          "name": "Ethereum Mainnet",
+          "type": "public-mainnet",
+          "status": "active",
+          "chainId": 1,
+          "symbol": "ETH",
+          "explorer": "https://etherscan.io"
+        },
+        {
+          "key": "ethereum-sepolia",
+          "name": "Ethereum Sepolia",
+          "type": "testnet",
+          "status": "active",
+          "chainId": 11155111,
+          "symbol": "ETH",
+          "explorer": "https://sepolia.etherscan.io"
+        },
+        {
+          "key": "ethereum-hoodi",
+          "name": "Ethereum Hoodi",
+          "type": "testnet",
+          "status": "active",
+          "chainId": 560048,
+          "symbol": "ETH",
+          "explorer": "https://hoodi.etherscan.io"
+        },
+        {
+          "key": "ethereum-holesky",
+          "name": "Ethereum Holesky",
+          "type": "testnet",
+          "status": "deprecated",
+          "chainId": 17000,
+          "symbol": "ETH",
+          "explorer": "https://holesky.etherscan.io",
+          "selectable": false,
+          "description": "Deprecated testnet."
+        },
+        {
+          "key": "ethereum-private",
+          "name": "Ethereum Private Mainnet",
+          "type": "private-mainnet",
+          "status": "custom",
+          "chainId": null,
+          "symbol": "ETH",
+          "explorer": null,
+          "selectable": false,
+          "description": "Private/custom network. RPC dan Chain ID ditentukan operator."
+        }
+      ]
+    },
+    {
+      "key": "polygon",
+      "name": "Polygon",
+      "category": "Layer 1 / PoS",
+      "networks": [
+        {
+          "key": "polygon-mainnet",
+          "name": "Polygon PoS Mainnet",
+          "type": "public-mainnet",
+          "status": "active",
+          "chainId": 137,
+          "symbol": "POL",
+          "explorer": "https://polygonscan.com"
+        },
+        {
+          "key": "polygon-amoy",
+          "name": "Polygon Amoy",
+          "type": "testnet",
+          "status": "active",
+          "chainId": 80002,
+          "symbol": "POL",
+          "explorer": "https://amoy.polygonscan.com"
+        }
+      ]
+    },
+    {
+      "key": "arbitrum",
+      "name": "Arbitrum",
+      "category": "Layer 2",
+      "networks": [
+        {
+          "key": "arbitrum-one",
+          "name": "Arbitrum One",
+          "type": "public-mainnet",
+          "status": "active",
+          "chainId": 42161,
+          "symbol": "ETH",
+          "explorer": "https://arbiscan.io"
+        },
+        {
+          "key": "arbitrum-nova",
+          "name": "Arbitrum Nova",
+          "type": "public-mainnet",
+          "status": "active",
+          "chainId": 42170,
+          "symbol": "ETH",
+          "explorer": "https://nova.arbiscan.io"
+        },
+        {
+          "key": "arbitrum-sepolia",
+          "name": "Arbitrum Sepolia",
+          "type": "testnet",
+          "status": "active",
+          "chainId": 421614,
+          "symbol": "ETH",
+          "explorer": "https://sepolia.arbiscan.io"
+        }
+      ]
+    },
+    {
+      "key": "base",
+      "name": "Base",
+      "category": "Layer 2",
+      "networks": [
+        {
+          "key": "base-mainnet",
+          "name": "Base Mainnet",
+          "type": "public-mainnet",
+          "status": "active",
+          "chainId": 8453,
+          "symbol": "ETH",
+          "explorer": "https://basescan.org"
+        },
+        {
+          "key": "base-sepolia",
+          "name": "Base Sepolia",
+          "type": "testnet",
+          "status": "active",
+          "chainId": 84532,
+          "symbol": "ETH",
+          "explorer": "https://sepolia.basescan.org"
+        }
+      ]
+    },
+    {
+      "key": "bnb",
+      "name": "BNB Chain",
+      "category": "Layer 1",
+      "networks": [
+        {
+          "key": "bsc-mainnet",
+          "name": "BNB Smart Chain Mainnet",
+          "type": "public-mainnet",
+          "status": "active",
+          "chainId": 56,
+          "symbol": "BNB",
+          "explorer": "https://bscscan.com"
+        },
+        {
+          "key": "bsc-testnet",
+          "name": "BNB Smart Chain Testnet",
+          "type": "testnet",
+          "status": "active",
+          "chainId": 97,
+          "symbol": "tBNB",
+          "explorer": "https://testnet.bscscan.com"
+        },
+        {
+          "key": "opbnb-mainnet",
+          "name": "opBNB Mainnet",
+          "type": "public-mainnet",
+          "status": "active",
+          "chainId": 204,
+          "symbol": "BNB",
+          "explorer": "https://opbnbscan.com"
+        },
+        {
+          "key": "opbnb-testnet",
+          "name": "opBNB Testnet",
+          "type": "testnet",
+          "status": "active",
+          "chainId": 5611,
+          "symbol": "tBNB",
+          "explorer": "https://testnet.opbnbscan.com"
+        }
+      ]
+    },
+    {
+      "key": "optimism",
+      "name": "Optimism",
+      "category": "Layer 2",
+      "networks": [
+        {
+          "key": "optimism-mainnet",
+          "name": "OP Mainnet",
+          "type": "public-mainnet",
+          "status": "active",
+          "chainId": 10,
+          "symbol": "ETH",
+          "explorer": "https://optimistic.etherscan.io"
+        },
+        {
+          "key": "optimism-sepolia",
+          "name": "OP Sepolia",
+          "type": "testnet",
+          "status": "active",
+          "chainId": 11155420,
+          "symbol": "ETH",
+          "explorer": "https://sepolia-optimism.etherscan.io"
+        }
+      ]
+    },
+    {
+      "key": "avalanche",
+      "name": "Avalanche",
+      "category": "Layer 1",
+      "networks": [
+        {
+          "key": "avalanche-c",
+          "name": "Avalanche C-Chain",
+          "type": "public-mainnet",
+          "status": "active",
+          "chainId": 43114,
+          "symbol": "AVAX",
+          "explorer": "https://snowtrace.io"
+        },
+        {
+          "key": "avalanche-fuji",
+          "name": "Avalanche Fuji",
+          "type": "testnet",
+          "status": "active",
+          "chainId": 43113,
+          "symbol": "AVAX",
+          "explorer": "https://testnet.snowtrace.io"
+        }
+      ]
+    },
+    {
+      "key": "linea",
+      "name": "Linea",
+      "category": "Layer 2",
+      "networks": [
+        {
+          "key": "linea-mainnet",
+          "name": "Linea Mainnet",
+          "type": "public-mainnet",
+          "status": "active",
+          "chainId": 59144,
+          "symbol": "ETH",
+          "explorer": "https://lineascan.build"
+        },
+        {
+          "key": "linea-sepolia",
+          "name": "Linea Sepolia",
+          "type": "testnet",
+          "status": "active",
+          "chainId": 59141,
+          "symbol": "ETH",
+          "explorer": "https://sepolia.lineascan.build"
+        }
+      ]
+    },
+    {
+      "key": "zksync",
+      "name": "ZKsync Era",
+      "category": "Layer 2",
+      "networks": [
+        {
+          "key": "zksync-mainnet",
+          "name": "ZKsync Era Mainnet",
+          "type": "public-mainnet",
+          "status": "active",
+          "chainId": 324,
+          "symbol": "ETH",
+          "explorer": "https://explorer.zksync.io"
+        },
+        {
+          "key": "zksync-sepolia",
+          "name": "ZKsync Era Sepolia",
+          "type": "testnet",
+          "status": "active",
+          "chainId": 300,
+          "symbol": "ETH",
+          "explorer": "https://sepolia.explorer.zksync.io"
+        }
+      ]
+    }
+  ]
+        }
