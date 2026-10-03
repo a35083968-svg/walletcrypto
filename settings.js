@@ -65,6 +65,9 @@ const CHAINS_JSON_URL = "chains.json";
 
 let chainCatalog = null;
 
+let providers = [];
+let providerAktif = null;
+
 let settings = bacaSettings();
 
 function bacaSettings() {
@@ -172,48 +175,39 @@ function renderSettingsState() {
 // ======================================================
 
 async function loadChainCatalog() {
-
     try {
+        const url =
+            `${CHAINS_JSON_URL}?v=${Date.now()}`;
 
         const response =
-            await fetch(CHAINS_JSON_URL, {
+            await fetch(url, {
                 cache: "no-store"
             });
 
-
         if (!response.ok) {
-
             throw new Error(
                 `HTTP ${response.status}`
             );
-
         }
-
 
         const data =
             await response.json();
-
 
         if (
             !data ||
             !Array.isArray(data.blockchains)
         ) {
-
             throw new Error(
                 "Format chains.json tidak valid."
             );
-
         }
 
-
         chainCatalog = data;
-
 
         console.log(
             "CHAIN CATALOG BERHASIL DIMUAT:",
             chainCatalog
         );
-
 
         return chainCatalog;
 
@@ -224,109 +218,28 @@ async function loadChainCatalog() {
             error
         );
 
-
         chainCatalog = null;
 
-
         if (networkList) {
-
             networkList.innerHTML = `
-
                 <div class="empty-state">
-
                     Gagal memuat daftar jaringan.
-
                     <br>
-
                     <small>
-                        Periksa file chains.json
+                        Periksa chains.json
                         dan koneksi halaman.
                     </small>
-
                 </div>
-
             `;
-
         }
-
 
         setSettingsStatus(
             "Gagal memuat daftar jaringan."
         );
 
-
         return null;
     }
-}
-
-
-// ======================================================
-// NORMALIZE CHAIN ID
-// ======================================================
-
-function chainIdToHex(chainId) {
-
-    if (
-        chainId === null ||
-        chainId === undefined
-    ) {
-
-        return null;
-    }
-
-
-    if (
-        typeof chainId === "string" &&
-        chainId.startsWith("0x")
-    ) {
-
-        return chainId.toLowerCase();
-    }
-
-
-    return (
-        "0x" +
-        Number(chainId).toString(16)
-    ).toLowerCase();
-}
-
-
-// ======================================================
-// NETWORK TYPE LABEL
-// ======================================================
-
-function networkTypeLabel(network) {
-
-    if (
-        network.type ===
-        "public-mainnet"
-    ) {
-
-        return "Public Mainnet";
-    }
-
-
-    if (
-        network.type ===
-        "private-mainnet"
-    ) {
-
-        return "Private Mainnet";
-    }
-
-
-    if (
-        network.type ===
-        "testnet"
-    ) {
-
-        return "Testnet";
-    }
-
-
-    return "Network";
-}
-
+}             
 
 // ======================================================
 // NETWORK STATUS LABEL
@@ -517,29 +430,40 @@ async function renderNetworkList() {
         .trim()
         .toLowerCase();
 
+    const testnetMode =
+        Boolean(
+            settings.testnetMode
+        );
 
     const filteredBlockchains =
         chainCatalog.blockchains
-
             .map(function (blockchain) {
 
-                // ==========================================
-                // 1. FILTER BERDASARKAN MODE
-                // ==========================================
+                if (
+                    !Array.isArray(
+                        blockchain.networks
+                    )
+                ) {
+                    return {
+                        ...blockchain,
+                        networks: []
+                    };
+                }
+
+                // --------------------------------------
+                // PILIH MODE
+                // --------------------------------------
 
                 const modeNetworks =
                     blockchain.networks.filter(
                         function (network) {
 
-                            if (
-                                settings.testnetMode
-                            ) {
+                            if (testnetMode) {
 
                                 return (
                                     network.type ===
                                     "testnet"
                                 );
-
                             }
 
                             return (
@@ -549,43 +473,60 @@ async function renderNetworkList() {
                                 network.type ===
                                     "private-mainnet"
                             );
-
                         }
                     );
 
+                // --------------------------------------
+                // SEARCH
+                // --------------------------------------
 
-                // ==========================================
-                // 2. FILTER BERDASARKAN SEARCH
-                // ==========================================
+                const blockchainText = [
+                    blockchain.key,
+                    blockchain.name,
+                    blockchain.category
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
 
                 const networks =
                     modeNetworks.filter(
                         function (network) {
 
-                            const searchableText = (
+                            const networkText = [
+                                network.key,
+                                network.name,
+                                network.type,
+                                network.status,
+                                network.description
+                            ]
+                                .filter(Boolean)
+                                .join(" ")
+                                .toLowerCase();
 
-                                blockchain.name +
-                                " " +
-                                network.name +
-                                " " +
-                                networkTypeLabel(
-                                    network
-                                ) +
-                                " " +
-                                networkStatusLabel(
-                                    network
+                            /*
+                             * Kalau user mencari "ethereum",
+                             * nama blockchain juga diperiksa.
+                             *
+                             * Jadi:
+                             *
+                             * Ethereum
+                             * ├─ Sepolia
+                             * ├─ Hoodi
+                             * └─ Holesky
+                             */
+
+                            return (
+                                blockchainText.includes(
+                                    searchQuery
+                                ) ||
+
+                                networkText.includes(
+                                    searchQuery
                                 )
-
-                            ).toLowerCase();
-
-
-                            return searchableText.includes(
-                                searchQuery
                             );
-
                         }
                     );
-
 
                 return {
                     ...blockchain,
@@ -593,54 +534,44 @@ async function renderNetworkList() {
                 };
 
             })
-
             .filter(
                 function (blockchain) {
 
                     return (
                         blockchain.networks.length > 0
                     );
-
                 }
             );
 
-
-    // ==========================================
+    // --------------------------------------
     // TIDAK ADA HASIL
-    // ==========================================
+    // --------------------------------------
 
     if (
         filteredBlockchains.length === 0
     ) {
 
         networkList.innerHTML = `
-
             <div class="empty-state">
-
                 Jaringan tidak ditemukan.
-
             </div>
-
         `;
 
         return;
     }
 
-
-    // ==========================================
-    // CEK NETWORK AKTIF
-    // ==========================================
+    // --------------------------------------
+    // AMBIL CHAIN ID WALLET
+    // --------------------------------------
 
     const activeChainId =
         await ambilChainIdWallet();
 
-
     networkList.innerHTML = "";
 
-
-    // ==========================================
+    // --------------------------------------
     // RENDER BLOCKCHAIN
-    // ==========================================
+    // --------------------------------------
 
     filteredBlockchains.forEach(
         function (blockchain) {
@@ -653,7 +584,6 @@ async function renderNetworkList() {
             blockchainGroup.className =
                 "network-group";
 
-
             const title =
                 document.createElement(
                     "h4"
@@ -662,15 +592,9 @@ async function renderNetworkList() {
             title.textContent =
                 blockchain.name;
 
-
             blockchainGroup.appendChild(
                 title
             );
-
-
-            // ==========================================
-            // RENDER NETWORK
-            // ==========================================
 
             blockchain.networks.forEach(
                 function (network) {
@@ -683,7 +607,6 @@ async function renderNetworkList() {
                     item.className =
                         "network-item";
 
-
                     const content =
                         document.createElement(
                             "div"
@@ -692,7 +615,6 @@ async function renderNetworkList() {
                     content.className =
                         "network-info";
 
-
                     const name =
                         document.createElement(
                             "strong"
@@ -700,7 +622,6 @@ async function renderNetworkList() {
 
                     name.textContent =
                         network.name;
-
 
                     const meta =
                         document.createElement(
@@ -711,7 +632,6 @@ async function renderNetworkList() {
                         `${networkTypeLabel(network)} • ` +
                         `${networkStatusLabel(network)}`;
 
-
                     content.appendChild(
                         name
                     );
@@ -719,11 +639,6 @@ async function renderNetworkList() {
                     content.appendChild(
                         meta
                     );
-
-
-                    // ==========================================
-                    // BUTTON
-                    // ==========================================
 
                     const button =
                         document.createElement(
@@ -736,19 +651,16 @@ async function renderNetworkList() {
                     button.className =
                         "network-select-button";
 
-
                     const networkChainId =
                         chainIdToHex(
                             network.chainId
                         );
-
 
                     const isActive =
                         activeChainId &&
                         networkChainId &&
                         activeChainId.toLowerCase() ===
                         networkChainId;
-
 
                     if (isActive) {
 
@@ -774,14 +686,6 @@ async function renderNetworkList() {
                         button.textContent =
                             "Pilih";
 
-                    }
-
-
-                    if (
-                        network.selectable !== false &&
-                        !isActive
-                    ) {
-
                         button.addEventListener(
                             "click",
                             function () {
@@ -792,9 +696,7 @@ async function renderNetworkList() {
 
                             }
                         );
-
                     }
-
 
                     item.appendChild(
                         content
@@ -804,7 +706,6 @@ async function renderNetworkList() {
                         button
                     );
 
-
                     blockchainGroup.appendChild(
                         item
                     );
@@ -812,14 +713,13 @@ async function renderNetworkList() {
                 }
             );
 
-
             networkList.appendChild(
                 blockchainGroup
             );
 
         }
     );
-}                    
+}                                
 
 // ======================================================
 // NETWORK SEARCH
