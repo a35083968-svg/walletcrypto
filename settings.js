@@ -1,99 +1,4 @@
 // ======================================================
-// DEBUG PANEL UNTUK HP
-// ======================================================
-
-const debugPanel = document.createElement("div");
-
-debugPanel.id = "debugPanel";
-
-debugPanel.style.cssText = `
-    position:fixed;
-    left:10px;
-    right:10px;
-    bottom:10px;
-    max-height:220px;
-    overflow-y:auto;
-    background:#020617;
-    color:#00ff88;
-    border:1px solid #00ff88;
-    border-radius:10px;
-    padding:10px;
-    font-family:monospace;
-    font-size:12px;
-    z-index:99999;
-`;
-
-debugPanel.innerHTML = `
-    <b>🛠 DEBUG PANEL</b>
-    <hr>
-`;
-
-document.body.appendChild(debugPanel);
-
-
-// ======================================================
-// TANGKAP console.log()
-// ======================================================
-
-const consoleLogAsli = console.log;
-
-console.log = function (...args) {
-
-    consoleLogAsli(...args);
-
-    const baris = document.createElement("div");
-
-    baris.textContent =
-        args.map(function (item) {
-
-            if (
-                typeof item === "object" &&
-                item !== null
-            ) {
-                try {
-                    return JSON.stringify(item);
-                } catch {
-                    return String(item);
-                }
-            }
-
-            return String(item);
-
-        }).join(" ");
-
-    debugPanel.appendChild(baris);
-
-    debugPanel.scrollTop =
-        debugPanel.scrollHeight;
-};
-
-// ======================================================
-// TANGKAP console.error()
-// ======================================================
-
-const consoleErrorAsli = console.error;
-
-console.error = function (...args) {
-
-    consoleErrorAsli(...args);
-
-    const baris = document.createElement("div");
-
-    baris.style.color = "#ff5555";
-
-    baris.textContent =
-        "ERROR: " +
-        args.map(function (item) {
-            return String(item);
-        }).join(" ");
-
-    debugPanel.appendChild(baris);
-
-    debugPanel.scrollTop =
-        debugPanel.scrollHeight;
-};
-
-// ======================================================
 // CRYPTO WALLET SETTINGS
 // ======================================================
 
@@ -361,6 +266,99 @@ function networkStatusLabel(network) {
 
 
     return "Active";
+}
+
+// ======================================================
+// NETWORK TYPE LABEL
+// ======================================================
+
+function networkTypeLabel(network) {
+
+    if (network.type === "testnet") {
+        return "Testnet";
+    }
+
+    if (network.type === "private-mainnet") {
+        return "Private Mainnet";
+    }
+
+    if (network.type === "public-mainnet") {
+        return "Public Mainnet";
+    }
+
+    return "Network";
+}
+
+
+// ======================================================
+// CHAIN ID → HEX
+// ======================================================
+
+function chainIdToHex(chainId) {
+
+    if (
+        chainId === null ||
+        chainId === undefined ||
+        chainId === ""
+    ) {
+        return null;
+    }
+
+    const numericChainId =
+        Number(chainId);
+
+    if (
+        !Number.isSafeInteger(numericChainId) ||
+        numericChainId < 0
+    ) {
+        return null;
+    }
+
+    return (
+        "0x" +
+        numericChainId.toString(16)
+    );
+}
+
+
+// ======================================================
+// BACA CHAIN ID WALLET
+// ======================================================
+
+async function ambilChainIdWallet() {
+
+    if (
+        !providerAktif ||
+        !providerAktif.provider ||
+        typeof providerAktif.provider.request !== "function"
+    ) {
+        return null;
+    }
+
+    try {
+
+        const chainId =
+            await providerAktif.provider.request({
+                method: "eth_chainId"
+            });
+
+        if (
+            typeof chainId !== "string"
+        ) {
+            return null;
+        }
+
+        return chainId.toLowerCase();
+
+    } catch (error) {
+
+        console.warn(
+            "GAGAL MEMBACA CHAIN ID WALLET:",
+            error?.message || error
+        );
+
+        return null;
+    }
 }
 
 // ======================================================
