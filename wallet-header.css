@@ -1,1 +1,813 @@
+/* =====================================================
+   CRYPTO WALLET - WALLET HEADER
+===================================================== */
 
+:root {
+
+    --background: #0a0a0a;
+
+    --surface: #121212;
+
+    --surface-soft: #181818;
+
+    --border: #292929;
+
+    --text: #f5f5f5;
+
+    --muted: #9a9a9a;
+
+    --accent: #2a1e2e;
+
+    --accent-hover: #35253b;
+
+    --testnet: #35d07f;
+
+    --testnet-soft: rgba(53, 208, 127, 0.12);
+
+    --danger: #ff6b81;
+
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+
+html {
+    min-height: 100%;
+}
+
+
+body {
+
+    margin: 0;
+
+    min-height: 100vh;
+
+    background:
+        var(--background);
+
+    color:
+        var(--text);
+
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    -webkit-font-smoothing:
+        antialiased;
+}
+
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.wallet-page {
+
+    width:
+        min(100%, 620px);
+
+    min-height:
+        100vh;
+
+    margin:
+        0 auto;
+
+    padding:
+        18px 18px 36px;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.wallet-header {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    min-height:
+        44px;
+
+    margin-bottom:
+        18px;
+}
+
+
+.header-actions {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+}
+
+
+.icon-button {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    width:
+        42px;
+
+    height:
+        42px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        14px;
+
+    background:
+        var(--surface);
+
+    color:
+        var(--text);
+
+    text-decoration:
+        none;
+
+    font-size:
+        19px;
+
+    line-height:
+        1;
+
+    cursor:
+        pointer;
+
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease;
+}
+
+
+.icon-button:hover {
+
+    background:
+        var(--surface-soft);
+
+    border-color:
+        #3a3a3a;
+}
+
+
+.icon-button:active {
+
+    transform:
+        scale(0.96);
+}
+
+
+/* =====================================================
+   TESTNET
+===================================================== */
+
+.testnet-banner {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        9px;
+
+    margin-bottom:
+        22px;
+
+    padding:
+        11px 14px;
+
+    border:
+        1px solid rgba(53, 208, 127, 0.28);
+
+    border-radius:
+        14px;
+
+    background:
+        var(--testnet-soft);
+
+    color:
+        #8ff0b9;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+}
+
+
+.testnet-banner.is-hidden {
+    display: none;
+}
+
+
+.testnet-dot {
+
+    width:
+        8px;
+
+    height:
+        8px;
+
+    flex:
+        0 0 auto;
+
+    border-radius:
+        50%;
+
+    background:
+        var(--testnet);
+}
+
+
+/* =====================================================
+   WALLET IDENTITY
+===================================================== */
+
+.wallet-identity {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        14px;
+
+    margin-bottom:
+        24px;
+}
+
+
+.wallet-avatar {
+
+    position:
+        relative;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    width:
+        58px;
+
+    height:
+        58px;
+
+    flex:
+        0 0 auto;
+
+    border-radius:
+        18px;
+
+    background:
+        #2fd879;
+
+    color:
+        #07140d;
+
+    font-size:
+        25px;
+
+    font-weight:
+        900;
+}
+
+
+.chain-badge {
+
+    position:
+        absolute;
+
+    right:
+        -5px;
+
+    bottom:
+        -5px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    width:
+        25px;
+
+    height:
+        25px;
+
+    border:
+        3px solid var(--background);
+
+    border-radius:
+        50%;
+
+    background:
+        #7653d9;
+
+    color:
+        #ffffff;
+
+    font-size:
+        11px;
+}
+
+
+.wallet-identity-info {
+    min-width: 0;
+}
+
+
+.wallet-identity-info h1 {
+
+    margin:
+        0 0 7px;
+
+    font-size:
+        19px;
+
+    line-height:
+        1.2;
+}
+
+
+.wallet-address-row {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    min-width:
+        0;
+}
+
+
+.wallet-address-row code {
+
+    overflow:
+        hidden;
+
+    color:
+        var(--muted);
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+
+    font-size:
+        12px;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+}
+
+
+.wallet-count {
+
+    flex:
+        0 0 auto;
+
+    color:
+        #c8c8c8;
+
+    font-size:
+        12px;
+}
+
+
+/* =====================================================
+   BALANCE
+===================================================== */
+
+.balance-card {
+
+    margin-bottom:
+        22px;
+
+    padding:
+        22px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        24px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #151515,
+            #101010
+        );
+}
+
+
+.balance-label {
+
+    margin:
+        0 0 7px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        13px;
+}
+
+
+.wallet-balance {
+
+    display:
+        block;
+
+    margin:
+        0;
+
+    font-size:
+        clamp(30px, 8vw, 42px);
+
+    line-height:
+        1.05;
+
+    letter-spacing:
+        -1px;
+}
+
+
+.eth-balance {
+
+    display:
+        block;
+
+    margin-top:
+        10px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        12px;
+}
+
+
+/* =====================================================
+   MAIN ACTIONS
+===================================================== */
+
+.wallet-actions {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap:
+        12px;
+
+    margin-bottom:
+        26px;
+}
+
+
+.wallet-action-button {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        9px;
+
+    min-height:
+        56px;
+
+    border:
+        1px solid #3a2b3f;
+
+    border-radius:
+        18px;
+
+    background:
+        var(--accent);
+
+    color:
+        var(--text);
+
+    font:
+        inherit;
+
+    font-size:
+        15px;
+
+    font-weight:
+        750;
+
+    cursor:
+        pointer;
+
+    transition:
+        background 0.18s ease,
+        transform 0.18s ease;
+}
+
+
+.wallet-action-button:hover {
+
+    background:
+        var(--accent-hover);
+}
+
+
+.wallet-action-button:active {
+
+    transform:
+        translateY(1px);
+}
+
+
+.action-icon {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    width:
+        24px;
+
+    height:
+        24px;
+
+    border-radius:
+        8px;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+}
+
+
+/* =====================================================
+   SECTIONS
+===================================================== */
+
+.wallet-section {
+
+    padding:
+        18px 0;
+
+    border-top:
+        1px solid var(--border);
+}
+
+
+.section-heading {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        12px;
+
+    margin-bottom:
+        13px;
+}
+
+
+.section-heading h2 {
+
+    margin:
+        3px 0 0;
+
+    font-size:
+        18px;
+
+    line-height:
+        1.2;
+}
+
+
+.section-eyebrow {
+
+    margin:
+        0;
+
+    color:
+        var(--muted);
+
+    font-size:
+        11px;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        0.08em;
+}
+
+
+.section-arrow {
+
+    color:
+        var(--muted);
+
+    font-size:
+        20px;
+}
+
+
+.wide-button {
+
+    width:
+        100%;
+
+    min-height:
+        48px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        15px;
+
+    background:
+        var(--surface);
+
+    color:
+        var(--text);
+
+    font:
+        inherit;
+
+    font-size:
+        14px;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease;
+}
+
+
+.wide-button:hover {
+
+    background:
+        var(--surface-soft);
+
+    border-color:
+        #3a3a3a;
+}
+
+
+.activity-state {
+
+    padding:
+        16px;
+
+    border:
+        1px dashed #303030;
+
+    border-radius:
+        15px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        13px;
+
+    line-height:
+        1.5;
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.wallet-status {
+
+    margin:
+        18px 0 0;
+
+    color:
+        var(--muted);
+
+    font-size:
+        12px;
+
+    text-align:
+        center;
+}
+
+
+.wallet-status.error {
+    color:
+        var(--danger);
+}
+
+
+/* =====================================================
+   FOCUS
+===================================================== */
+
+button:focus-visible,
+a:focus-visible {
+
+    outline:
+        2px solid #ffffff;
+
+    outline-offset:
+        3px;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (min-width: 700px) {
+
+    .wallet-page {
+
+        padding:
+            24px 24px 48px;
+    }
+
+}
