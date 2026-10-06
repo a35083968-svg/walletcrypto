@@ -1,1 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#0a0a0a"
+    >
+
+    <title>Wallet Header</title>
+
+    <link
+        rel="stylesheet"
+        href="wallet-header.css"
+    >
+
+</head>
+
+<body>
+
+<main class="wallet-page">
+
+    <!-- HEADER -->
+
+    <header class="wallet-header">
+
+        <!-- PAGE 2 → PAGE 1 -->
+
+        <a
+            href="index.html"
+            class="icon-button"
+            aria-label="Kembali ke Home"
+            title="Kembali"
+        >
+            ←
+        </a>
+
+
+        <div class="header-actions">
+
+            <!-- PAGE 2 → PAGE 3 -->
+
+            <a
+                href="settings.html"
+                class="icon-button"
+                aria-label="Pengaturan"
+                title="Pengaturan"
+            >
+                ⚙️
+            </a>
+
+
+            <button
+                id="disconnectButton"
+                class="icon-button"
+                type="button"
+                aria-label="Wallet"
+                title="Aksi wallet"
+            >
+                ⏻
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- TESTNET BANNER -->
+
+    <section
+        id="testnetBanner"
+        class="testnet-banner"
+        aria-label="Status jaringan"
+    >
+
+        <span
+            class="testnet-dot"
+            aria-hidden="true"
+        ></span>
+
+        <span>
+            Testnet aktif
+        </span>
+
+    </section>
+
+
+    <!-- WALLET IDENTITY -->
+
+    <section class="wallet-identity">
+
+        <div
+            class="wallet-avatar"
+            aria-hidden="true"
+        >
+
+            ◆
+
+            <span class="chain-badge">
+                ◇
+            </span>
+
+        </div>
+
+
+        <div class="wallet-identity-info">
+
+            <h1>
+                crypto Wallet
+            </h1>
+
+
+            <div class="wallet-address-row">
+
+                <code id="walletAddress">
+                    Wallet belum terhubung
+                </code>
+
+
+                <span
+                    id="walletCount"
+                    class="wallet-count"
+                >
+                    +1 lagi
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- BALANCE -->
+
+    <section class="balance-card">
+
+        <p class="balance-label">
+            Saldo
+        </p>
+
+
+        <strong
+            id="walletBalance"
+            class="wallet-balance"
+        >
+            Rp 0
+        </strong>
+
+
+        <span
+            id="ethBalance"
+            class="eth-balance"
+        >
+            ETH — belum terhubung
+        </span>
+
+    </section>
+
+
+    <!-- MAIN ACTIONS -->
+
+    <section
+        class="wallet-actions"
+        aria-label="Aksi wallet"
+    >
+
+        <button
+            id="sendButton"
+            class="wallet-action-button"
+            type="button"
+        >
+
+            <span
+                class="action-icon"
+                aria-hidden="true"
+            >
+                ↑
+            </span>
+
+            <span>
+                Kirim
+            </span>
+
+        </button>
+
+
+        <button
+            id="receiveButton"
+            class="wallet-action-button"
+            type="button"
+        >
+
+            <span
+                class="action-icon"
+                aria-hidden="true"
+            >
+                ↓
+            </span>
+
+            <span>
+                Terima
+            </span>
+
+        </button>
+
+    </section>
+
+
+    <!-- PORTFOLIO -->
+
+    <section class="wallet-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="section-eyebrow">
+                    Wallet
+                </p>
+
+                <h2>
+                    Lihat portofolio
+                </h2>
+
+            </div>
+
+
+            <span
+                class="section-arrow"
+                aria-hidden="true"
+            >
+                →
+            </span>
+
+        </div>
+
+
+        <button
+            id="portfolioButton"
+            class="wide-button"
+            type="button"
+        >
+            Lihat portofolio
+        </button>
+
+    </section>
+
+
+    <!-- RECENT ACTIVITY -->
+
+    <section class="wallet-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="section-eyebrow">
+                    Wallet
+                </p>
+
+                <h2>
+                    Aktivitas terbaru
+                </h2>
+
+            </div>
+
+
+            <span
+                class="section-arrow"
+                aria-hidden="true"
+            >
+                →
+            </span>
+
+        </div>
+
+
+        <div
+            id="activityState"
+            class="activity-state"
+        >
+            Belum ada aktivitas terbaru.
+        </div>
+
+    </section>
+
+
+    <!-- STATUS -->
+
+    <p
+        id="walletStatus"
+        class="wallet-status"
+        role="status"
+        aria-live="polite"
+    >
+        Memuat wallet...
+    </p>
+
+</main>
+
+
+<script src="wallet-header.js"></script>
+
+</body>
+
+          </html>
