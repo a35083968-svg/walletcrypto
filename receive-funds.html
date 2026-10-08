@@ -1,1 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#0a0a0a"
+    >
+
+    <title>Terima / Receive</title>
+
+    <link
+        rel="stylesheet"
+        href="receive-funds.css"
+    >
+
+</head>
+
+
+<body>
+
+<main class="receive-page">
+
+
+    <!-- HEADER -->
+
+    <header class="receive-header">
+
+        <a
+            href="wallet-header.html"
+            class="icon-button"
+            aria-label="Kembali ke Wallet"
+            title="Kembali"
+        >
+            ←
+        </a>
+
+
+        <h1>
+            Terima / Receive
+        </h1>
+
+
+        <span
+            class="header-spacer"
+            aria-hidden="true"
+        ></span>
+
+    </header>
+
+
+    <!-- TESTNET -->
+
+    <section
+        id="testnetBadge"
+        class="testnet-badge"
+        aria-label="Status jaringan"
+        hidden
+    >
+
+        <span
+            class="testnet-dot"
+            aria-hidden="true"
+        ></span>
+
+        <span>
+            Testnet aktif
+        </span>
+
+    </section>
+
+
+    <!-- DESCRIPTION -->
+
+    <p class="receive-description">
+        Tunjukkan QR ini untuk menerima uang
+    </p>
+
+
+    <!-- QR CODE -->
+
+    <section
+        class="qr-section"
+        aria-label="QR Code alamat wallet"
+    >
+
+        <div
+            id="qrCode"
+            class="qr-code"
+            aria-label="QR Code wallet"
+        ></div>
+
+    </section>
+
+
+    <!-- WALLET ADDRESS -->
+
+    <section
+        class="address-card"
+        aria-label="Alamat wallet"
+    >
+
+        <code id="walletAddress">
+            Wallet belum terhubung
+        </code>
+
+
+        <button
+            id="copyIconButton"
+            class="copy-icon-button"
+            type="button"
+            aria-label="Salin alamat wallet"
+            title="Salin alamat"
+        >
+            ⧉
+        </button>
+
+    </section>
+
+
+    <!-- ACTIONS -->
+
+    <section
+        class="receive-actions"
+        aria-label="Aksi alamat wallet"
+    >
+
+        <button
+            id="copyAddressButton"
+            class="receive-action-button"
+            type="button"
+        >
+
+            <span aria-hidden="true">
+                ▣
+            </span>
+
+            <span>
+                Salin Alamat
+            </span>
+
+        </button>
+
+
+        <button
+            id="shareButton"
+            class="receive-action-button"
+            type="button"
+        >
+
+            <span aria-hidden="true">
+                ↗
+            </span>
+
+            <span>
+                Bagikan
+            </span>
+
+        </button>
+
+    </section>
+
+
+    <!-- INFO BOX 1 -->
+
+    <section class="info-box">
+
+        <div
+            class="info-icon"
+            aria-hidden="true"
+        >
+            ⓘ
+        </div>
+
+
+        <div>
+
+            <strong>
+                Receive = alamat rekening wallet
+            </strong>
+
+            <p>
+                Alamat unik untuk menerima ETH &amp; token ERC-20
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- INFO BOX 2 -->
+
+    <section class="info-box">
+
+        <div
+            class="info-icon"
+            aria-hidden="true"
+        >
+            ▦
+        </div>
+
+
+        <div>
+
+            <strong>
+                QR = versi gambar alamat, tinggal SCAN
+            </strong>
+
+            <p>
+                Pindai untuk otomatis mengisi alamat wallet
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- STATUS -->
+
+    <p
+        id="receiveStatus"
+        class="receive-status"
+        role="status"
+        aria-live="polite"
+    >
+        Memuat wallet...
+    </p>
+
+</main>
+
+
+<!-- QR LIBRARY -->
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+
+
+<!-- PAGE LOGIC -->
+
+<script src="receive-funds.js"></script>
+
+</body>
+
+  </html>
