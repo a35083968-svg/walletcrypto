@@ -313,19 +313,22 @@ function generateQr(address) {
     qrCode.replaceChildren();
 
     if (
-        typeof window.QRCode === "undefined" ||
-        typeof window.QRCode.toCanvas !== "function"
-    ) {
-        console.error("QRCode library tidak tersedia.");
+    !window.QRCode ||
+    typeof window.QRCode.toCanvas !== "function"
+) {
+    console.error(
+        "QRCode library tidak tersedia.",
+        "window.QRCode:",
+        typeof window.QRCode
+    );
 
-        setStatus(
-            "Library QR Code gagal dimuat. Periksa koneksi internet.",
-            true
-        );
+    setStatus(
+        "Library QR Code gagal dimuat. Periksa koneksi atau URL CDN.",
+        true
+    );
 
-        return;
-    }
-
+    return;
+}
     // Gunakan alamat wallet LENGKAP, bukan alamat truncated.
     window.QRCode.toCanvas(
         address,
