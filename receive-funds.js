@@ -212,80 +212,57 @@ function enableWalletActions(
 ===================================================== */
 
 function generateQr(address) {
-
     if (!qrCode) {
         return;
     }
 
     qrCode.replaceChildren();
 
-
     if (
         typeof window.QRCode === "undefined" ||
         typeof window.QRCode.toCanvas !== "function"
     ) {
+        console.error("QRCode library tidak tersedia.");
 
         setStatus(
-            "Library QR Code gagal dimuat.",
+            "Library QR Code gagal dimuat. Periksa koneksi internet.",
             true
         );
 
         return;
     }
 
-
+    // Gunakan alamat wallet LENGKAP, bukan alamat truncated.
     window.QRCode.toCanvas(
-
         address,
-
         {
-            errorCorrectionLevel:
-                "H",
-
-            margin:
-                1,
-
-            width:
-                270,
-
+            errorCorrectionLevel: "H",
+            margin: 2,
+            width: 300,
             color: {
-
-                dark:
-                    "#000000",
-
-                light:
-                    "#ffffff"
+                dark: "#000000",
+                light: "#ffffff"
             }
         },
-
-        function (
-            error,
-            canvas
-        ) {
-
+        function (error, canvas) {
             if (error) {
+                console.error("GAGAL MEMBUAT QR:", error);
 
-                console.error(
-                    "GAGAL MEMBUAT QR:",
-                    error
-                );
-
-                setStatus(
-                    "QR Code gagal dibuat.",
-                    true
-                );
-
+                setStatus("QR Code gagal dibuat.", true);
                 return;
             }
 
+            qrCode.replaceChildren(canvas);
 
-            qrCode.appendChild(
-                canvas
-            );
+            canvas.style.display = "block";
+            canvas.style.width = "100%";
+            canvas.style.maxWidth = "300px";
+            canvas.style.height = "auto";
+
+            setStatus("QR Code wallet berhasil dibuat.");
         }
     );
-}
-
+        }
 
 /* =====================================================
    COPY
