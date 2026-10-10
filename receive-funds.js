@@ -312,7 +312,8 @@ function generateQr(address) {
 
     qrCode.replaceChildren();
 
-    if (
+    
+if (
     !window.QRCode ||
     typeof window.QRCode.toCanvas !== "function"
 ) {
@@ -323,12 +324,13 @@ function generateQr(address) {
     );
 
     setStatus(
-        "Library QR Code gagal dimuat. Periksa koneksi atau URL CDN.",
+        "Library QR Code belum tersedia. Periksa pemuatan CDN.",
         true
     );
 
     return;
 }
+
     // Gunakan alamat wallet LENGKAP, bukan alamat truncated.
     window.QRCode.toCanvas(
         address,
