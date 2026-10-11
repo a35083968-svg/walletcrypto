@@ -305,18 +305,13 @@ function enableWalletActions(
    QR CODE
 ===================================================== */
 
-
-function generateQr(address) {
-
 function generateQr(address) {
     if (!qrCode) {
         return;
     }
 
-    // Bersihkan QR lama agar sesuai dengan wallet terbaru.
     qrCode.replaceChildren();
 
-    // Pastikan alamat Ethereum lengkap dan valid.
     if (
         typeof address !== "string" ||
         !/^0x[a-fA-F0-9]{40}$/.test(address)
@@ -325,15 +320,16 @@ function generateQr(address) {
         return;
     }
 
-    // Pastikan library QRCode.js sudah dimuat.
-    if (typeof window.QRCode !== "function") {
+    if (
+        typeof window.QRCode !== "function" ||
+        !window.QRCode.CorrectLevel
+    ) {
         console.error(
-            "QRCode.js tidak tersedia.",
-            "Periksa URL CDN dan koneksi internet."
+            "QRCode.js tidak tersedia atau gagal dimuat."
         );
 
         setStatus(
-            "Library QR Code gagal dimuat. Periksa koneksi internet.",
+            "Library QR Code gagal dimuat.",
             true
         );
 
@@ -356,8 +352,8 @@ function generateQr(address) {
         qrCode.replaceChildren();
         setStatus("QR Code gagal dibuat.", true);
     }
-}
-
+ }
+            
 /* =====================================================
    COPY
 ===================================================== */
