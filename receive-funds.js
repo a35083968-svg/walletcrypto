@@ -305,51 +305,56 @@ function enableWalletActions(
    QR CODE
 ===================================================== */
 
+
 function generateQr(address) {
     if (!qrCode) {
         return;
     }
 
+    // Bersihkan QR lama agar sesuai dengan wallet terbaru.
     qrCode.replaceChildren();
 
-    
-if (
-    !window.QRCode ||
-    typeof window.QRCode.toCanvas !== "function"
-) {
-    console.error(
-        "QRCode library tidak tersedia.",
-        "window.QRCode:",
-        typeof window.QRCode
-    );
+    // Pastikan alamat Ethereum lengkap dan valid.
+    if (
+        typeof address !== "string" ||
+        !/^0x[a-fA-F0-9]{40}$/.test(address)
+    ) {
+        setStatus("Alamat wallet tidak valid.", true);
+        return;
+    }
 
-    setStatus(
-        "Library QR Code belum tersedia. Periksa pemuatan CDN.",
-        true
-    );
+    // Pastikan library QRCode.js sudah dimuat.
+    if (typeof window.QRCode !== "function") {
+        console.error(
+            "QRCode.js tidak tersedia.",
+            "Periksa URL CDN dan koneksi internet."
+        );
 
-    return;
-}
+        setStatus(
+            "Library QR Code gagal dimuat. Periksa koneksi internet.",
+            true
+        );
 
-    // Gunakan alamat wallet LENGKAP, bukan alamat truncated.
-    window.QRCode.toCanvas(
-        address,
-        {
-            errorCorrectionLevel: "H",
-            margin: 2,
+        return;
+    }
+
+    try {
+        new window.QRCode(qrCode, {
+            text: address,
             width: 300,
-            color: {
-                dark: "#000000",
-                light: "#ffffff"
-            }
-        },
-        function (error, canvas) {
-            if (error) {
-                console.error("GAGAL MEMBUAT QR:", error);
+            height: 300,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: window.QRCode.CorrectLevel.H
+        });
 
-                setStatus("QR Code gagal dibuat.", true);
-                return;
-            }
+        setStatus("QR Code wallet berhasil dibuat.");
+    } catch (error) {
+        console.error("GAGAL MEMBUAT QR CODE:", error);
+        qrCode.replaceChildren();
+        setStatus("QR Code gagal dibuat.", true);
+    }
+}
 
             qrCode.replaceChildren(canvas);
 
