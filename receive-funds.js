@@ -307,6 +307,8 @@ function enableWalletActions(
 
 
 function generateQr(address) {
+
+function generateQr(address) {
     if (!qrCode) {
         return;
     }
@@ -355,18 +357,6 @@ function generateQr(address) {
         setStatus("QR Code gagal dibuat.", true);
     }
 }
-
-            qrCode.replaceChildren(canvas);
-
-            canvas.style.display = "block";
-            canvas.style.width = "100%";
-            canvas.style.maxWidth = "300px";
-            canvas.style.height = "auto";
-
-            setStatus("QR Code wallet berhasil dibuat.");
-        }
-    );
-        }
 
 /* =====================================================
    COPY
