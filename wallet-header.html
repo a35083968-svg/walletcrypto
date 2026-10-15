@@ -166,6 +166,40 @@
     </section>
 
 
+<!-- ERC-20 TOKEN MANAGER -->
+<section class="erc20-card" aria-labelledby="erc20Title">
+    <h2 id="erc20Title">Token ERC-20</h2>
+    <p>Hubungkan alamat kontrak token untuk membaca informasi token di jaringan aktif.</p>
+
+    <label for="erc20ContractAddress">Alamat kontrak token</label>
+    <input
+        id="erc20ContractAddress"
+        type="text"
+        placeholder="0x..."
+        autocomplete="off"
+        spellcheck="false"
+    >
+
+    <button id="erc20LoadButton" type="button">
+        Baca Token
+    </button>
+
+    <div class="erc20-info">
+        <p>Nama: <strong id="erc20Name">—</strong></p>
+        <p>Simbol: <strong id="erc20Symbol">—</strong></p>
+        <p>Desimal: <strong id="erc20Decimals">—</strong></p>
+        <p>Total supply: <strong id="erc20TotalSupply">—</strong></p>
+        <p>Saldo wallet: <strong id="erc20Balance">—</strong></p>
+    </div>
+
+    <p
+        id="erc20Status"
+        role="status"
+        aria-live="polite"
+    >Masukkan alamat kontrak token.</p>
+</section>
+    
+    
     <!-- MAIN ACTIONS -->
 
     <section
@@ -304,6 +338,7 @@
 </main>
 
 
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
 <script src="wallet-header.js"></script>
 
 </body>
