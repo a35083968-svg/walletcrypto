@@ -523,7 +523,6 @@ if (portfolioButton) {
     );
 }
 
-
 // =====================================================
 // INIT
 // =====================================================
@@ -532,10 +531,8 @@ async function initWalletHeader() {
 
     renderTestnetState();
 
-
     const provider =
         getProvider();
-
 
     if (provider) {
 
@@ -544,10 +541,204 @@ async function initWalletHeader() {
         );
     }
 
-
     await loadWallet();
 
+/* =========================================
+   ERC-20: BACA INFORMASI TOKEN
+========================================= */
 
+const ERC20_ABI_READ = [
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "name",
+        "outputs": [{ "name": "", "type": "string" }],
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "symbol",
+        "outputs": [{ "name": "", "type": "string" }],
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "decimals",
+        "outputs": [{ "name": "", "type": "uint8" }],
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "totalSupply",
+        "outputs": [{ "name": "", "type": "uint256" }],
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            { "name": "account", "type": "address" }
+        ],
+        "name": "balanceOf",
+        "outputs": [{ "name": "", "type": "uint256" }],
+        "type": "function"
+    }
+];
+
+const erc20ContractInput =
+    document.getElementById("erc20ContractAddress");
+
+const erc20LoadButton =
+    document.getElementById("erc20LoadButton");
+
+const erc20Status =
+    document.getElementById("erc20Status");
+
+function setERC20Status(message) {
+    if (erc20Status) {
+        erc20Status.textContent = message;
+    }
+}
+
+function setERC20Value(id, value) {
+    const element = document.getElementById(id);
+
+    if (element) {
+        element.textContent = String(value);
+    }
+}
+
+/*
+ * Mengubah bilangan integer token menjadi format desimal
+ * tanpa menggunakan Number untuk seluruh nilai token.
+ */
+function formatERC20Units(rawValue, decimals) {
+    const value = BigInt(rawValue);
+    const places = Number(decimals);
+
+    if (!Number.isInteger(places) || places < 0 || places > 255) {
+        throw new Error("Jumlah desimal token tidak valid.");
+    }
+
+    const divisor = 10n ** BigInt(places);
+    const whole = value / divisor;
+
+    if (places === 0) {
+        return whole.toString();
+    }
+
+    const fraction = (value % divisor)
+        .toString()
+        .padStart(places, "0")
+        .replace(/0+$/, "");
+
+    return fraction
+        ? `${whole}.${fraction}`
+        : whole.toString();
+}
+
+async function loadERC20Token() {
+    if (typeof Web3 === "undefined") {
+        setERC20Status(
+            "Web3.js tidak tersedia. Periksa koneksi dan pemuatan library."
+        );
+        return;
+    }
+
+    const provider = getProvider();
+
+    if (!provider) {
+        setERC20Status(
+            "Wallet provider tidak terdeteksi."
+        );
+        return;
+    }
+
+    const contractAddress =
+        erc20ContractInput?.value.trim();
+
+    if (!Web3.utils.isAddress(contractAddress || "")) {
+        setERC20Status(
+            "Alamat kontrak token tidak valid."
+        );
+        return;
+    }
+
+    try {
+        setERC20Status("Memeriksa jaringan dan membaca token...");
+
+        const accounts = await provider.request({
+            method: "eth_accounts"
+        });
+
+        if (!Array.isArray(accounts) || accounts.length === 0) {
+            throw new Error(
+                "Hubungkan wallet terlebih dahulu."
+            );
+        }
+
+        const web3Instance = new Web3(provider);
+
+        const contract = new web3Instance.eth.Contract(
+            ERC20_ABI_READ,
+            contractAddress
+        );
+
+        const [
+            chainId,
+            name,
+            symbol,
+            decimalsResult,
+            supplyResult,
+            balanceResult
+        ] = await Promise.all([
+            provider.request({ method: "eth_chainId" }),
+            contract.methods.name().call(),
+            contract.methods.symbol().call(),
+            contract.methods.decimals().call(),
+            contract.methods.totalSupply().call(),
+            contract.methods.balanceOf(accounts[0]).call()
+        ]);
+
+        const decimals = Number(decimalsResult);
+
+        setERC20Value("erc20Name", name);
+        setERC20Value("erc20Symbol", symbol);
+        setERC20Value("erc20Decimals", decimals);
+        setERC20Value(
+            "erc20TotalSupply",
+            formatERC20Units(supplyResult, decimals) +
+                " " + symbol
+        );
+        setERC20Value(
+            "erc20Balance",
+            formatERC20Units(balanceResult, decimals) +
+                " " + symbol
+        );
+
+        setERC20Status(
+            `Token berhasil dibaca. Chain ID aktif: ${parseInt(chainId, 16)}.`
+        );
+
+    } catch (error) {
+        console.error("ERC-20 READ ERROR:", error);
+
+        setERC20Status(
+            "Gagal membaca token: " +
+            (error?.message || "Kesalahan tidak diketahui.")
+        );
+    }
+}
+
+if (erc20LoadButton) {
+    erc20LoadButton.addEventListener(
+        "click",
+        loadERC20Token
+    );
+}
+    
     console.log(
         "WALLET-HEADER.JS BERHASIL DIMUAT"
     );
