@@ -761,72 +761,93 @@ async function loadERC20Token() {
         return;
     }
 
-    try {
-        setERC20Status("Memeriksa jaringan dan membaca token...");
+try {
+    setERC20Status("Memeriksa jaringan dan membaca token...");
 
-        const accounts = await provider.request({
-            method: "eth_accounts"
-        });
+    const accounts = await provider.request({
+        method: "eth_accounts"
+    });
 
-        if (!Array.isArray(accounts) || accounts.length === 0) {
-            throw new Error(
-                "Hubungkan wallet terlebih dahulu."
-            );
-        }
+    if (!Array.isArray(accounts) || accounts.length === 0) {
+        throw new Error("Hubungkan wallet terlebih dahulu.");
+    }
 
-        const web3Instance = new Web3(provider);
+    // 1. Periksa jaringan yang sedang digunakan.
+    const chainIdHex = await provider.request({
+        method: "eth_chainId"
+    });
 
-        const contract = new web3Instance.eth.Contract(
-            ERC20_ABI_READ,
-            contractAddress
-        );
+    const chainId = Number.parseInt(chainIdHex, 16);
 
-        const [
-            chainId,
-            name,
-            symbol,
-            decimalsResult,
-            supplyResult,
-            balanceResult
-        ] = await Promise.all([
-            provider.request({ method: "eth_chainId" }),
-            contract.methods.name().call(),
-            contract.methods.symbol().call(),
-            contract.methods.decimals().call(),
-            contract.methods.totalSupply().call(),
-            contract.methods.balanceOf(accounts[0]).call()
-        ]);
+    // 2. Periksa apakah alamat memiliki smart contract
+    //    pada jaringan yang sedang aktif.
+    const contractCode = await provider.request({
+        method: "eth_getCode",
+        params: [contractAddress, "latest"]
+    });
 
-        const decimals = Number(decimalsResult);
-
-        setERC20Value("erc20Name", name);
-        setERC20Value("erc20Symbol", symbol);
-        setERC20Value("erc20Decimals", decimals);
-        setERC20Value(
-            "erc20TotalSupply",
-            formatERC20Units(supplyResult, decimals) +
-                " " + symbol
-        );
-        setERC20Value(
-            "erc20Balance",
-            formatERC20Units(balanceResult, decimals) +
-                " " + symbol
-        );
-
-        setERC20Status(
-            `Token berhasil dibaca. Chain ID aktif: ${parseInt(chainId, 16)}.`
-        );
-
-    } catch (error) {
-        console.error("ERC-20 READ ERROR:", error);
-
-        setERC20Status(
-            "Gagal membaca token: " +
-            (error?.message || "Kesalahan tidak diketahui.")
+    if (
+        typeof contractCode !== "string" ||
+        contractCode === "0x" ||
+        /^0x0+$/i.test(contractCode)
+    ) {
+        throw new Error(
+            `Tidak ditemukan smart contract pada alamat ini di jaringan aktif (Chain ID ${chainId}). ` +
+            "Periksa alamat kontrak dan ganti ke jaringan tempat token tersebut diterbitkan."
         );
     }
-}
 
+    // 3. Baca data ERC-20 hanya setelah kontrak ditemukan.
+    const web3Instance = new Web3(provider);
+
+    const contract = new web3Instance.eth.Contract(
+        ERC20_ABI_READ,
+        contractAddress
+    );
+
+    const [
+        name,
+        symbol,
+        decimalsResult,
+        supplyResult,
+        balanceResult
+    ] = await Promise.all([
+        contract.methods.name().call(),
+        contract.methods.symbol().call(),
+        contract.methods.decimals().call(),
+        contract.methods.totalSupply().call(),
+        contract.methods.balanceOf(accounts[0]).call()
+    ]);
+
+    const decimals = Number(decimalsResult);
+
+    setERC20Value("erc20Name", name);
+    setERC20Value("erc20Symbol", symbol);
+    setERC20Value("erc20Decimals", decimals);
+
+    setERC20Value(
+        "erc20TotalSupply",
+        `${formatERC20Units(supplyResult, decimals)} ${symbol}`
+    );
+
+    setERC20Value(
+        "erc20Balance",
+        `${formatERC20Units(balanceResult, decimals)} ${symbol}`
+    );
+
+    setERC20Status(
+        `Token berhasil dibaca. Chain ID aktif: ${chainId}.`
+    );
+
+} catch (error) {
+    console.error("ERC-20 READ ERROR:", error);
+
+    setERC20Status(
+        "Gagal membaca token: " +
+        (error?.message || "Kesalahan tidak diketahui.")
+    );
+}    
+    
 if (erc20LoadButton) {
     erc20LoadButton.addEventListener(
         "click",
