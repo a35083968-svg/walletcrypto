@@ -618,27 +618,6 @@ if (portfolioButton) {
     );
 }
 
-// =====================================================
-// INIT
-// =====================================================
-
-async function initWalletHeader() {
-
-    renderTestnetState();
-
-    const provider =
-        getProvider();
-
-    if (provider) {
-
-        setupProviderEvents(
-            provider
-        );
-    }
-
-    await loadWallet();
-
-
 /* =========================================
    ERC-20: ABI READ-ONLY
 ========================================= */
