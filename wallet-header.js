@@ -472,23 +472,11 @@ if (disconnectButton) {
     );
 }
 
-
 if (sendButton) {
-
-    sendButton.addEventListener(
-        "click",
-        function () {
-
-            if (walletStatus) {
-
-                walletStatus.textContent =
-                    "Fitur Kirim akan dihubungkan ke alur transaksi yang sudah ada.";
-            }
-
-        }
-    );
+    sendButton.addEventListener("click", function () {
+        window.location.href = "send-token.html";
+    });
 }
-
 
 if (receiveButton) {
 
