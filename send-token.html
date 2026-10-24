@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0a">
+
+    <title>Kirim Token | Walletcrypto</title>
+
+    <link rel="stylesheet" href="send-token.css">
+</head>
+<body>
+    <main class="send-page">
+        <header class="page-header">
+            <a href="wallet-header.html" class="back-button">
+                ← Kembali
+            </a>
+            <h1>Kirim Token</h1>
+            <p>Transfer ERC-20 di Sepolia Testnet</p>
+        </header>
+
+        <section class="network-card">
+            <span class="status-dot"></span>
+            <div>
+                <strong>Sepolia Testnet</strong>
+                <p>Chain ID: 11155111</p>
+            </div>
+        </section>
+
+        <section class="send-card">
+            <button id="connectSendWallet" type="button">
+                Hubungkan Wallet
+            </button>
+
+            <p class="field-label">Wallet pengirim</p>
+            <code id="senderAddress">Belum terhubung</code>
+
+            <label for="tokenAddress">Alamat kontrak token</label>
+            <input
+                id="tokenAddress"
+                type="text"
+                value="0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"
+                autocomplete="off"
+                spellcheck="false"
+            >
+
+            <button id="loadTokenButton" type="button">
+                Baca Token dan Saldo
+            </button>
+
+            <div class="token-info">
+                <p>Token: <strong id="tokenSymbol">—</strong></p>
+                <p>Saldo: <strong id="tokenBalance">—</strong></p>
+            </div>
+
+            <label for="recipientAddress">
+                Alamat wallet penerima
+            </label>
+            <input
+                id="recipientAddress"
+                type="text"
+                placeholder="0x..."
+                autocomplete="off"
+                spellcheck="false"
+            >
+
+            <label for="tokenAmount">Jumlah token</label>
+            <input
+                id="tokenAmount"
+                type="text"
+                inputmode="decimal"
+                placeholder="Contoh: 1.5"
+                autocomplete="off"
+            >
+
+            <button
+                id="sendTokenButton"
+                class="send-button"
+                type="button"
+                disabled
+            >
+                Kirim Token
+            </button>
+
+            <p
+                id="sendStatus"
+                class="status-message"
+                role="status"
+                aria-live="polite"
+            >
+                Hubungkan wallet untuk memulai.
+            </p>
+        </section>
+
+        <p class="security-note">
+            Periksa jaringan, alamat penerima, dan jumlah token.
+            Transaksi blockchain yang berhasil biasanya tidak dapat
+            dibatalkan. Biaya gas dibayar menggunakan ETH Sepolia.
+        </p>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js"></script>
+    <script src="send-token.js"></script>
+</body>
+</html>
